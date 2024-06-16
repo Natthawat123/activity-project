@@ -15,7 +15,7 @@ const Add_Users = ({ closeModal }) => {
       role: data.get('role')
     };
 
-    fetch('http://localhost:3000/api/auth/register', {
+    fetch('/api/auth/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

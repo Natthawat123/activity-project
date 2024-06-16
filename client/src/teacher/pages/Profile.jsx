@@ -94,7 +94,7 @@ const StudentForm = () => {
 
   useEffect(() => {
     // กำหนด URL ของ API ที่สร้างด้วย Node.js
-    const apiUrl = 'http://localhost:3000/api/staff/resume?id=';
+    const apiUrl = '/api/resume/staff?id=';
 
     fetch(apiUrl + loginID)
       .then(response => {
@@ -192,8 +192,8 @@ const StudentForm = () => {
       zipcode: zipcode,
     };
 
-    fetch('http://localhost:3333/api/updateStaff/' + staffIDValue, {
-      method: 'PATCH',
+    fetch('/api/update/staff/' + staffIDValue, {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },

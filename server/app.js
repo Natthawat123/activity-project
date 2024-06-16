@@ -2,20 +2,20 @@ import express from 'express'
 import cors from 'cors'
 
 import authRoutes from './routes/auth.js'
-import studentRoutes from './routes/student.js'
-import staffRoutes from './routes/staff.js'
-import activityRoutes from './routes/activity.js'
-import getRoutes from './routes/get.js'
+import listRoutes from './routes/list.js'
+import createRoutes from './routes/create.js'
+import resumeRoutes from './routes/resume.js'
+import updateRoutes from './routes/update.js'
 
 const app = express()
 app.use(express.json())
-app.use(cors())
+// app.use(cors())
 
-app.use('/api/auth', authRoutes)
-app.use('/api/student', studentRoutes)
-app.use('/api/staff', staffRoutes)
-app.use('/api/activity', activityRoutes)
-app.use('/api/get', getRoutes)
+app.use('/auth', authRoutes)
+app.use('/list', listRoutes)
+app.use('/create', createRoutes)
+app.use('/resume', resumeRoutes)
+app.use('/update', updateRoutes)
 
 app.listen(3000, () => console.log('server on port 3000'))
 

@@ -12,7 +12,7 @@ function Dash_users() {
 
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/activity/read")
+    fetch("/api/list/activity")
       .then((res) => res.json())
       .then(
         (result) => {

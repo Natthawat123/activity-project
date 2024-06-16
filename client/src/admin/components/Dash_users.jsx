@@ -11,7 +11,7 @@ function Dash_users() {
   const [countAdminRoles, setCountAdminRoles] = useState(0);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/student/read")
+    fetch("/api/list/student")
       .then((res) => res.json())
       .then(
         (result) => {

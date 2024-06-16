@@ -11,7 +11,7 @@ const ProductTable = () => {
 
   useEffect(() => {
     // Fetch user data
-    fetch("http://localhost:3000/api/staff/read")
+    fetch("/api/list/student")
       .then((res) => res.json())
       .then(
         (result) => {
@@ -25,7 +25,7 @@ const ProductTable = () => {
       );
 
     // Fetch section data
-    fetch("http://localhost:3000/api/student/section")
+    fetch("/api/list/section")
       .then((res) => res.json())
       .then(
         (result) => {

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Swal from 'sweetalert2'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { Link } from "react-router-dom";
+import axios from 'axios'
 
 const StudentForm = () => {
 
@@ -96,23 +97,19 @@ const StudentForm = () => {
   const loginID = localStorage.getItem('login_ID');
 
   useEffect(() => {
-    // กำหนด URL ของ API ที่สร้างด้วย Node.js
-    const apiUrl = 'http://localhost:3000/api/student/resume?id=';  // ปรับ URL ตามที่คุณใช้
-
-    // ทำ HTTP request ด้วย fetch 
-    fetch(apiUrl + loginID)
+    fetch('/api/resume/student?id=' + loginID)
       .then(response => {
         if (!response.ok) {
-          throw new Error('เกิดข้อผิดพลาดในการดึงข้อมูล');
+          throw new Error('Error fetching data');
         }
         return response.json();
       })
       .then(data => {
-        setUsername(data.login_ID)
+        setUsername(data.login_ID);
         setFnameValue(data.std_fname);
         setLnameValue(data.std_lname);
         setSectionIDValue(data.sec_ID);
-        setSectionNameValue(data.sec_Name)
+        setSectionNameValue(data.sec_Name);
         setMobileValue(data.std_mobile);
         setEmailValue(data.std_email);
         setAddressValue(data.std_address);
@@ -121,9 +118,7 @@ const StudentForm = () => {
         setProvinceValue(data.province);
         setZipcodeValue(data.zipcode);
       })
-      .catch(error => {
-        console.error('เกิดข้อผิดพลาด: ', error);
-      });
+      .catch(error => console.error('Error fetching student data:', error));
 
 
     fetch(
@@ -142,7 +137,7 @@ const StudentForm = () => {
         setProvinces(sortedProvinces);
       });
 
-    fetch('http://localhost:3000/api/student/section')
+    fetch('/api/list/section')
       .then((respose) => respose.json())
       .then((result) => {
         setSectionSelect(result)
@@ -198,7 +193,7 @@ const StudentForm = () => {
       subdistrict: subdistrictsValue,
       zipcode: zipcode,
     };
-    fetch('http://localhost:3000/api/student/update/' + loginID, {
+    fetch('/api/update/student/' + loginID, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -206,13 +201,7 @@ const StudentForm = () => {
       body: JSON.stringify(dataJson),
     })
       .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(result => {
-        console.log(result);
+        console.log(response.data); // Log response data for debugging
         Swal.fire({
           title: 'แก้ไขประวัติส่วนตัวเสร็จสิ้น',
           icon: 'success',

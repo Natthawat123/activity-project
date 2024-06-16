@@ -14,7 +14,7 @@ function CalendarFull() {
   const [studentID, setstudentID] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/activity/read')
+    fetch('/api/list/activity')
       .then(response => {
         if (!response.ok) {
           throw new Error('เกิดข้อผิดพลาดในการดึงข้อมูล');
@@ -49,38 +49,38 @@ function CalendarFull() {
       act_ID: selectedEvent.id
     }
 
-    fetch('http://localhost:3333/reserve', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(manageData),
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log(data)
-        if (data.status === 'ok') {
-          Swal.fire({
-            icon: 'success',
-            title: 'จองเข้าร่วมกิจกรรมสำเร็จ!',
-            showConfirmButton: false,
-            timer: 1500
-          });
-          setTimeout(() => {
-            window.location.reload(); // รีเฟรชหน้าจอ
-          }, 2000); // ล่าช้าการรีเฟรชให้เกิดชั่วโมง 2 วินาที
-        } else {
-          console.log("error", data);
-        }
-      })
-      .catch((error) => {
-        console.log("error", error);
-      });
+    // fetch('http://localhost:3333/reserve', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(manageData),
+    // })
+    //   .then(response => {
+    //     if (!response.ok) {
+    //       throw new Error(`HTTP error! Status: ${response.status}`);
+    //     }
+    //     return response.json();
+    //   })
+    //   .then(data => {
+    //     console.log(data)
+    //     if (data.status === 'ok') {
+    //       Swal.fire({
+    //         icon: 'success',
+    //         title: 'จองเข้าร่วมกิจกรรมสำเร็จ!',
+    //         showConfirmButton: false,
+    //         timer: 1500
+    //       });
+    //       setTimeout(() => {
+    //         window.location.reload(); // รีเฟรชหน้าจอ
+    //       }, 2000); // ล่าช้าการรีเฟรชให้เกิดชั่วโมง 2 วินาที
+    //     } else {
+    //       console.log("error", data);
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.log("error", error);
+    //   });
   }
 
   const eventStyleGetter = (event, start, end, isSelected) => {

@@ -31,7 +31,7 @@ const ProductTable = () => {
   };
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/student/read")
+    fetch("/api/list/student")
       .then((res) => res.json())
       .then(
         (result) => {
@@ -44,7 +44,7 @@ const ProductTable = () => {
         }
       );
 
-    fetch("http://localhost:3000/api/student/section")
+    fetch("/api/list/section")
       .then((res) => res.json())
       .then(
         (result) => {
@@ -55,7 +55,7 @@ const ProductTable = () => {
         }
       );
 
-    fetch("http://localhost:3000/api/get/login") // Fetch roles from the correct endpoint
+    fetch("/api/list/login") // Fetch roles from the correct endpoint
       .then((res) => res.json())
       .then(
         (result) => {

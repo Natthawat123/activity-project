@@ -32,7 +32,7 @@ const AppRouter = () => (
   <Router>
     <Routes>
       <Route path="/" element={<Layoutm />} >
-      <Route path="/" element={<App />} />
+        <Route path="/" element={<App />} />
       </Route>
       <Route path="/login" element={<Login />} />
 

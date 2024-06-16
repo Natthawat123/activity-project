@@ -1,10 +1,10 @@
 import express from 'express'
 import {
-    login
-} from '../controllers/get.js'
+    activity
+} from '../controllers/create.js'
 
 const router = express.Router()
 
-router.get('/login', login)
+router.post('/activity', activity)
 
 export default router
