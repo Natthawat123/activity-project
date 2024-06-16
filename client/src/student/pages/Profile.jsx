@@ -94,10 +94,10 @@ const StudentForm = () => {
   const [zipcodeValue, setZipcodeValue] = useState('');
   const [sectionSelect, setSectionSelect] = useState('')
 
-  const loginID = localStorage.getItem('login_ID');
+  const stdID = localStorage.getItem('std_ID');
 
   useEffect(() => {
-    fetch('/api/resume/student?id=' + loginID)
+    fetch('/api/resume/student?id=' + stdID)
       .then(response => {
         if (!response.ok) {
           throw new Error('Error fetching data');
@@ -148,7 +148,7 @@ const StudentForm = () => {
 
 
 
-  }, [loginID]);
+  }, [stdID]);
 
 
 
@@ -193,7 +193,7 @@ const StudentForm = () => {
       subdistrict: subdistrictsValue,
       zipcode: zipcode,
     };
-    fetch('/api/update/student/' + loginID, {
+    fetch('/api/update/student/' + stdID, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -254,12 +254,15 @@ const StudentForm = () => {
           {/* bug */}
           {/* {sectionSelect && sectionSelect.length > 0 && (
             <select name="section" id="section" value={sectionNameValue} className="mt-1 p-2 border w-full rounded-md">
-              <option>{sectionNameValue}</option>
+              <option value="">{sectionNameValue}</option>
               {sectionSelect.map((item) => (
-                <option key={item.sec_ID} value={item.sec_ID} label={item.sec_Name}>{item.sec_Name}</option>
+                <option key={item.sec_ID} value={item.sec_ID}>
+                  {item.sec_Name}
+                </option>
               ))}
             </select>
           )} */}
+
 
 
           <input

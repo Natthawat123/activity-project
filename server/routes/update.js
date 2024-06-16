@@ -6,7 +6,7 @@ import {
 
 const router = express.Router()
 
-router.put('/student', student)
-router.put('/staff', staff)
+router.put('/student/:id', student)
+router.put('/staff/:id', staff)
 
 export default router
