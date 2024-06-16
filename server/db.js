@@ -7,3 +7,5 @@ const db = mysql.createConnection({
     database: "activitydb"
 })
 export default db
+
+//test
