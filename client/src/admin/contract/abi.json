@@ -1,0 +1,57 @@
+[
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_actID",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string[]",
+                "name": "_stdID",
+                "type": "string[]"
+            }
+        ],
+        "name": "add",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_actID",
+                "type": "uint256"
+            }
+        ],
+        "name": "get",
+        "outputs": [
+            {
+                "internalType": "string[]",
+                "name": "",
+                "type": "string[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getAll",
+        "outputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "string[][]",
+                "name": "",
+                "type": "string[][]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    }
+]
