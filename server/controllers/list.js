@@ -43,7 +43,7 @@ export const activity = (req, res) => {
     })
 }
 
-//section
+// section
 export const section = (req, res) => {
     const q = 'SELECT * FROM section '
 
@@ -54,5 +54,34 @@ export const section = (req, res) => {
             return;
         }
         res.json(result);
+    })
+}
+
+// list upload
+export const upload = (req, res) => {
+    const q = `
+        SELECT activity.*, manage.std_ID, student.std_fname, student.std_lname, staff.staff_fname
+        FROM activity 
+        JOIN manage ON activity.act_ID = manage.act_ID
+        JOIN student ON manage.std_ID = student.std_ID
+        JOIN staff ON activity.staff_ID = staff.login_ID
+    `;
+
+    db.query(q, (err, result) => {
+        if (err) return res.status(500).json(err);
+        return res.json(result);
+    });
+};
+
+
+
+
+// staff
+export const staff = (req, res) => {
+    const q = 'SELECT * FROM staff'
+
+    db.query(q, (err, result) => {
+        if (err) return res.status(500).json(err)
+        return res.json(ersult)
     })
 }

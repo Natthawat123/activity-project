@@ -1,10 +1,10 @@
 import React from 'react'
-import CS from '../../components/Calendar'
+import CS from '../components/Calendar'
 function Calendar() {
   return (
-    <CS/>
-    )
-  }
-  
+    <CS />
+  )
+}
 
-  export default Calendar
+
+export default Calendar
