@@ -27,7 +27,7 @@ export const login = (req, res) => {
                 }, secret, {
                     expiresIn: '1h'
                 });
-                if (user[0].role === 'teacher') {
+                if (user[0].role === 'teacher' || user[0].role === 'admin') {
                     res.json({
                         status: 'ok',
                         message: 'Login Success',
@@ -35,7 +35,7 @@ export const login = (req, res) => {
                         role: user[0].role,
                         staff_ID: user[0].staff_ID // ส่งบทบาทในการตอบกลับ
                     });
-                }else if(user[0].role === 'student') {
+                } else if (user[0].role === 'student') {
                     res.json({
                         status: 'ok',
                         message: 'Login Success',

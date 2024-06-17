@@ -19,11 +19,7 @@ function Upload() {
 
   return (
     <>
-      {data.map((item) => (
-        <div className="container" >
-          <h1 key={item.act_ID}>{item.act_title}</h1>
-        </div>
-      ))}
+
     </>
   );
 }

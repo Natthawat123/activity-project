@@ -96,7 +96,7 @@ const StudentForm = () => {
     // กำหนด URL ของ API ที่สร้างด้วย Node.js
     const apiUrl = '/api/resume/staff?id=';
 
-    fetch(apiUrl + staffID)
+    fetch(apiUrl, staffID)
       .then(response => {
         if (!response.ok) {
           throw new Error('เกิดข้อผิดพลาดในการดึงข้อมูล');
