@@ -27,7 +27,7 @@ export const login = (req, res) => {
                 }, secret, {
                     expiresIn: '1h'
                 });
-                if (user[0].role === 'teacher') {
+                if (user[0].role === 'teacher' || user[0].role === 'admin') {
                     res.json({
                         status: 'ok',
                         message: 'Login Success',

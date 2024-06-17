@@ -82,6 +82,6 @@ export const staff = (req, res) => {
 
     db.query(q, (err, result) => {
         if (err) return res.status(500).json(err)
-        return res.json(ersult)
+        return res.json(result)
     })
 }
