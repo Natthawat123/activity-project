@@ -40,7 +40,7 @@ function CalendarFull() {
                 console.error('เกิดข้อผิดพลาด: ', error);
             });
 
-        const student_ID = localStorage.getItem('login_ID')
+        const student_ID = localStorage.getItem('std_ID')
         setstudentID(student_ID);
 
     }, []);
