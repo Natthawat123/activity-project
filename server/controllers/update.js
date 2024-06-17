@@ -46,9 +46,7 @@ export const student = (req, res) => {
 
 // staff
 export const staff = (req, res) => {
-    const {
-        id
-    } = req.params.id
+    const  id = req.params.id
     const {
         fname,
         lname,

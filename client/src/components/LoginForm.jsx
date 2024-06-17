@@ -26,14 +26,15 @@ export default function SignInSide() {
 
       if (response.ok && result.status === 'ok') {
         localStorage.setItem('token', result.token);
-        localStorage.setItem('login_ID', result.login_ID);
         localStorage.setItem('role', result.role);
         if (result.role === 'admin') {
           window.location = '/admin/dashboard'; // Redirect to admin dashboard
         } else if (result.role === 'teacher') {
           window.location = '/teacher/calendar'; // Redirect to teacher dashboard
+          localStorage.setItem('staff_ID', result.staff_ID);
         } else {
           window.location = '/activity/calendar'; // Redirect to user dashboard
+          localStorage.setItem('std_ID', result.std_ID);
         }
       } else {
         setErrorMessage('Login failed. Please check your username and password.');

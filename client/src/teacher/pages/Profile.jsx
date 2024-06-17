@@ -90,13 +90,13 @@ const StudentForm = () => {
   const [subdistrictsValue, setSubdistrictValue] = useState('');
   const [zipcodeValue, setZipcodeValue] = useState('');
 
-  const loginID = localStorage.getItem('login_ID');
+  const staffID = localStorage.getItem('staff_ID');
 
   useEffect(() => {
     // กำหนด URL ของ API ที่สร้างด้วย Node.js
     const apiUrl = '/api/resume/staff?id=';
 
-    fetch(apiUrl + loginID)
+    fetch(apiUrl + staffID)
       .then(response => {
         if (!response.ok) {
           throw new Error('เกิดข้อผิดพลาดในการดึงข้อมูล');
@@ -145,12 +145,12 @@ const StudentForm = () => {
       });
 
 
-    console.log(loginID)
+    console.log(staffID)
 
 
 
 
-  }, [loginID]);
+  }, [staffID]);
 
 
 
@@ -192,7 +192,7 @@ const StudentForm = () => {
       zipcode: zipcode,
     };
 
-    fetch('/api/update/staff/' + staffIDValue, {
+    fetch('/api/update/staff/' + staffID, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -212,7 +212,7 @@ const StudentForm = () => {
           icon: 'success',
         });
         setTimeout(() => {
-          window.location = '/teacher/calendar';
+          window.location = '/teacher/profile';
         }, 1500);
       })
       .catch(error => {
