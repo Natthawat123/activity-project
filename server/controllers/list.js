@@ -60,11 +60,10 @@ export const section = (req, res) => {
 // list upload
 export const upload = (req, res) => {
     const q = `
-        SELECT activity.*, manage.std_ID, student.std_fname, student.std_lname, staff.staff_fname
+        SELECT activity.*, manage.std_ID, student.std_fname, student.std_lname
         FROM activity 
         JOIN manage ON activity.act_ID = manage.act_ID
         JOIN student ON manage.std_ID = student.std_ID
-        JOIN staff ON activity.staff_ID = staff.login_ID
     `;
 
     db.query(q, (err, result) => {
