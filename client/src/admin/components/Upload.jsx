@@ -3,6 +3,7 @@ import axios from 'axios';
 
 function Upload() {
   const [data, setData] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,23 +25,28 @@ function Upload() {
     return acc;
   }, {});
 
-  const handleUpload = (e) => {
+  const handleCheckboxChange = (stdID, actID) => {
+    const isSelected = selectedItems.some(item => item.stdID === stdID && item.actID === actID);
+    if (isSelected) {
+      setSelectedItems(prev => prev.filter(item => !(item.stdID === stdID && item.actID === actID)));
+    } else {
+      setSelectedItems(prev => [...prev, { stdID, actID }]);
+    }
+  };
 
-  }
+  const handleUpload = () => {
+    console.log('Selected Items:', selectedItems);
+
+  };
 
   return (
-<<<<<<< HEAD
-    <>
-
-    </>
-=======
     <div>
       {Object.keys(groupedData).map((actTitle) => {
-        let index = 0;  // Initialize index inside the map function
+        let index = 0;
         return (
           <div key={actTitle}>
             <h1>Activity: {actTitle}</h1>
-            <table onSubmit={handleUpload}>
+            <table>
               <thead>
                 <tr>
                   <th>ลำดับ</th>
@@ -49,24 +55,28 @@ function Upload() {
                   <th>เข้าร่วม</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody >
                 {groupedData[actTitle].map((item) => (
                   <tr key={item.id}>
                     <td>{++index}</td>
                     <td>{item.std_ID}</td>
                     <td>{item.std_fname} {item.std_lname}</td>
-                    <td><input type="checkbox" /></td>
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.some(i => i.stdID === item.std_ID && i.actID === item.act_ID)}
+                        onChange={() => handleCheckboxChange(item.std_ID, item.act_ID)}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
-
-              <button>submit</button>
             </table>
           </div>
         );
       })}
+      <button onClick={handleUpload}>Submit</button>
     </div>
->>>>>>> origin/wave
   );
 }
 
