@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function Upload() {
@@ -27,10 +27,6 @@ function Upload() {
 
   const handleCheckboxChange = (stdID, actID) => {
     const isSelected = selectedItems.some(item => item.stdID === stdID && item.actID === actID);
-<<<<<<< HEAD
-=======
-
->>>>>>> karan
     if (isSelected) {
       setSelectedItems(prev => prev.filter(item => !(item.stdID === stdID && item.actID === actID)));
     } else {
@@ -59,11 +55,7 @@ function Upload() {
                   <th>เข้าร่วม</th>
                 </tr>
               </thead>
-<<<<<<< HEAD
-              <tbody >
-=======
               <tbody>
->>>>>>> karan
                 {groupedData[actTitle].map((item) => (
                   <tr key={item.id}>
                     <td>{++index}</td>
@@ -72,11 +64,7 @@ function Upload() {
                     <td>
                       <input
                         type="checkbox"
-<<<<<<< HEAD
-                        checked={selectedItems.some(i => i.stdID === item.std_ID && i.actID === item.act_ID)}
-=======
                         checked={selectedItems.some(si => si.stdID === item.std_ID && si.actID === item.act_ID)}
->>>>>>> karan
                         onChange={() => handleCheckboxChange(item.std_ID, item.act_ID)}
                       />
                     </td>
