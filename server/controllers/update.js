@@ -4,12 +4,12 @@ import db from '../db.js'
 export const student = (req, res) => {
     const id = req.params.id;
     const {
-        fname,
-        lname,
-        section,
-        email,
-        mobile,
-        address,
+        std_fname,
+        std_lname,
+        sec_ID,
+        std_email,
+        std_mobile,
+        std_address,
         province,
         district,
         subdistrict,
@@ -31,22 +31,22 @@ export const student = (req, res) => {
         WHERE std_ID = ?
     `;
 
-    db.query(q, [fname, lname, section, email, mobile, address, province, district, subdistrict, zipcode, id], (err, result) => {
-        if (err) {
-            return res.status(500).json({
-                error: err.message
+    db.query(q, [std_fname, std_lname, sec_ID, std_email, std_mobile, std_address, province, district, subdistrict, zipcode, id], (err, result) => {
+            if (err) {
+                return res.status(500).json({
+                    error: err.message
+                });
+            }
+            return res.json({
+                message: 'Student updated successfully',
+                result
             });
-        }
-        return res.json({
-            message: 'Student updated successfully',
-            result
         });
-    });
 };
 
 // staff
 export const staff = (req, res) => {
-    const  id = req.params.id
+    const id = req.params.id
     const {
         fname,
         lname,
