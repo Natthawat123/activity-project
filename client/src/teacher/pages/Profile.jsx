@@ -8,7 +8,7 @@ const StudentForm = () => {
   const [provinces, setProvinces] = useState([]);
   const [amphures, setAmphures] = useState([]);
   const [tambons, setTambons] = useState([]);
-  const [zipcode, setZipcode] = useState();
+  const [zipcodeS, setZipcode] = useState();
   const [selected, setSelected] = useState({
     province_id: undefined,
     amphure_id: undefined,
@@ -16,14 +16,22 @@ const StudentForm = () => {
     zip_code: undefined
   });
 
-
   const onChangeHandle = (id, selectedValue) => {
     if (id === "province_id") {
-      setProvinceValue(selectedValue);
+      setValue((prev) => ({
+        ...prev,
+        province: selectedValue
+      }));
     } else if (id === "amphure_id") {
-      setDistrictValue(selectedValue);
+      setValue((prev) => ({
+        ...prev,
+        district: selectedValue
+      }));
     } else if (id === "tambon_id") {
-      setSubdistrictValue(selectedValue);
+      setValue((prev) => ({
+        ...prev,
+        subdistrict: selectedValue
+      }));
     }
   };
 
@@ -78,49 +86,38 @@ const StudentForm = () => {
     );
   };
 
-  const [username, setUsername] = useState('');
-  const [fnameValue, setFnameValue] = useState();
-  const [lnameValue, setLnameValue] = useState('');
-  const [staffIDValue, setstaffID] = useState('');
-  const [mobileValue, setMobileValue] = useState('');
-  const [emailValue, setEmailValue] = useState('');
-  const [addressValue, setAddressValue] = useState('');
-  const [provinceValue, setProvinceValue] = useState('');
-  const [districtsValue, setDistrictValue] = useState('');
-  const [subdistrictsValue, setSubdistrictValue] = useState('');
-  const [zipcodeValue, setZipcodeValue] = useState('');
+  const [value, setValue] = useState({
+    staff_ID: '',
+    staff_fname: '',
+    std_lname: '',
+    staff_mobile: '',
+    staff_email: '',
+    staff_address: '',
+    province: '',
+    district: '',
+    subdistrict: '',
+    zipcode: ''
+  });
 
-  const staffID = localStorage.getItem('staff_ID');
+  const staff_ID = localStorage.getItem('staff_ID');
 
   useEffect(() => {
-    // กำหนด URL ของ API ที่สร้างด้วย Node.js
-    const apiUrl = '/api/resume/staff?id=';
-
-    fetch(apiUrl, staffID)
+    fetch('/api/resume/staff?id=' + staff_ID)
       .then(response => {
         if (!response.ok) {
-          throw new Error('เกิดข้อผิดพลาดในการดึงข้อมูล');
+          throw new Error('Error fetching data');
         }
         return response.json();
       })
       .then(data => {
-        console.log(data)
-        setUsername(data.login_ID)
-        setstaffID(data.staff_ID)
-        setFnameValue(data.staff_fname);
-        setLnameValue(data.staff_lname);
-        setMobileValue(data.staff_mobile);
-        setEmailValue(data.staff_email);
-        setAddressValue(data.staff_address);
-        setSubdistrictValue(data.subdistrict);
-        setDistrictValue(data.district);
-        setProvinceValue(data.province);
-        setZipcodeValue(data.zipcode);
+        setValue((prev) => ({
+          ...prev,
+          ...data,
+        }));
       })
       .catch(error => {
-        console.error('เกิดข้อผิดพลาด: ', error);
+        console.error('Error:', error);
       });
-
 
     fetch(
       "https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json"
@@ -130,83 +127,41 @@ const StudentForm = () => {
         // Sort the provinces alphabetically by name_th
         const sortedProvinces = result.sort((a, b) =>
           a.name_th.localeCompare(b.name_th)
-
         );
-
-        const idProvince = sortedProvinces.map(province => [province.id, province.name_th]);
-
-        console.log(idProvince);
-
-
-
-
-        console.log(sortedProvinces);
         setProvinces(sortedProvinces);
       });
 
+  }, [staff_ID]);
 
-    console.log(staffID)
-
-
-
-
-  }, [staffID]);
-
-
-
-  const updateFname = (event) => {
-    setFnameValue(event.target.value);
-  }
-  const updateLname = (event) => {
-    setLnameValue(event.target.value);
-  }
-  const updateMobile = (event) => {
-    setMobileValue(event.target.value);
-  }
-  const updateEmail = (event) => {
-    setEmailValue(event.target.value);
-  }
-  const updateAddress = (event) => {
-    setAddressValue(event.target.value);
-  }
-
-  const updateZipcode = (event) => {
-    const value = event.target.value;
-    setZipcodeValue(value);
+  const handlechange = (e) => {
+    setValue((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
   };
-
-
 
   const updateClick = (event) => {
     event.preventDefault();
 
-    const dataJson = {
-      fname: fnameValue,
-      lname: lnameValue,
-      mobile: mobileValue,
-      email: emailValue,
-      address: addressValue,
-      province: provinceValue,
-      district: districtsValue,
-      subdistrict: subdistrictsValue,
-      zipcode: zipcode,
+    const updatedValue = {
+      ...value,
+      zipcode: zipcodeS || value.zipcode
     };
 
-    fetch('/api/update/staff/' + staffID, {
+    fetch('/api/update/staff/' + staff_ID, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(dataJson),
+      body: JSON.stringify(updatedValue),
     })
       .then(response => {
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error('Error updating data');
         }
         return response.json();
       })
-      .then(result => {
-        console.log(result);
+      .then(data => {
         Swal.fire({
           title: 'แก้ไขประวัติส่วนตัวเสร็จสิ้น',
           icon: 'success',
@@ -224,34 +179,30 @@ const StudentForm = () => {
           confirmButtonText: 'OK',
         });
       });
-
   };
 
-
-  if (!username) {
+  if (!value.staff_ID) {
     return <div>Loading...</div>;
   }
-  return (
 
+  return (
     <div className="w-full lg:w-2/3 mx-auto mt-10 p-4 bg-white shadow-md rounded-md">
-      <Link to='/activity/dashboard'>
+      <Link to='/teacher/calendar'>
         <div className="items-center mb-5"><ArrowBackIosNewIcon />ย้อนกลับ</div>
       </Link>
       <form className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:px-10">
-
         <div className="mb-4">
           <label htmlFor="studentId" className="block text-sm font-medium text-gray-600">
-            รหัสประจำตัวอาจารย์
+            รหัสนักศึกษา
           </label>
           <input
             type="text"
             id="username"
-            name="username"
-            value={staffIDValue}
+            name="staff_ID"
+            value={value.staff_ID}
             readOnly
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
-
 
         <div className="mb-4">
           <label htmlFor="firstName" className="block text-sm font-medium text-gray-600">
@@ -260,9 +211,9 @@ const StudentForm = () => {
           <input
             type="text"
             id="fname"
-            name="fname"
-            onChange={updateFname}
-            value={fnameValue}
+            name="staff_fname"
+            onChange={handlechange}
+            value={value.staff_fname}
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
@@ -273,9 +224,9 @@ const StudentForm = () => {
           <input
             type="text"
             id="lname"
-            name="lname"
-            onChange={updateLname}
-            value={lnameValue}
+            name="staff_lname"
+            onChange={handlechange}
+            value={value.staff_lname}
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
@@ -286,9 +237,9 @@ const StudentForm = () => {
           <input
             type="tel"
             id="tel"
-            name="tel"
-            onChange={updateMobile}
-            value={mobileValue}
+            name="staff_mobile"
+            onChange={handlechange}
+            value={value.staff_mobile}
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
@@ -299,9 +250,9 @@ const StudentForm = () => {
           <input
             type="email"
             id="email"
-            name="email"
-            onChange={updateEmail}
-            value={emailValue}
+            name="staff_email"
+            onChange={handlechange}
+            value={value.staff_email}
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
@@ -311,9 +262,9 @@ const StudentForm = () => {
           </label>
           <input
             id="address"
-            name="address"
-            onChange={updateAddress}
-            value={addressValue}
+            name="staff_address"
+            onChange={handlechange}
+            value={value.staff_address}
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
@@ -326,7 +277,7 @@ const StudentForm = () => {
             list={provinces}
             child="amphure"
             childsId={["amphure_id", "tambon_id"]}
-            addressValue_PDS={provinceValue}
+            addressValue_PDS={value.province}
             setChilds={[setAmphures, setTambons]}
           />
         </div>
@@ -341,7 +292,7 @@ const StudentForm = () => {
             child="tambon"
             childsId={["tambon_id"]}
             setChilds={[setTambons]}
-            addressValue_PDS={districtsValue}
+            addressValue_PDS={value.district}
           />
         </div>
 
@@ -355,10 +306,9 @@ const StudentForm = () => {
             child="zip_code"
             childsId={["zip_code"]}
             setChilds={[setZipcode]}
-            addressValue_PDS={subdistrictsValue}
+            addressValue_PDS={value.subdistrict}
           />
         </div>
-
 
         <div className="mb-4">
           <label htmlFor="zipcode" className="block text-sm font-medium text-gray-600">
@@ -368,19 +318,18 @@ const StudentForm = () => {
             type="text"
             id="zipcode"
             name="zipcode"
-            onChange={updateZipcode}
-            value={zipcode ?? zipcodeValue}
+            onChange={handlechange}
+            value={zipcodeS ?? value.zipcode}
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
+        <div className="flex justify-end items-center">
+          <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-1/8 h-1/2" onClick={updateClick}>
+            แก้ไข
+          </button>
+        </div>
       </form>
-      <div className="flex justify-center items-center mb-4">
-        <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-1/8 " onClick={updateClick}>
-          แก้ไข
-        </button>
-      </div>
     </div>
-
   );
 };
 
