@@ -9,7 +9,7 @@ const StudentForm = () => {
   const [provinces, setProvinces] = useState([]);
   const [amphures, setAmphures] = useState([]);
   const [tambons, setTambons] = useState([]);
-  const [zipcode, setZipcode] = useState();
+  const [zipcodeS, setZipcode] = useState();
   const [selected, setSelected] = useState({
     province_id: undefined,
     amphure_id: undefined,
@@ -17,14 +17,22 @@ const StudentForm = () => {
     zip_code: undefined
   });
 
-
   const onChangeHandle = (id, selectedValue) => {
     if (id === "province_id") {
-      setProvinceValue(selectedValue);
+      setValue((prev) => ({
+        ...prev,
+        province: selectedValue
+      }));
     } else if (id === "amphure_id") {
-      setDistrictValue(selectedValue);
+      setValue((prev) => ({
+        ...prev,
+        district: selectedValue
+      }));
     } else if (id === "tambon_id") {
-      setSubdistrictValue(selectedValue);
+      setValue((prev) => ({
+        ...prev,
+        subdistrict: selectedValue
+      }));
     }
   };
 
@@ -79,22 +87,23 @@ const StudentForm = () => {
     );
   };
 
-
-  const [username, setUsername] = useState('');
-  const [fnameValue, setFnameValue] = useState();
-  const [lnameValue, setLnameValue] = useState('');
-  const [sectionIDValue, setSectionIDValue] = useState('');
-  const [sectionNameValue, setSectionNameValue] = useState('');
-  const [mobileValue, setMobileValue] = useState('');
-  const [emailValue, setEmailValue] = useState('');
-  const [addressValue, setAddressValue] = useState('');
-  const [provinceValue, setProvinceValue] = useState('');
-  const [districtsValue, setDistrictValue] = useState('');
-  const [subdistrictsValue, setSubdistrictValue] = useState('');
-  const [zipcodeValue, setZipcodeValue] = useState('');
-  const [sectionSelect, setSectionSelect] = useState('')
+  const [value, setValue] = useState({
+    std_ID: '',
+    std_fname: '',
+    std_lname: '',
+    sec_ID: '',
+    std_mobile: '',
+    std_email: '',
+    std_address: '',
+    province: '',
+    district: '',
+    subdistrict: '',
+    zipcode: ''
+  });
 
   const stdID = localStorage.getItem('std_ID');
+
+  const [section, setSection] = useState([]);
 
   useEffect(() => {
     fetch('/api/resume/student?id=' + stdID)
@@ -105,21 +114,14 @@ const StudentForm = () => {
         return response.json();
       })
       .then(data => {
-        setUsername(data.login_ID);
-        setFnameValue(data.std_fname);
-        setLnameValue(data.std_lname);
-        setSectionIDValue(data.sec_ID);
-        setSectionNameValue(data.sec_Name);
-        setMobileValue(data.std_mobile);
-        setEmailValue(data.std_email);
-        setAddressValue(data.std_address);
-        setSubdistrictValue(data.subdistrict);
-        setDistrictValue(data.district);
-        setProvinceValue(data.province);
-        setZipcodeValue(data.zipcode);
+        setValue((prev) => ({
+          ...prev,
+          ...data,
+        }));
       })
-      .catch(error => console.error('Error fetching student data:', error));
-
+      .catch(error => {
+        console.error('Error:', error);
+      });
 
     fetch(
       "https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json"
@@ -129,79 +131,55 @@ const StudentForm = () => {
         // Sort the provinces alphabetically by name_th
         const sortedProvinces = result.sort((a, b) =>
           a.name_th.localeCompare(b.name_th)
-
         );
-
-        const idProvince = sortedProvinces.map(province => [province.id, province.name_th]);
-
         setProvinces(sortedProvinces);
       });
 
     fetch('/api/list/section')
       .then((respose) => respose.json())
       .then((result) => {
-        setSectionSelect(result)
+        setSection(result)
       })
-
-
-
-
-
 
   }, [stdID]);
 
-
-
-  const updateFname = (event) => {
-    setFnameValue(event.target.value);
-  }
-  const updateLname = (event) => {
-    setLnameValue(event.target.value);
-  }
-  const updateSection = (event) => {
-    setSectionValue(event.target.value);
-  }
-  const updateMobile = (event) => {
-    setMobileValue(event.target.value);
-  }
-  const updateEmail = (event) => {
-    setEmailValue(event.target.value);
-  }
-  const updateAddress = (event) => {
-    setAddressValue(event.target.value);
-  }
-
-  const updateZipcode = (event) => {
-    const value = event.target.value;
-    setZipcodeValue(value);
+  const handlechange = (e) => {
+    setValue((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
   };
 
-
+  const handleSectionChange = (e) => {
+    const selectedSecID = e.target.value;
+    setValue((prev) => ({
+      ...prev,
+      sec_ID: selectedSecID,
+    }));
+  };
 
   const updateClick = (event) => {
     event.preventDefault();
 
-    const dataJson = {
-      fname: fnameValue,
-      lname: lnameValue,
-      section: sectionIDValue,
-      mobile: mobileValue,
-      email: emailValue,
-      address: addressValue,
-      province: provinceValue,
-      district: districtsValue,
-      subdistrict: subdistrictsValue,
-      zipcode: zipcode,
+    const updatedValue = {
+      ...value,
+      zipcode: zipcodeS || value.zipcode
     };
+
     fetch('/api/update/student/' + stdID, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(dataJson),
+      body: JSON.stringify(updatedValue),
     })
       .then(response => {
-        console.log(response.data); // Log response data for debugging
+        if (!response.ok) {
+          throw new Error('Error updating data');
+        }
+        return response.json();
+      })
+      .then(data => {
         Swal.fire({
           title: 'แก้ไขประวัติส่วนตัวเสร็จสิ้น',
           icon: 'success',
@@ -219,21 +197,18 @@ const StudentForm = () => {
           confirmButtonText: 'OK',
         });
       });
-
   };
 
-
-  if (!username) {
+  if (!value.std_ID) {
     return <div>Loading...</div>;
   }
-  return (
 
+  return (
     <div className="w-full lg:w-2/3 mx-auto mt-10 p-4 bg-white shadow-md rounded-md">
       <Link to='/activity/dashboard'>
         <div className="items-center mb-5"><ArrowBackIosNewIcon />ย้อนกลับ</div>
       </Link>
       <form className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:px-10">
-
         <div className="mb-4">
           <label htmlFor="studentId" className="block text-sm font-medium text-gray-600">
             รหัสนักศึกษา
@@ -241,8 +216,8 @@ const StudentForm = () => {
           <input
             type="text"
             id="username"
-            name="username"
-            value={username}
+            name="std_ID"
+            value={value.std_ID}
             readOnly
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
@@ -251,27 +226,14 @@ const StudentForm = () => {
           <label htmlFor="classGroup" className="block text-sm font-medium text-gray-600">
             หมู่เรียน
           </label>
-          {/* bug */}
-          {/* {sectionSelect && sectionSelect.length > 0 && (
-            <select name="section" id="section" value={sectionNameValue} className="mt-1 p-2 border w-full rounded-md">
-              <option value="">{sectionNameValue}</option>
-              {sectionSelect.map((item) => (
-                <option key={item.sec_ID} value={item.sec_ID}>
-                  {item.sec_Name}
-                </option>
-              ))}
-            </select>
-          )} */}
-
-
-
-          <input
-            type="text"
-            id="section"
-            name="section"
-            onChange={updateSection}
-            value={sectionNameValue}
-            className="mt-1 p-2 border w-full rounded-md" />
+          <select value={value.sec_ID} onChange={handleSectionChange} name="sec_ID" className="mt-1 p-2 border w-full rounded-md">
+            <option value="">{value.sec_Name || "Select a section"}</option>
+            {section.map(sec => (
+              <option key={sec.sec_ID} value={sec.sec_ID}>
+                {sec.sec_name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="mb-4">
@@ -281,9 +243,9 @@ const StudentForm = () => {
           <input
             type="text"
             id="fname"
-            name="fname"
-            onChange={updateFname}
-            value={fnameValue}
+            name="std_fname"
+            onChange={handlechange}
+            value={value.std_fname}
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
@@ -294,9 +256,9 @@ const StudentForm = () => {
           <input
             type="text"
             id="lname"
-            name="lname"
-            onChange={updateLname}
-            value={lnameValue}
+            name="std_lname"
+            onChange={handlechange}
+            value={value.std_lname}
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
@@ -307,9 +269,9 @@ const StudentForm = () => {
           <input
             type="tel"
             id="tel"
-            name="tel"
-            onChange={updateMobile}
-            value={mobileValue}
+            name="std_mobile"
+            onChange={handlechange}
+            value={value.std_mobile}
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
@@ -320,9 +282,9 @@ const StudentForm = () => {
           <input
             type="email"
             id="email"
-            name="email"
-            onChange={updateEmail}
-            value={emailValue}
+            name="std_email"
+            onChange={handlechange}
+            value={value.std_email}
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
@@ -332,9 +294,9 @@ const StudentForm = () => {
           </label>
           <input
             id="address"
-            name="address"
-            onChange={updateAddress}
-            value={addressValue}
+            name="std_address"
+            onChange={handlechange}
+            value={value.std_address}
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
@@ -347,7 +309,7 @@ const StudentForm = () => {
             list={provinces}
             child="amphure"
             childsId={["amphure_id", "tambon_id"]}
-            addressValue_PDS={provinceValue}
+            addressValue_PDS={value.province}
             setChilds={[setAmphures, setTambons]}
           />
         </div>
@@ -362,7 +324,7 @@ const StudentForm = () => {
             child="tambon"
             childsId={["tambon_id"]}
             setChilds={[setTambons]}
-            addressValue_PDS={districtsValue}
+            addressValue_PDS={value.district}
           />
         </div>
 
@@ -376,10 +338,9 @@ const StudentForm = () => {
             child="zip_code"
             childsId={["zip_code"]}
             setChilds={[setZipcode]}
-            addressValue_PDS={subdistrictsValue}
+            addressValue_PDS={value.subdistrict}
           />
         </div>
-
 
         <div className="mb-4">
           <label htmlFor="zipcode" className="block text-sm font-medium text-gray-600">
@@ -389,8 +350,8 @@ const StudentForm = () => {
             type="text"
             id="zipcode"
             name="zipcode"
-            onChange={updateZipcode}
-            value={zipcode ?? zipcodeValue}
+            onChange={handlechange}
+            value={zipcodeS ?? value.zipcode}
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
@@ -401,7 +362,6 @@ const StudentForm = () => {
         </div>
       </form>
     </div>
-
   );
 };
 
