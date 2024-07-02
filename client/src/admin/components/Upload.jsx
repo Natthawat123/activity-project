@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function Upload() {
@@ -27,10 +27,6 @@ function Upload() {
 
   const handleCheckboxChange = (stdID, actID) => {
     const isSelected = selectedItems.some(item => item.stdID === stdID && item.actID === actID);
-<<<<<<< HEAD
-=======
-
->>>>>>> karan
     if (isSelected) {
       setSelectedItems(prev => prev.filter(item => !(item.stdID === stdID && item.actID === actID)));
     } else {
