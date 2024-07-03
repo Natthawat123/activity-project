@@ -12,6 +12,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
+    "@fileforge/react-print": "^0.1.141",
     "@mui/icons-material": "^5.15.1",
     "@mui/material": "^5.15.1",
     "axios": "^1.6.5",
@@ -26,7 +27,8 @@
     "react-router": "^6.22.0",
     "react-router-dom": "^6.21.1",
     "sweetalert2": "^11.10.2",
-    "sweetalert2-react-content": "^5.0.7"
+    "sweetalert2-react-content": "^5.0.7",
+    "web3": "^4.10.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
