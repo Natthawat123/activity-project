@@ -1,18 +1,48 @@
 [
     {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "anonymous": false,
         "inputs": [
             {
-                "internalType": "uint256",
-                "name": "_actID",
-                "type": "uint256"
+                "indexed": true,
+                "internalType": "address",
+                "name": "_admin",
+                "type": "address"
             },
             {
-                "internalType": "string[]",
-                "name": "_stdID",
-                "type": "string[]"
+                "indexed": false,
+                "internalType": "uint16",
+                "name": "activityId",
+                "type": "uint16"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint32[]",
+                "name": "_studentId",
+                "type": "uint32[]"
             }
         ],
-        "name": "add",
+        "name": "UploadEvent",
+        "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint16",
+                "name": "_activityId",
+                "type": "uint16"
+            },
+            {
+                "internalType": "uint32[]",
+                "name": "_studentId",
+                "type": "uint32[]"
+            }
+        ],
+        "name": "Upload",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -21,16 +51,35 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "_actID",
+                "name": "",
                 "type": "uint256"
+            }
+        ],
+        "name": "admin",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint16",
+                "name": "_i",
+                "type": "uint16"
             }
         ],
         "name": "get",
         "outputs": [
             {
-                "internalType": "string[]",
+                "internalType": "uint32[]",
                 "name": "",
-                "type": "string[]"
+                "type": "uint32[]"
             }
         ],
         "stateMutability": "view",
@@ -41,14 +90,14 @@
         "name": "getAll",
         "outputs": [
             {
-                "internalType": "uint256[]",
+                "internalType": "uint16[]",
                 "name": "",
-                "type": "uint256[]"
+                "type": "uint16[]"
             },
             {
-                "internalType": "string[][]",
+                "internalType": "uint32[][]",
                 "name": "",
-                "type": "string[][]"
+                "type": "uint32[][]"
             }
         ],
         "stateMutability": "view",

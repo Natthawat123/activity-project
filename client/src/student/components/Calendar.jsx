@@ -46,24 +46,80 @@ function CalendarFull() {
     }, []);
 
     const handleReserve = async () => {
-        const reserve = {
-            man_status: selectedEvent.status,
-            std_ID: studentID,
-            act_ID: selectedEvent.id
-        }
-
         try {
-            await axios.post('/api/reserve/activity', reserve)
+            // Check if the user is logged in
+            if (!studentID) {
+                Swal.fire({
+                    title: 'กรุณาเข้าสู่ระบบ',
+                    text: 'คุณต้องเข้าสู่ระบบก่อนจองกิจกรรม',
+                    icon: 'warning',
+                });
+                return;
+            }
+    
+            let reservations = [];
+            try {
+                // Check for existing reservations
+                const checkResponse = await axios.get('/api/manage');
+                reservations = checkResponse.data;
+            } catch (error) {
+                console.warn('Unable to fetch existing reservations:', error);
+                // Proceed without checking for existing reservations
+            }
+    
+            console.log('Current studentID:', studentID);
+            console.log('Current activity ID:', selectedEvent.id);
+            console.log('All reservations:', reservations);
+    
+            if (Array.isArray(reservations) && reservations.length > 0) {
+                const alreadyReserved = reservations.some(reservation => 
+                    reservation.std_ID.toString() === studentID.toString() && 
+                    reservation.act_ID.toString() === selectedEvent.id.toString()
+                );
+    
+                console.log('Already reserved:', alreadyReserved);
+    
+                if (alreadyReserved) {
+                    Swal.fire({
+                        title: 'คุณได้จองกิจกรรมนี้ไปแล้ว',
+                        icon: 'info',
+                    });
+                    return;
+                }
+            }
+    
+            // Proceed with reservation
+            const reserve = {
+                man_status: selectedEvent.status,
+                std_ID: studentID,
+                act_ID: selectedEvent.id
+            };
+    
+            const reserveResponse = await axios.post('/api/reserve/activity', reserve);
+    
+            console.log('Reservation response:', reserveResponse);
+    
+            if (reserveResponse.data && (reserveResponse.data.success || reserveResponse.status === 200)) {
+                Swal.fire({
+                    title: 'ลงทะเบียนเรียบร้อย',
+                    icon: 'success',
+                });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                throw new Error('เกิดข้อผิดพลาดในการจองกิจกรรม: ไม่สามารถยืนยันการจองได้');
+            }
+        } catch (err) {
+            console.error('Reservation error:', err);
+            console.error('Error details:', err.response ? err.response.data : 'No response data');
             Swal.fire({
-                title: 'ละทะเบียนเรียบร้อย',
-                icon: 'success',
+                title: 'เกิดข้อผิดพลาด',
+                text: err.message || 'ไม่สามารถจองกิจกรรมได้ กรุณาลองใหม่อีกครั้ง',
+                icon: 'error',
             });
-            setTimeout(() => {
-                window.location = '/activity/calendar';
-            }, 1500);
-        } catch (err) { console.log(err) }
-
-    }
+        }
+    };
 
     const eventStyleGetter = (event, start, end, isSelected) => {
         const backgroundColor = event.color;
