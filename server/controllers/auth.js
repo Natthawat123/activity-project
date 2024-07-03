@@ -58,26 +58,28 @@ export const login = (req, res) => {
 // create user  table login
 export const register = async (req, res) => {
     const {
-        login_ID,
         username,
         password,
         role
     } = req.body
 
-    if (!login_ID || !username || !password || !role) {
-        return res.status(400).json('required : login_ID ,uername, password and role')
+    if (!username || !password || !role) {
+        return res.status(400).json('required : username, password and role')
     }
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    const q = 'INSERT INTO login (login_ID, username, password, role) VALUES (?, ?, ?, ?)'
+    const q = 'INSERT INTO login (username, password, role) VALUES (?, ?, ?)'
 
-    db.query(q, [login_ID, username, hashedPassword, role], (err, results) => {
+    db.query(q, [username, hashedPassword, role], (err, results) => {
         if (err) {
             return res.status(500).json(err)
         }
+        const loginID = results.insertId;
         res.status(201).json({
-            message: 'registered successfully'
+            status: 'ok',
+            message: 'registered successfully',
+            login_ID: loginID
         })
     })
 }
