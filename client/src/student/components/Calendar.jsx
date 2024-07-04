@@ -12,9 +12,14 @@ function CalendarFull() {
     const [events, setEvents] = useState([]);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [showPopup, setShowPopup] = useState(false);
+<<<<<<< HEAD
     const [studentID, setstudentID] = useState(null);
 
     // table activity
+=======
+    const [studentID, setStudentID] = useState(null);
+
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
     useEffect(() => {
         fetch('/api/list/activity')
             .then(response => {
@@ -34,12 +39,16 @@ function CalendarFull() {
                     color: index % 3 === 0 ? 'blue' : index % 3 === 1 ? 'green' : 'red',
                 }));
                 setEvents(eventList);
+<<<<<<< HEAD
 
+=======
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
             })
             .catch(error => {
                 console.error('เกิดข้อผิดพลาด: ', error);
             });
 
+<<<<<<< HEAD
         const student_ID = localStorage.getItem('std_ID')
         setstudentID(student_ID);
 
@@ -66,6 +75,76 @@ function CalendarFull() {
     }
 
     const eventStyleGetter = (event, start, end, isSelected) => {
+=======
+        const student_ID = localStorage.getItem('std_ID');
+        setStudentID(student_ID);
+    }, []);
+
+    const handleReserve = async () => {
+        try {
+            if (!studentID) {
+                Swal.fire({
+                    title: 'กรุณาเข้าสู่ระบบ',
+                    text: 'คุณต้องเข้าสู่ระบบก่อนจองกิจกรรม',
+                    icon: 'warning',
+                });
+                return;
+            }
+    
+            let reservations = [];
+            try {
+                const checkResponse = await axios.get('/api/manage');
+                reservations = checkResponse.data;
+            } catch (error) {
+                console.log(error);
+            }
+        
+            if (Array.isArray(reservations) && reservations.length > 0) {
+                const alreadyReserved = reservations.some(reservation => 
+                    reservation.std_ID.toString() === studentID.toString() && 
+                    reservation.act_ID.toString() === selectedEvent.id.toString()
+                );    
+                if (alreadyReserved) {
+                    Swal.fire({
+                        position: "top-end",
+                        icon: "info",
+                        title: "คุณได้ลงทะเบียนกิจกรรมนี้ไปเรียบร้อยแล้ว",
+                        showConfirmButton: false,
+                        timer: 1500,
+                      });
+                
+                    return;
+                }
+            }
+    
+            const reserve = {
+                man_status: selectedEvent.status,
+                std_ID: studentID,
+                act_ID: selectedEvent.id
+            };
+    
+            const reserveResponse = await axios.post('/api/reserve/activity', reserve);
+    
+    
+            if (reserveResponse.data && (reserveResponse.data.success || reserveResponse.status === 200)) {
+                Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: "ลงทะเบียนสำเร็จ",
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } 
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    const eventStyleGetter = (event) => {
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
         const backgroundColor = event.color;
         const style = {
             backgroundColor,
@@ -108,7 +187,12 @@ function CalendarFull() {
                     <div className="w-full justify-end flex ">
                         <div className="cursor-pointer flex" onClick={closePopup}>
                             <CloseIcon />
+<<<<<<< HEAD
                         </div></div>
+=======
+                        </div>
+                    </div>
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
                     <div className="text-left -mt-5">
                         <h2 className="text-xl font-bold mb-4">รายละเอียดกิจกรรม</h2>
                         <p className="text-xl">ชื่อกิจกรรม : {selectedEvent.title}</p>
@@ -127,4 +211,8 @@ function CalendarFull() {
     );
 }
 
+<<<<<<< HEAD
 export default CalendarFull;
+=======
+export default CalendarFull;
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)

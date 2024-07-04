@@ -8,7 +8,11 @@ const StudentForm = () => {
   const [provinces, setProvinces] = useState([]);
   const [amphures, setAmphures] = useState([]);
   const [tambons, setTambons] = useState([]);
+<<<<<<< HEAD
   const [zipcode, setZipcode] = useState();
+=======
+  const [zipcodeS, setZipcode] = useState();
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
   const [selected, setSelected] = useState({
     province_id: undefined,
     amphure_id: undefined,
@@ -16,6 +20,7 @@ const StudentForm = () => {
     zip_code: undefined
   });
 
+<<<<<<< HEAD
 
   const onChangeHandle = (id, selectedValue) => {
     if (id === "province_id") {
@@ -24,6 +29,24 @@ const StudentForm = () => {
       setDistrictValue(selectedValue);
     } else if (id === "tambon_id") {
       setSubdistrictValue(selectedValue);
+=======
+  const onChangeHandle = (id, selectedValue) => {
+    if (id === "province_id") {
+      setValue((prev) => ({
+        ...prev,
+        province: selectedValue
+      }));
+    } else if (id === "amphure_id") {
+      setValue((prev) => ({
+        ...prev,
+        district: selectedValue
+      }));
+    } else if (id === "tambon_id") {
+      setValue((prev) => ({
+        ...prev,
+        subdistrict: selectedValue
+      }));
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
     }
   };
 
@@ -78,6 +101,7 @@ const StudentForm = () => {
     );
   };
 
+<<<<<<< HEAD
   const [username, setUsername] = useState('');
   const [fnameValue, setFnameValue] = useState();
   const [lnameValue, setLnameValue] = useState('');
@@ -100,10 +124,33 @@ const StudentForm = () => {
       .then(response => {
         if (!response.ok) {
           throw new Error('เกิดข้อผิดพลาดในการดึงข้อมูล');
+=======
+  const [value, setValue] = useState({
+    staff_ID: '',
+    staff_fname: '',
+    std_lname: '',
+    staff_mobile: '',
+    staff_email: '',
+    staff_address: '',
+    province: '',
+    district: '',
+    subdistrict: '',
+    zipcode: ''
+  });
+
+  const staff_ID = localStorage.getItem('staff_ID');
+
+  useEffect(() => {
+    fetch('/api/resume/staff?id=' + staff_ID)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error fetching data');
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
         }
         return response.json();
       })
       .then(data => {
+<<<<<<< HEAD
         console.log(data)
         setUsername(data.login_ID)
         setstaffID(data.staff_ID)
@@ -122,6 +169,17 @@ const StudentForm = () => {
       });
 
 
+=======
+        setValue((prev) => ({
+          ...prev,
+          ...data,
+        }));
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
     fetch(
       "https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json"
     )
@@ -130,6 +188,7 @@ const StudentForm = () => {
         // Sort the provinces alphabetically by name_th
         const sortedProvinces = result.sort((a, b) =>
           a.name_th.localeCompare(b.name_th)
+<<<<<<< HEAD
 
         );
 
@@ -193,10 +252,35 @@ const StudentForm = () => {
     };
 
     fetch('/api/update/staff/' + staffIDValue, {
+=======
+        );
+        setProvinces(sortedProvinces);
+      });
+
+  }, [staff_ID]);
+
+  const handlechange = (e) => {
+    setValue((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
+  const updateClick = (event) => {
+    event.preventDefault();
+
+    const updatedValue = {
+      ...value,
+      zipcode: zipcodeS || value.zipcode
+    };
+
+    fetch('/api/update/staff/' + staff_ID, {
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
+<<<<<<< HEAD
       body: JSON.stringify(dataJson),
     })
       .then(response => {
@@ -207,12 +291,27 @@ const StudentForm = () => {
       })
       .then(result => {
         console.log(result);
+=======
+      body: JSON.stringify(updatedValue),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error updating data');
+        }
+        return response.json();
+      })
+      .then(data => {
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
         Swal.fire({
           title: 'แก้ไขประวัติส่วนตัวเสร็จสิ้น',
           icon: 'success',
         });
         setTimeout(() => {
+<<<<<<< HEAD
           window.location = '/teacher/calendar';
+=======
+          window.location = '/teacher/profile';
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
         }, 1500);
       })
       .catch(error => {
@@ -224,6 +323,7 @@ const StudentForm = () => {
           confirmButtonText: 'OK',
         });
       });
+<<<<<<< HEAD
 
   };
 
@@ -242,17 +342,42 @@ const StudentForm = () => {
         <div className="mb-4">
           <label htmlFor="studentId" className="block text-sm font-medium text-gray-600">
             รหัสประจำตัวอาจารย์
+=======
+  };
+
+  if (!value.staff_ID) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div className="w-full lg:w-2/3 mx-auto mt-10 p-4 bg-white shadow-md rounded-md">
+      <Link to='/teacher/calendar'>
+        <div className="items-center mb-5"><ArrowBackIosNewIcon />ย้อนกลับ</div>
+      </Link>
+      <form className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:px-10">
+        <div className="mb-4">
+          <label htmlFor="studentId" className="block text-sm font-medium text-gray-600">
+            รหัสนักศึกษา
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
           </label>
           <input
             type="text"
             id="username"
+<<<<<<< HEAD
             name="username"
             value={staffIDValue}
+=======
+            name="staff_ID"
+            value={value.staff_ID}
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
             readOnly
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
         <div className="mb-4">
           <label htmlFor="firstName" className="block text-sm font-medium text-gray-600">
             ชื่อ
@@ -260,9 +385,15 @@ const StudentForm = () => {
           <input
             type="text"
             id="fname"
+<<<<<<< HEAD
             name="fname"
             onChange={updateFname}
             value={fnameValue}
+=======
+            name="staff_fname"
+            onChange={handlechange}
+            value={value.staff_fname}
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
@@ -273,9 +404,15 @@ const StudentForm = () => {
           <input
             type="text"
             id="lname"
+<<<<<<< HEAD
             name="lname"
             onChange={updateLname}
             value={lnameValue}
+=======
+            name="staff_lname"
+            onChange={handlechange}
+            value={value.staff_lname}
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
@@ -286,9 +423,15 @@ const StudentForm = () => {
           <input
             type="tel"
             id="tel"
+<<<<<<< HEAD
             name="tel"
             onChange={updateMobile}
             value={mobileValue}
+=======
+            name="staff_mobile"
+            onChange={handlechange}
+            value={value.staff_mobile}
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
@@ -299,9 +442,15 @@ const StudentForm = () => {
           <input
             type="email"
             id="email"
+<<<<<<< HEAD
             name="email"
             onChange={updateEmail}
             value={emailValue}
+=======
+            name="staff_email"
+            onChange={handlechange}
+            value={value.staff_email}
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
@@ -311,9 +460,15 @@ const StudentForm = () => {
           </label>
           <input
             id="address"
+<<<<<<< HEAD
             name="address"
             onChange={updateAddress}
             value={addressValue}
+=======
+            name="staff_address"
+            onChange={handlechange}
+            value={value.staff_address}
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
@@ -326,7 +481,11 @@ const StudentForm = () => {
             list={provinces}
             child="amphure"
             childsId={["amphure_id", "tambon_id"]}
+<<<<<<< HEAD
             addressValue_PDS={provinceValue}
+=======
+            addressValue_PDS={value.province}
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
             setChilds={[setAmphures, setTambons]}
           />
         </div>
@@ -341,7 +500,11 @@ const StudentForm = () => {
             child="tambon"
             childsId={["tambon_id"]}
             setChilds={[setTambons]}
+<<<<<<< HEAD
             addressValue_PDS={districtsValue}
+=======
+            addressValue_PDS={value.district}
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
           />
         </div>
 
@@ -355,11 +518,18 @@ const StudentForm = () => {
             child="zip_code"
             childsId={["zip_code"]}
             setChilds={[setZipcode]}
+<<<<<<< HEAD
             addressValue_PDS={subdistrictsValue}
           />
         </div>
 
 
+=======
+            addressValue_PDS={value.subdistrict}
+          />
+        </div>
+
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
         <div className="mb-4">
           <label htmlFor="zipcode" className="block text-sm font-medium text-gray-600">
             รหัสไปรษณีย์
@@ -368,6 +538,7 @@ const StudentForm = () => {
             type="text"
             id="zipcode"
             name="zipcode"
+<<<<<<< HEAD
             onChange={updateZipcode}
             value={zipcode ?? zipcodeValue}
             className="mt-1 p-2 border w-full rounded-md" />
@@ -381,6 +552,20 @@ const StudentForm = () => {
       </div>
     </div>
 
+=======
+            onChange={handlechange}
+            value={zipcodeS ?? value.zipcode}
+            className="mt-1 p-2 border w-full rounded-md" />
+        </div>
+
+        <div className="flex justify-end items-center">
+          <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-1/8 h-1/2" onClick={updateClick}>
+            แก้ไข
+          </button>
+        </div>
+      </form>
+    </div>
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
   );
 };
 
