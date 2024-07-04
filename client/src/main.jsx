@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+<<<<<<< HEAD
 
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import App from './App.jsx';
@@ -69,3 +70,13 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <AppRouter />
   </React.StrictMode>,
 );
+=======
+import App from './App.jsx';
+import './index.css';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)

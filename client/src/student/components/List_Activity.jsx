@@ -141,8 +141,18 @@ const ProductTable = () => {
                                     <td scope="col" className="px-6 py-3 w-1/6">
                                         {item.act_dateStart.slice(0, 10)}
                                     </td>
+<<<<<<< HEAD
                                     <td scope="col" className="px-6 py-3 w-3/12 text-left">
                                         {item.act_status === 1 ? "เปิด" : "ปิด"}
+=======
+<<<<<<< HEAD
+                                    <td scope="col" className="px-6 py-3 w-1/6">
+                                        error
+=======
+                                    <td scope="col" className="px-6 py-3 w-3/12 text-left">
+                                        {item.act_status === 1 ? "เปิด" : "ปิด"}
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
+>>>>>>> karan
                                     </td>
                                     <td scope="col" className="px-6 py-3 w-1/6">
                                         เพิ่มเติม

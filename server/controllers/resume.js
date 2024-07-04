@@ -5,7 +5,15 @@ export const student = (req, res) => {
     const {
         id
     } = req.query;
+<<<<<<< HEAD
     const query = 'SELECT student.*, section.sec_Name FROM student JOIN section ON student.sec_ID = section.sec_ID WHERE std_ID = ?';
+=======
+<<<<<<< HEAD
+    const query = 'SELECT student.*, section.sec_Name FROM student JOIN section ON student.sec_ID = section.sec_ID WHERE login_ID = ?';
+=======
+    const query = 'SELECT student.*, section.sec_Name FROM student JOIN section ON student.sec_ID = section.sec_ID WHERE std_ID = ?';
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
+>>>>>>> karan
 
     db.query(query, [id], (err, results) => {
         if (err) {
@@ -33,7 +41,15 @@ export const staff = (req, res) => {
     const {
         id
     } = req.query;
+<<<<<<< HEAD
     const query = 'SELECT * FROM staff WHERE staff_ID = ?';
+=======
+<<<<<<< HEAD
+    const query = 'SELECT * FROM staff WHERE login_ID = ?';
+=======
+    const query = 'SELECT * FROM staff WHERE staff_ID = ?';
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
+>>>>>>> karan
 
     db.query(query, [id], (err, results) => {
         if (err) {

@@ -1,9 +1,24 @@
+<<<<<<< HEAD
+import { useState, useEffect } from 'react';
+=======
+<<<<<<< HEAD
+import { useState } from 'react';
+>>>>>>> karan
+import Swal from 'sweetalert2';
+import PropTypes from 'prop-types';
+import CloseIcon from '@mui/icons-material/Close';
+import axios from 'axios'
+function Add_Activity({ closeModal }) {
+<<<<<<< HEAD
+=======
+=======
 import { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import PropTypes from 'prop-types';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios'
 function Add_Activity({ closeModal }) {
+>>>>>>> karan
 
   useEffect(() => {
     axios.get('/api/list/staff')
@@ -16,14 +31,26 @@ function Add_Activity({ closeModal }) {
   }, []);
 
 
+<<<<<<< HEAD
+=======
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
+>>>>>>> karan
   const [inputTitle, setInputTitle] = useState('');
   const [inputDesc, setInputDesc] = useState('');
   const [inputNumStd, setInputNumStd] = useState(1);
   const [inputLocation, setInputLocation] = useState('');
   const [inputStartDate, setStartDate] = useState('');
   const [inputEndDate, setEndDate] = useState('');
+<<<<<<< HEAD
   const [inputStaffID, setstaffID] = useState('')
   const [staffName, setStaffName] = useState([]);
+=======
+<<<<<<< HEAD
+=======
+  const [inputStaffID, setstaffID] = useState('')
+  const [staffName, setStaffName] = useState([]);
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
+>>>>>>> karan
 
   const handleTitle = (event) => {
     setInputTitle(event.target.value);
@@ -46,13 +73,23 @@ function Add_Activity({ closeModal }) {
   const handleEndDate = (event) => {
     setEndDate(event.target.value);
   };
+<<<<<<< HEAD
   const handleStaffID = (event) => {
     setstaffID(event.target.value);
   };
+=======
+<<<<<<< HEAD
+=======
+  const handleStaffID = (event) => {
+    setstaffID(event.target.value);
+  };
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
+>>>>>>> karan
 
   const handleSubmit = () => {
 
     const activity = {
+<<<<<<< HEAD
       act_title: inputTitle,
       act_desc: inputDesc,
       act_dateStart: inputStartDate,
@@ -64,6 +101,32 @@ function Add_Activity({ closeModal }) {
     };
 
     fetch('/api/create/activity', {
+=======
+<<<<<<< HEAD
+      Act_Title: inputTitle,
+      Act_Desc: inputDesc,
+      Act_DateStart: inputStartDate,
+      Act_DateEnd: inputEndDate,
+      Act_NumStd: inputNumStd,
+      Act_Location: inputLocation,
+
+    };
+
+    fetch('http://localhost:3000/api/activity/create', {
+=======
+      act_title: inputTitle,
+      act_desc: inputDesc,
+      act_dateStart: inputStartDate,
+      act_dateEnd: inputEndDate,
+      act_numstd: inputNumStd,
+      act_location: inputLocation,
+      staff_ID: inputStaffID
+
+    };
+
+    fetch('/api/create/activity', {
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
+>>>>>>> karan
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -72,30 +135,68 @@ function Add_Activity({ closeModal }) {
     })
       .then(response => response.json())
       .then(result => {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> karan
         Swal.fire({
           title: 'เพิ่มกิจจกรรมใหม่สำเร็จ',
           icon: 'success',
         });
         setTimeout(() => {
         }, 1500);
+<<<<<<< HEAD
+=======
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
+>>>>>>> karan
         console.log(result);
       })
       .catch(error => {
         console.error('Error:', error);
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> karan
         Swal.fire({
           title: 'เพิ่มกิจจกรรมใหม่ไม่สำเร็จ',
           icon: 'error',
         });
         setTimeout(() => {
         }, 1500);
+<<<<<<< HEAD
+=======
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
+>>>>>>> karan
       });
 
 
   };
 
+<<<<<<< HEAD
 
   return (
     <div className="max-w-md mx-auto my-10 p-3  rounded-md ">
+=======
+<<<<<<< HEAD
+  // const showSweetAlert = () => {
+  //   Swal.fire({
+  //     title: 'Hashed Texts',
+  //     html: `<pre>${hashedText}</pre>`,
+  //     confirmButtonText: 'OK',
+  //   });
+  // };
+
+
+  return (
+    <div className="max-w-md mx-auto my-10 p-6  rounded-md ">
+=======
+
+  return (
+    <div className="max-w-md mx-auto my-10 p-3  rounded-md ">
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
+>>>>>>> karan
 
       <div className="cursor-pointer justify-between flex" onClick={closeModal}>
         <div></div>
@@ -163,6 +264,11 @@ function Add_Activity({ closeModal }) {
         />
       </div>
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> karan
       <div className='flex items-center '>
         <label className="block mb-2 text-lg text-gray-600 w-1/4 text-left pb-2">ผู้จัดกิจกรรม :</label>
         <select value={inputStaffID} onChange={handleStaffID} className="border border-gray-300 rounded-md p-1 mb-4 w-3/4">
@@ -173,6 +279,10 @@ function Add_Activity({ closeModal }) {
       </div>
 
 
+<<<<<<< HEAD
+=======
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
+>>>>>>> karan
 
       <button
         onClick={handleSubmit}

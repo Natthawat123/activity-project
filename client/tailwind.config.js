@@ -44,4 +44,14 @@ export default {
     ],
   },
   plugins: [require("daisyui")]
+<<<<<<< HEAD
 }
+=======
+<<<<<<< HEAD
+}
+
+
+=======
+}
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
+>>>>>>> karan

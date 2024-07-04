@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 import CalendarFull from './components/Calendar'
 import Layout from './components/Layout/Layout'
@@ -15,3 +16,19 @@ function App() {
 }
 
 export default App
+=======
+import { BrowserRouter } from 'react-router-dom';
+import { Router } from './Routes';
+
+
+ function App() {
+  return (
+    <BrowserRouter>
+      <Router />
+
+    </BrowserRouter>
+  );
+}
+
+export default App
+>>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
