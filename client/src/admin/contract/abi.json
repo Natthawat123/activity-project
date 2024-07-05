@@ -1,56 +1,5 @@
 [
     {
-<<<<<<< HEAD
-        "inputs": [],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "_admin",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint16",
-                "name": "activityId",
-                "type": "uint16"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint32[]",
-                "name": "_studentId",
-                "type": "uint32[]"
-            }
-        ],
-        "name": "UploadEvent",
-        "type": "event"
-    },
-    {
-=======
-<<<<<<< HEAD
->>>>>>> karan
-        "inputs": [
-            {
-                "internalType": "uint16",
-                "name": "_activityId",
-                "type": "uint16"
-            },
-            {
-                "internalType": "uint32[]",
-                "name": "_studentId",
-                "type": "uint32[]"
-            }
-        ],
-<<<<<<< HEAD
-        "name": "Upload",
-=======
-        "name": "add",
-=======
         "inputs": [],
         "stateMutability": "nonpayable",
         "type": "constructor"
@@ -107,8 +56,6 @@
             }
         ],
         "name": "Upload",
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
->>>>>>> karan
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -117,44 +64,6 @@
         "inputs": [
             {
                 "internalType": "uint256",
-<<<<<<< HEAD
-                "name": "",
-=======
-<<<<<<< HEAD
-                "name": "_actID",
->>>>>>> karan
-                "type": "uint256"
-            }
-        ],
-        "name": "admin",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint16",
-                "name": "_i",
-                "type": "uint16"
-            }
-        ],
-        "name": "get",
-        "outputs": [
-            {
-                "internalType": "uint32[]",
-                "name": "",
-<<<<<<< HEAD
-                "type": "uint32[]"
-=======
-                "type": "string[]"
-=======
                 "name": "",
                 "type": "uint256"
             }
@@ -197,8 +106,6 @@
                 "internalType": "address[]",
                 "name": "",
                 "type": "address[]"
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
->>>>>>> karan
             }
         ],
         "stateMutability": "view",
@@ -209,23 +116,6 @@
         "name": "getAll",
         "outputs": [
             {
-<<<<<<< HEAD
-                "internalType": "uint16[]",
-=======
-<<<<<<< HEAD
-                "internalType": "uint256[]",
->>>>>>> karan
-                "name": "",
-                "type": "uint16[]"
-            },
-            {
-                "internalType": "uint32[][]",
-                "name": "",
-<<<<<<< HEAD
-                "type": "uint32[][]"
-=======
-                "type": "string[][]"
-=======
                 "internalType": "uint16[]",
                 "name": "",
                 "type": "uint16[]"
@@ -234,8 +124,6 @@
                 "internalType": "uint32[][]",
                 "name": "",
                 "type": "uint32[][]"
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
->>>>>>> karan
             }
         ],
         "stateMutability": "view",

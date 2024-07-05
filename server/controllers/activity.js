@@ -15,9 +15,6 @@ export const manage = (req, res) => {
         }
         return res.json(result);
     })
-<<<<<<< HEAD
-}
-=======
 }
 
 // delete
@@ -41,4 +38,3 @@ export const reserve = (req, res) => {
         });
     });
 };
->>>>>>> karan

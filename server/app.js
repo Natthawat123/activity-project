@@ -7,10 +7,7 @@ import createRoutes from './routes/create.js'
 import resumeRoutes from './routes/resume.js'
 import updateRoutes from './routes/update.js'
 import reserveRoutes from './routes/reserve.js'
-<<<<<<< HEAD
-=======
 import activityRoutes from './routes/activity.js'
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
 
 const app = express()
 app.use(express.json())
@@ -22,10 +19,7 @@ app.use('/create', createRoutes)
 app.use('/resume', resumeRoutes)
 app.use('/update', updateRoutes)
 app.use('/reserve', reserveRoutes)
-<<<<<<< HEAD
-=======
 app.use('/', activityRoutes)
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
 
 app.listen(3000, () => console.log('server on port 3000'))
 

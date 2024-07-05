@@ -10,20 +10,10 @@ export const login = (req, res) => {
         username,
         password
     } = req.body
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-    const q = 'SELECT * FROM login WHERE Username=?'
-=======
->>>>>>> karan
     const q = `SELECT login.*, student.std_ID, staff.staff_ID  
     FROM login 
     LEFT JOIN student ON login.login_ID = student.login_ID 
     LEFT JOIN staff ON login.login_ID = staff.login_ID WHERE Username=?`
-<<<<<<< HEAD
-=======
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
->>>>>>> karan
 
     db.query(q, username, (err, user) => {
         if (err) return res.status(500).json(err)
@@ -37,18 +27,6 @@ export const login = (req, res) => {
                 }, secret, {
                     expiresIn: '1h'
                 });
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-                res.json({
-                    status: 'ok',
-                    message: 'Login Success',
-                    token,
-                    role: user[0].role,
-                    login_ID: user[0].login_ID // ส่งบทบาทในการตอบกลับ
-                });
-=======
->>>>>>> karan
                 if (user[0].role === 'teacher' || user[0].role === 'admin') {
                     res.json({
                         status: 'ok',
@@ -67,10 +45,6 @@ export const login = (req, res) => {
                     });
                 }
 
-<<<<<<< HEAD
-=======
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
->>>>>>> karan
             } else {
                 res.json({
                     status: 'error',
