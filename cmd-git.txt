@@ -1,0 +1,9 @@
+//คำสั่งในการอัพโค้ดขึ้น git
+
+git checkout -b pond //ใช้ครั้งแรกในการสร้าง branch
+git add .
+git commit -m "commit"
+git push
+
+//คำสั่งใช้ดึงข้อมูลลงมาจาก git
+git pull origin main 

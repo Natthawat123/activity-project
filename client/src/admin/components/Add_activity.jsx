@@ -16,12 +16,14 @@ function Add_Activity({ closeModal }) {
   }, []);
 
 
+
   const [inputTitle, setInputTitle] = useState('');
   const [inputDesc, setInputDesc] = useState('');
   const [inputNumStd, setInputNumStd] = useState(1);
   const [inputLocation, setInputLocation] = useState('');
   const [inputStartDate, setStartDate] = useState('');
   const [inputEndDate, setEndDate] = useState('');
+
   const [inputStaffID, setstaffID] = useState('')
   const [staffName, setStaffName] = useState([]);
 
@@ -46,6 +48,7 @@ function Add_Activity({ closeModal }) {
   const handleEndDate = (event) => {
     setEndDate(event.target.value);
   };
+
   const handleStaffID = (event) => {
     setstaffID(event.target.value);
   };
@@ -62,7 +65,6 @@ function Add_Activity({ closeModal }) {
       staff_ID: inputStaffID
 
     };
-
     fetch('/api/create/activity', {
       method: 'POST',
       headers: {
@@ -72,6 +74,8 @@ function Add_Activity({ closeModal }) {
     })
       .then(response => response.json())
       .then(result => {
+
+
         Swal.fire({
           title: 'เพิ่มกิจจกรรมใหม่สำเร็จ',
           icon: 'success',
@@ -82,6 +86,7 @@ function Add_Activity({ closeModal }) {
       })
       .catch(error => {
         console.error('Error:', error);
+
         Swal.fire({
           title: 'เพิ่มกิจจกรรมใหม่ไม่สำเร็จ',
           icon: 'error',
@@ -89,13 +94,11 @@ function Add_Activity({ closeModal }) {
         setTimeout(() => {
         }, 1500);
       });
-
-
   };
-
 
   return (
     <div className="max-w-md mx-auto my-10 p-3  rounded-md ">
+
 
       <div className="cursor-pointer justify-between flex" onClick={closeModal}>
         <div></div>
@@ -162,7 +165,6 @@ function Add_Activity({ closeModal }) {
           className="border border-gray-300 rounded-md p-1 mb-4 w-3/4"
         />
       </div>
-
       <div className='flex items-center '>
         <label className="block mb-2 text-lg text-gray-600 w-1/4 text-left pb-2">ผู้จัดกิจกรรม :</label>
         <select value={inputStaffID} onChange={handleStaffID} className="border border-gray-300 rounded-md p-1 mb-4 w-3/4">
@@ -171,9 +173,6 @@ function Add_Activity({ closeModal }) {
           ))}
         </select>
       </div>
-
-
-
       <button
         onClick={handleSubmit}
         className="bg-blue-500 ml-32 my-2  text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue active:bg-blue-800"
@@ -184,11 +183,7 @@ function Add_Activity({ closeModal }) {
     </div>
   );
 }
-
-
 Add_Activity.propTypes = {
   closeModal: PropTypes.func.isRequired,
 };
-
-
 export default Add_Activity;

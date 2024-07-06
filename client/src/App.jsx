@@ -1,17 +1,13 @@
+import { BrowserRouter } from 'react-router-dom';
+import { Router } from './Routes';
 
-import CalendarFull from './components/Calendar'
-import Layout from './components/Layout/Layout'
-
-// import Loading from './components/Loading'
-
-function App() {
-
-
+ function App() {
   return (
-    <div>
-      <CalendarFull />
-    </div>
-  )
+    <BrowserRouter>
+      <Router />
+
+    </BrowserRouter>
+  );
 }
 
 export default App

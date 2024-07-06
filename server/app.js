@@ -7,6 +7,7 @@ import createRoutes from './routes/create.js'
 import resumeRoutes from './routes/resume.js'
 import updateRoutes from './routes/update.js'
 import reserveRoutes from './routes/reserve.js'
+import activityRoutes from './routes/activity.js'
 
 const app = express()
 app.use(express.json())
@@ -18,6 +19,7 @@ app.use('/create', createRoutes)
 app.use('/resume', resumeRoutes)
 app.use('/update', updateRoutes)
 app.use('/reserve', reserveRoutes)
+app.use('/', activityRoutes)
 
 app.listen(3000, () => console.log('server on port 3000'))
 
