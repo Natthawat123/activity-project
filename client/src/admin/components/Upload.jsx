@@ -231,14 +231,25 @@ function Upload() {
         getAll
       </button>
       <div className="mt-4">
-        <h2 className="text-xl font-bold mb-2">getAll Results</h2>
-        {getAll.map((item, idx) => (
-          <div key={idx} className="mb-4">
-            <p>Activity ID: {item.actID}</p>
-            <p>Student IDs: {item.stdIDs.join(', ')}</p>
-          </div>
-        ))}
-      </div>
+      <h2 className="text-xl font-bold mb-2">getAll Results</h2>
+      <table className="min-w-full bg-white border border-gray-200">
+        <thead>
+          <tr>
+            <th className="py-2 px-4 border-b border-gray-200">Activity ID</th>
+            <th className="py-2 px-4 border-b border-gray-200">Student IDs</th>
+          </tr>
+        </thead>
+        <tbody>
+          {getAll.map((item, idx) => (
+            <tr key={idx} className="bg-gray-50 odd:bg-white">
+              <td className="py-2 px-4 border-b border-gray-200">{item.actID}</td>
+              <td className="py-2 px-4 border-b border-gray-200">{item.stdIDs.join(' ')}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    
   
     </div>
   </div>
