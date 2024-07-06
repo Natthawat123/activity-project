@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import contractAbi from '../contract/abi.json';
 import Web3 from 'web3';
+import Swal from 'sweetalert2';
 
 function Upload() {
   const [data, setData] = useState([]);
@@ -13,7 +14,7 @@ function Upload() {
   const [searchTerm, setSearchTerm] = useState("");
 
   // Web3 and contract
-  const contractAddress = '0x1E6f16857E1A2a97FE86892aEAbc6272E0Df2FdC';
+  const contractAddress = '0xF9322B9B17944cf80FA33Be311Ea472375698F90';
   const [web3, setWeb3] = useState(null);
   const [contract, setContract] = useState(null);
 
@@ -102,7 +103,7 @@ function Upload() {
 
       // Format the getAll data
       const formattedData = allData[0].map((actID, index) => ({
-        actID: actID,
+        actID: Number(actID),
         stdIDs: allData[1][index]
       }));
 
@@ -130,11 +131,55 @@ function Upload() {
       const accounts = await web3.eth.getAccounts();
       const tx = await contract.methods.Upload(selectedActID, selectedStdIDs).send({ from: accounts[0] });
       console.log('Transaction successful:', tx.transactionHash);
+
+      try {
+        const res = await axios.delete('/api/reserve', {
+          params: {
+            act_ID: selectedActID,
+            std_ID: selectedStdIDs.join(',') 
+          }
+        })
+        Swal.fire({
+          position: "top-end",
+          icon: "บันทึกข้อมูลสำเร็จ",
+          title: `transaction: ${tx.transactionHash}`,
+          showConfirmButton: false,
+          timer: 1500
+        });
+        setTimeout(() => {
+          window.location.reload();
+      }, 1500);
+      } catch (err) {
+        console.error('Error deleting reserve:', err);
+        Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: "Error deleting reserve",
+          showConfirmButton: false,
+          timer: 1500
+          
+        });
+        
+      }
+
     } catch (err) {
-      console.error('Error uploading data:', err);
+      console.error(err);
+      Swal.fire({
+        position: "top-end",
+        icon: "error",
+        title: "Error uploading",
+        showConfirmButton: false,
+        timer: 1500
+      });
     }
   };
 
+<<<<<<< HEAD
+=======
+
+  
+
+>>>>>>> ca386fc0fdac689cf5b197f833250d8a1661d678
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
     // setCurrentPage(0); // ตั้งค่าหน้าปัจจุบันเป็น 0 เมื่อมีการค้นหา
@@ -222,6 +267,10 @@ function Upload() {
       >
         Submit
       </button>
+<<<<<<< HEAD
+=======
+      
+>>>>>>> ca386fc0fdac689cf5b197f833250d8a1661d678
   
       <hr className="my-8" />
       <button
@@ -231,6 +280,7 @@ function Upload() {
         getAll
       </button>
       <div className="mt-4">
+<<<<<<< HEAD
       <h2 className="text-xl font-bold mb-2">getAll Results</h2>
       <table className="min-w-full bg-white border border-gray-200">
         <thead>
@@ -252,6 +302,18 @@ function Upload() {
     
   
     </div>
+=======
+        <h2 className="text-xl font-bold mb-2">getAll Results</h2>
+        {getAll.map((item, idx) => (
+          <div key={idx} className="mb-4">
+            <p>Activity ID: {item.actID}</p>
+            <p>Student IDs: {item.stdIDs.join(', ')}</p>
+          </div>
+        ))}
+      </div>
+  
+    </div>
+>>>>>>> ca386fc0fdac689cf5b197f833250d8a1661d678
   </div>
   );
 }

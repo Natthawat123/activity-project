@@ -16,13 +16,23 @@ function Add_Activity({ closeModal }) {
       });
   }, []);
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> ca386fc0fdac689cf5b197f833250d8a1661d678
   const [inputTitle, setInputTitle] = useState('');
   const [inputDesc, setInputDesc] = useState('');
   const [inputNumStd, setInputNumStd] = useState(1);
   const [inputLocation, setInputLocation] = useState('');
   const [inputStartDate, setStartDate] = useState('');
   const [inputEndDate, setEndDate] = useState('');
+<<<<<<< HEAD
   const [inputStaffID, setstaffID] = useState('');
+=======
+
+  const [inputStaffID, setstaffID] = useState('')
+>>>>>>> ca386fc0fdac689cf5b197f833250d8a1661d678
   const [staffName, setStaffName] = useState([]);
 
   const handleTitle = (event) => {
@@ -43,6 +53,7 @@ function Add_Activity({ closeModal }) {
   const handleEndDate = (event) => {
     setEndDate(event.target.value);
   };
+
   const handleStaffID = (event) => {
     setstaffID(event.target.value);
   };
@@ -57,7 +68,6 @@ function Add_Activity({ closeModal }) {
       act_location: inputLocation,
       staff_ID: inputStaffID
     };
-
     fetch('/api/create/activity', {
       method: 'POST',
       headers: {
@@ -65,6 +75,7 @@ function Add_Activity({ closeModal }) {
       },
       body: JSON.stringify(activity)
     })
+<<<<<<< HEAD
     .then(response => response.json())
     .then(result => {
       Swal.fire({
@@ -90,6 +101,36 @@ function Add_Activity({ closeModal }) {
 
   return (
     <div className="max-w-md mx-auto my-10 p-3 rounded-md ">
+=======
+      .then(response => response.json())
+      .then(result => {
+
+
+        Swal.fire({
+          title: 'เพิ่มกิจจกรรมใหม่สำเร็จ',
+          icon: 'success',
+        });
+        setTimeout(() => {
+        }, 1500);
+        console.log(result);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+
+        Swal.fire({
+          title: 'เพิ่มกิจจกรรมใหม่ไม่สำเร็จ',
+          icon: 'error',
+        });
+        setTimeout(() => {
+        }, 1500);
+      });
+  };
+
+  return (
+    <div className="max-w-md mx-auto my-10 p-3  rounded-md ">
+
+
+>>>>>>> ca386fc0fdac689cf5b197f833250d8a1661d678
       <div className="cursor-pointer justify-between flex" onClick={closeModal}>
         <div></div>
         <CloseIcon />
@@ -149,8 +190,13 @@ function Add_Activity({ closeModal }) {
           className="border border-gray-300 rounded-md p-1 mb-4 w-3/4"
         />
       </div>
+<<<<<<< HEAD
       <div className="flex items-center">
         <label className="block mb-2 text-lg text-gray-600 w-1/4 text-left pb-2">ผู้จัดกิจกรรม:</label>
+=======
+      <div className='flex items-center '>
+        <label className="block mb-2 text-lg text-gray-600 w-1/4 text-left pb-2">ผู้จัดกิจกรรม :</label>
+>>>>>>> ca386fc0fdac689cf5b197f833250d8a1661d678
         <select value={inputStaffID} onChange={handleStaffID} className="border border-gray-300 rounded-md p-1 mb-4 w-3/4">
           {staffName && staffName.length > 0 && staffName.map((item) => (
             <option key={item.staff_ID} value={item.staff_ID}>{item.staff_fname} {item.staff_lname}</option>
@@ -166,9 +212,16 @@ function Add_Activity({ closeModal }) {
     </div>
   );
 }
+<<<<<<< HEAD
 
 Add_Activity.propTypes = {
   closeModal: PropTypes.func.isRequired,
 };
 
 export default Add_Activity;
+=======
+Add_Activity.propTypes = {
+  closeModal: PropTypes.func.isRequired,
+};
+export default Add_Activity;
+>>>>>>> ca386fc0fdac689cf5b197f833250d8a1661d678

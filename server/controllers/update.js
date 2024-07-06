@@ -61,8 +61,9 @@ export const staff = (req, res) => {
     const q = 'UPDATE `staff` SET `staff_fname`= ?,`staff_lname`= ?,`staff_email`= ?,`staff_mobile`= ?,`staff_address`= ?,`province`= ?,`district`= ?,`subdistrict`= ?,`zipcode`= ? WHERE staff_ID = ?'
 
     db.query(q, [staff_fname,
-        staff_lname, staff_email, staff_mobile, staff_address, province, district, subdistrict, zipcode, id], (err, result) => {
-            if (err) return res.status(500).json(err)
-            return res.json(result)
-        })
+        staff_lname, staff_email, staff_mobile, staff_address, province, district, subdistrict, zipcode, id
+    ], (err, result) => {
+        if (err) return res.status(500).json(err)
+        return res.json(result)
+    })
 }
