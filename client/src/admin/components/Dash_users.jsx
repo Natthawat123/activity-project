@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react'
-
+import { useState, useEffect } from 'react';
 import Popup from './Popup_addUser';
 
 function Dash_users() {
@@ -11,34 +10,26 @@ function Dash_users() {
   const [countAdminRoles, setCountAdminRoles] = useState(0);
 
   useEffect(() => {
-    fetch("/api/list/student")
+    fetch("/api/list/login")
       .then((res) => res.json())
       .then(
         (result) => {
           setIsLoaded(true);
 
-          // กรองข้อมูลที่มี role เป็น "student" เท่านั้น
-          const filteredItems = result.filter((item) => item.role === "student");
-          const filteredItemsTeacher = result.filter((item) => item.role === "teacher");
-          const filteredItemsAdmin = result.filter((item) => item.role === "admin");
+          // Filter and count roles
+          const studentCount = result.filter((item) => item.role === "student").length;
+          const teacherCount = result.filter((item) => item.role === "teacher").length;
+          const adminCount = result.filter((item) => item.role === "admin").length;
 
-          // นับจำนวนข้อมูลที่มี role เป็น "student"
-          const countRoles = filteredItems.length;
-          setCountStudentRoles(countRoles);
-          console.log(`มี role เป็น "student" ทั้งหมด: ${countRoles}`);
-
-          // นับจำนวนข้อมูลที่มี role เป็น "teacher"
-          const countRolesTeacher = filteredItemsTeacher.length;
-          setCountTeacherRoles(countRolesTeacher);
-          console.log(`มี role เป็น "teacher" ทั้งหมด: ${countRolesTeacher}`);
-
-          // นับจำนวนข้อมูลที่มี role เป็น "admin"
-          const countRolesAdmin = filteredItemsAdmin.length;
-          setCountAdminRoles(countRolesAdmin);
-          console.log(`มี role เป็น "admin" ทั้งหมด: ${countRolesAdmin}`);
-
-          // ตั้งค่า state ด้วยข้อมูลทั้งหมด
+          // Update state
           setItems(result);
+          setCountStudentRoles(studentCount);
+          setCountTeacherRoles(teacherCount);
+          setCountAdminRoles(adminCount);
+
+          console.log(`มี role เป็น "student" ทั้งหมด: ${studentCount}`);
+          console.log(`มี role เป็น "teacher" ทั้งหมด: ${teacherCount}`);
+          console.log(`มี role เป็น "admin" ทั้งหมด: ${adminCount}`);
         },
         (error) => {
           setIsLoaded(true);
@@ -50,11 +41,8 @@ function Dash_users() {
   return (
     <div className='container mx-auto px-10 md:px-20 mb-5'>
       <div>
-
         {isLoaded ? (
-
           <div>
-
             <div className='flex justify-between items-center'>
               <h2 className='text-xl font-bold'>การจัดการผู้ใช้งาน</h2>
               <Popup />
@@ -66,7 +54,6 @@ function Dash_users() {
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                   </svg>
-
                   <div className='text-sm font-semibold'>จำนวนผู้ใช้ทั้งหมด</div>
                 </div>
                 <div className='text-center text-4xl font-bold'>{items.length}</div>
@@ -87,10 +74,6 @@ function Dash_users() {
                 <div className='text-center text-4xl font-bold'>{countAdminRoles}</div>
               </div>
             </div>
-
-
-
-
           </div>
         ) : (
           <p>Loading...</p>
@@ -107,4 +90,4 @@ function Dash_users() {
   );
 }
 
-export default Dash_users
+export default Dash_users;
