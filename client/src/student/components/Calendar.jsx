@@ -12,14 +12,8 @@ function CalendarFull() {
     const [events, setEvents] = useState([]);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [showPopup, setShowPopup] = useState(false);
-<<<<<<< HEAD
-    const [studentID, setstudentID] = useState(null);
-
-    // table activity
-=======
     const [studentID, setStudentID] = useState(null);
 
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
     useEffect(() => {
         fetch('/api/list/activity')
             .then(response => {
@@ -39,43 +33,11 @@ function CalendarFull() {
                     color: index % 3 === 0 ? 'blue' : index % 3 === 1 ? 'green' : 'red',
                 }));
                 setEvents(eventList);
-<<<<<<< HEAD
-
-=======
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
             })
             .catch(error => {
                 console.error('เกิดข้อผิดพลาด: ', error);
             });
 
-<<<<<<< HEAD
-        const student_ID = localStorage.getItem('std_ID')
-        setstudentID(student_ID);
-
-    }, []);
-
-    const handleReserve = async () => {
-        const reserve = {
-            man_status: selectedEvent.status,
-            std_ID: studentID,
-            act_ID: selectedEvent.id
-        }
-
-        try {
-            await axios.post('/api/reserve/activity', reserve)
-            Swal.fire({
-                title: 'ละทะเบียนเรียบร้อย',
-                icon: 'success',
-            });
-            setTimeout(() => {
-                window.location = '/activity/calendar';
-            }, 1500);
-        } catch (err) { console.log(err) }
-
-    }
-
-    const eventStyleGetter = (event, start, end, isSelected) => {
-=======
         const student_ID = localStorage.getItem('std_ID');
         setStudentID(student_ID);
     }, []);
@@ -144,7 +106,6 @@ function CalendarFull() {
     };
 
     const eventStyleGetter = (event) => {
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
         const backgroundColor = event.color;
         const style = {
             backgroundColor,
@@ -187,12 +148,8 @@ function CalendarFull() {
                     <div className="w-full justify-end flex ">
                         <div className="cursor-pointer flex" onClick={closePopup}>
                             <CloseIcon />
-<<<<<<< HEAD
-                        </div></div>
-=======
                         </div>
                     </div>
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
                     <div className="text-left -mt-5">
                         <h2 className="text-xl font-bold mb-4">รายละเอียดกิจกรรม</h2>
                         <p className="text-xl">ชื่อกิจกรรม : {selectedEvent.title}</p>
@@ -211,8 +168,4 @@ function CalendarFull() {
     );
 }
 
-<<<<<<< HEAD
 export default CalendarFull;
-=======
-export default CalendarFull;
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)

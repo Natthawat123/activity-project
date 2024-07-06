@@ -1,20 +1,13 @@
-<<<<<<< HEAD
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-=======
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import contractAbi from '../contract/abi.json';
 import Web3 from 'web3';
 import Swal from 'sweetalert2';
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
 
 function Upload() {
   const [data, setData] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
 
-<<<<<<< HEAD
-=======
   const [selectedActID, setSelectedActID] = useState(null); 
   const [selectedStdIDs, setSelectedStdIDs] = useState([]); 
 
@@ -28,7 +21,6 @@ function Upload() {
   // State to hold getAll results
   const [getAll, setGetAll] = useState([]);
 
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -49,61 +41,6 @@ function Upload() {
     return acc;
   }, {});
 
-<<<<<<< HEAD
-  const handleCheckboxChange = (stdID, actID) => {
-    const isSelected = selectedItems.some(item => item.stdID === stdID && item.actID === actID);
-
-    if (isSelected) {
-      setSelectedItems(prev => prev.filter(item => !(item.stdID === stdID && item.actID === actID)));
-    } else {
-      setSelectedItems(prev => [...prev, { stdID, actID }]);
-    }
-  };
-
-  const handleUpload = () => {
-    console.log('Selected Items:', selectedItems);
-
-  };
-
-  return (
-    <div>
-      {Object.keys(groupedData).map((actTitle) => {
-        let index = 0;
-        return (
-          <div key={actTitle}>
-            <h1>Activity: {actTitle}</h1>
-            <table>
-              <thead>
-                <tr>
-                  <th>ลำดับ</th>
-                  <th>รหัสนักศึกษา</th>
-                  <th>ชื่อ-นามสกุล</th>
-                  <th>เข้าร่วม</th>
-                </tr>
-              </thead>
-              <tbody>
-                {groupedData[actTitle].map((item) => (
-                  <tr key={item.id}>
-                    <td>{++index}</td>
-                    <td>{item.std_ID}</td>
-                    <td>{item.std_fname} {item.std_lname}</td>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={selectedItems.some(si => si.stdID === item.std_ID && si.actID === item.act_ID)}
-                        onChange={() => handleCheckboxChange(item.std_ID, item.act_ID)}
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        );
-      })}
-      <button onClick={handleUpload}>Submit</button>
-    </div>
-=======
   const sortedActivities = Object.keys(groupedData).map(actTitle => ({
     actTitle,
     activities: groupedData[actTitle],
@@ -348,7 +285,6 @@ function Upload() {
   
     </div>
   </div>
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
   );
 }
 

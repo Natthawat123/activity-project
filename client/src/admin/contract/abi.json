@@ -1,20 +1,5 @@
 [
     {
-<<<<<<< HEAD
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_actID",
-                "type": "uint256"
-            },
-            {
-                "internalType": "string[]",
-                "name": "_stdID",
-                "type": "string[]"
-            }
-        ],
-        "name": "add",
-=======
         "inputs": [],
         "stateMutability": "nonpayable",
         "type": "constructor"
@@ -71,7 +56,6 @@
             }
         ],
         "name": "Upload",
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -80,18 +64,6 @@
         "inputs": [
             {
                 "internalType": "uint256",
-<<<<<<< HEAD
-                "name": "_actID",
-                "type": "uint256"
-            }
-        ],
-        "name": "get",
-        "outputs": [
-            {
-                "internalType": "string[]",
-                "name": "",
-                "type": "string[]"
-=======
                 "name": "",
                 "type": "uint256"
             }
@@ -134,7 +106,6 @@
                 "internalType": "address[]",
                 "name": "",
                 "type": "address[]"
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
             }
         ],
         "stateMutability": "view",
@@ -145,16 +116,6 @@
         "name": "getAll",
         "outputs": [
             {
-<<<<<<< HEAD
-                "internalType": "uint256[]",
-                "name": "",
-                "type": "uint256[]"
-            },
-            {
-                "internalType": "string[][]",
-                "name": "",
-                "type": "string[][]"
-=======
                 "internalType": "uint16[]",
                 "name": "",
                 "type": "uint16[]"
@@ -163,7 +124,6 @@
                 "internalType": "uint32[][]",
                 "name": "",
                 "type": "uint32[][]"
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
             }
         ],
         "stateMutability": "view",

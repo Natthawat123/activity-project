@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-import { useState } from 'react';
-import Swal from 'sweetalert2';
-import PropTypes from 'prop-types';
-import CloseIcon from '@mui/icons-material/Close';
-
-function Add_Activity({ closeModal }) {
-=======
 import { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import PropTypes from 'prop-types';
@@ -24,18 +16,16 @@ function Add_Activity({ closeModal }) {
   }, []);
 
 
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
+
   const [inputTitle, setInputTitle] = useState('');
   const [inputDesc, setInputDesc] = useState('');
   const [inputNumStd, setInputNumStd] = useState(1);
   const [inputLocation, setInputLocation] = useState('');
   const [inputStartDate, setStartDate] = useState('');
   const [inputEndDate, setEndDate] = useState('');
-<<<<<<< HEAD
-=======
+
   const [inputStaffID, setstaffID] = useState('')
   const [staffName, setStaffName] = useState([]);
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
 
   const handleTitle = (event) => {
     setInputTitle(event.target.value);
@@ -58,28 +48,14 @@ function Add_Activity({ closeModal }) {
   const handleEndDate = (event) => {
     setEndDate(event.target.value);
   };
-<<<<<<< HEAD
-=======
+
   const handleStaffID = (event) => {
     setstaffID(event.target.value);
   };
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
 
   const handleSubmit = () => {
 
     const activity = {
-<<<<<<< HEAD
-      Act_Title: inputTitle,
-      Act_Desc: inputDesc,
-      Act_DateStart: inputStartDate,
-      Act_DateEnd: inputEndDate,
-      Act_NumStd: inputNumStd,
-      Act_Location: inputLocation,
-
-    };
-
-    fetch('http://localhost:3000/api/activity/create', {
-=======
       act_title: inputTitle,
       act_desc: inputDesc,
       act_dateStart: inputStartDate,
@@ -89,9 +65,7 @@ function Add_Activity({ closeModal }) {
       staff_ID: inputStaffID
 
     };
-
     fetch('/api/create/activity', {
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -100,50 +74,31 @@ function Add_Activity({ closeModal }) {
     })
       .then(response => response.json())
       .then(result => {
-<<<<<<< HEAD
-=======
+
+
         Swal.fire({
           title: 'เพิ่มกิจจกรรมใหม่สำเร็จ',
           icon: 'success',
         });
         setTimeout(() => {
         }, 1500);
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
         console.log(result);
       })
       .catch(error => {
         console.error('Error:', error);
-<<<<<<< HEAD
-=======
+
         Swal.fire({
           title: 'เพิ่มกิจจกรรมใหม่ไม่สำเร็จ',
           icon: 'error',
         });
         setTimeout(() => {
         }, 1500);
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
       });
-
-
   };
-
-<<<<<<< HEAD
-  // const showSweetAlert = () => {
-  //   Swal.fire({
-  //     title: 'Hashed Texts',
-  //     html: `<pre>${hashedText}</pre>`,
-  //     confirmButtonText: 'OK',
-  //   });
-  // };
-
-
-  return (
-    <div className="max-w-md mx-auto my-10 p-6  rounded-md ">
-=======
 
   return (
     <div className="max-w-md mx-auto my-10 p-3  rounded-md ">
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
+
 
       <div className="cursor-pointer justify-between flex" onClick={closeModal}>
         <div></div>
@@ -210,9 +165,6 @@ function Add_Activity({ closeModal }) {
           className="border border-gray-300 rounded-md p-1 mb-4 w-3/4"
         />
       </div>
-
-<<<<<<< HEAD
-=======
       <div className='flex items-center '>
         <label className="block mb-2 text-lg text-gray-600 w-1/4 text-left pb-2">ผู้จัดกิจกรรม :</label>
         <select value={inputStaffID} onChange={handleStaffID} className="border border-gray-300 rounded-md p-1 mb-4 w-3/4">
@@ -221,10 +173,6 @@ function Add_Activity({ closeModal }) {
           ))}
         </select>
       </div>
-
-
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
-
       <button
         onClick={handleSubmit}
         className="bg-blue-500 ml-32 my-2  text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue active:bg-blue-800"
@@ -235,11 +183,7 @@ function Add_Activity({ closeModal }) {
     </div>
   );
 }
-
-
 Add_Activity.propTypes = {
   closeModal: PropTypes.func.isRequired,
 };
-
-
 export default Add_Activity;

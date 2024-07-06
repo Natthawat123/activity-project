@@ -81,10 +81,6 @@ export const staff = (req, res) => {
 
     db.query(q, (err, result) => {
         if (err) return res.status(500).json(err)
-<<<<<<< HEAD
-        return res.json(ersult)
-=======
         return res.json(result)
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
     })
 }

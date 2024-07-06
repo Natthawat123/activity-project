@@ -44,10 +44,4 @@ export default {
     ],
   },
   plugins: [require("daisyui")]
-<<<<<<< HEAD
 }
-
-
-=======
-}
->>>>>>> cd46f31 (update upload and delete to blockchain reserve once)
