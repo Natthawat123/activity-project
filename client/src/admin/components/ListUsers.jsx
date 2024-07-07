@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link ,useNavigate} from "react-router-dom";
 
 const ProductTable = () => {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const navigate = useNavigate();
 
   const [users, setUsers] = useState([]);
   const [sections, setSections] = useState([]);
@@ -180,7 +181,7 @@ const ProductTable = () => {
                   บทบาท
                 </th>
                 <th scope="col" className=" -ml-6 pr-12 py-3 w-2/12 text-center">
-                  ดูเพิ่มเติม
+                 รายละเอียด
                 </th>
               </tr>
             </thead>
@@ -205,7 +206,7 @@ const ProductTable = () => {
                     </td>
                     <td scope="col" className="ml-10  py-3 w-2/12 text-center">
                       <button className="bg-cyan-400 hover:bg-cyan-500 px-2 py-1 text-white rounded">
-                        ตรวจสอบกิจกรรม
+                      <a onClick={() => navigate(`detail/student/${item.std_ID}`)}>เรียกดู</a>
                       </button>
                     </td>
                   </tr>

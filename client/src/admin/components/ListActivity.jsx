@@ -140,10 +140,10 @@ const ProductTable = () => {
                   วันเริ่ม
                 </th>
                 <th scope="col" className="px-6 py-3 w-3/12">
-                  วันสิ้นสุด
+                  สถานะ
                 </th>
                 <th scope="col" className="px-6 py-3 w-3/12">
-                  สถานะ
+                  แก้ไข
                 </th>
                 <th scope="col" className="px-6 py-3 w-3/12">
                   รายละเอียดกิจกรรม
@@ -169,15 +169,16 @@ const ProductTable = () => {
                   {<td scope="col" className="px-6 py-3 w-3/12">
                     {item.act_dateStart.slice(0, 10)}
                   </td>}
-                  {<td scope="col" className="px-6 py-3 w-3/12">
-                    {item.act_dateEnd.slice(0, 10)}
-                  </td>}
                   <td scope="col" className="px-6 py-3 w-3/12 text-left">
                     {item.act_status === 1 ? "เปิด" : "ปิด"}
                   </td>
+                  {<td scope="col" className="px-6 py-3 w-3/12 text-left hover:text-red-500">
+                    <a onClick={() => navigate(`manage/${item.act_ID}`)}>แก้ไขกิจกรรม</a>
+                  </td>}
                   <td scope="col" className="px-6 py-3 w-3/12 text-left hover:text-green-500">
-                    <a onClick={() => navigate(`manage/${item.act_ID}`)}>เพิ่มเติม</a>
-                    {/* เหลือรายละเอียดกิจกรรม แสดงรายชื่อนศ และข้อมูลทั้งหมด ลิ้งอีกหน้าs */}
+                    
+                    <a onClick={() => navigate(`detail/${item.act_ID}`)}>รายละเอียดกิจกรรม</a>
+                    
                   </td>
                 </tr>
               ))}

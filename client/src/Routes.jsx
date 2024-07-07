@@ -30,6 +30,9 @@ import Activity from './admin/pages/Activity.jsx';
 import Wallet from './admin/pages/Wallet.jsx';
 import AddUsers from './admin/components/Add_users.jsx';
 import UpdateUser from './admin/components/Update_user.jsx';
+import DetailActivityA from './admin/components/DetailActivity.jsx';
+import DetailStudent from './admin/components/DetailStudent.jsx';
+
 
 
 import ManageActivity from './admin/components/Manage_activity.jsx';
@@ -53,7 +56,8 @@ export function Router() {
                     <Route path="listusers" element={<ListUsers />} />
                     <Route path="activity" element={<Activity />} />
                     <Route path="activity/manage/:act_ID" element={<ManageActivity />} />
-                    <Route path="addusers" element={<AddUsers />} />
+                    <Route path="activity/detail/:act_ID" element={<DetailActivityA />} />
+                    <Route path="/admin/dashboard/detail/student/:std_ID" element={<DetailStudent />} />                    <Route path="addusers" element={<AddUsers />} />
                     <Route path="update" element={<UpdateUser />} />
                     <Route path="wallet" element={<Wallet />} />
                 </Route>

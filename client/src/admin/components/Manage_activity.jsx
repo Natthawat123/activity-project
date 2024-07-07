@@ -169,7 +169,7 @@ const UpdateActivity = () => {
         </div>
         <button type="submit">Update Activity</button>
         <button onClick={handleDelete} type="button">Delete Activity</button>
-        <h1 className='text-9xl'>ต้องการปลุ่มย้อนกลับ</h1>
+        <h1 className='text-9xl mt-12'>ต้องการปลุ่มย้อนกลับ</h1>
       </form>
     </div>
   );

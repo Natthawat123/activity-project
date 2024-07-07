@@ -31,6 +31,7 @@ class Popup extends Component {
                             <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                         </svg>
                     </div>
+                    
                 </button>
                 <Modal visible={this.state.visible} width="500" height="600"  effect="fadeInUp" onClickAway={() => this.closeModal()}>
                     <div className="">

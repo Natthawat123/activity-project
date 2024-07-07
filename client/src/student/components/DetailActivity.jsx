@@ -81,8 +81,6 @@
         fetchSection()
         fetchStaff()
     }, [act_ID, stdID]); 
-    console.log(section)
-    console.log(student)
 
     if (!activity || !student ) {
         return <div>Loading...</div>;
@@ -137,7 +135,7 @@
                 : 'Not found'
             }
         </p>  
-        <h1 className='text-9xl'>ขอปุ่มย้อนกลับด้วย</h1>
+        <h1 className='text-9xl mt-5'>ขอปุ่มย้อนกลับด้วย</h1>
         </div>
     );
     }
