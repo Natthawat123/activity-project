@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Swal from "sweetalert2";
 import PropTypes from "prop-types";
 import CloseIcon from "@mui/icons-material/Close";

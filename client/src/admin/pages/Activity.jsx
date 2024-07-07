@@ -1,4 +1,4 @@
-import React from 'react';
+
 import Dash_activity from '../components/Dash_activity';
 import ListActivity from '../components/ListActivity';
 import Popup from '../components/Popup_addAc';
