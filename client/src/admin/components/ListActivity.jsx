@@ -176,7 +176,7 @@ const ProductTable = () => {
                     {item.act_status === 1 ? "เปิด" : "ปิด"}
                   </td>
                   <td scope="col" className="px-6 py-3 w-3/12 text-left hover:text-green-500">
-                    <a onClick={() => navigate(`update/${item.act_ID}`)}>เพิ่มเติม</a>
+                    <a onClick={() => navigate(`manage/${item.act_ID}`)}>เพิ่มเติม</a>
                     {/* เหลือรายละเอียดกิจกรรม แสดงรายชื่อนศ และข้อมูลทั้งหมด ลิ้งอีกหน้าs */}
                   </td>
                 </tr>

@@ -13,6 +13,8 @@ import DashUser from './student/pages/Dashboard.jsx';
 import Profile from './student/pages/Profile.jsx';
 import Calendar from './student/pages/Calendar.jsx';
 import History from './student/pages/History.jsx';
+import DetailActivity from './student/components/DetailActivity.jsx';
+
 
 import LayoutT from './teacher/components/Layout.jsx';
 import CalendarT from './teacher/pages/Calendar.jsx';
@@ -30,7 +32,7 @@ import AddUsers from './admin/components/Add_users.jsx';
 import UpdateUser from './admin/components/Update_user.jsx';
 
 
-import UpdateActivity from './admin/components/Update_activity.jsx';
+import ManageActivity from './admin/components/Manage_activity.jsx';
 // import Login from './pages/Login.jsx';
 
 
@@ -50,7 +52,7 @@ export function Router() {
                     <Route path="calendar" element={<CalendarA />} />
                     <Route path="listusers" element={<ListUsers />} />
                     <Route path="activity" element={<Activity />} />
-                    <Route path="activity/update/:act_ID" element={<UpdateActivity />} />
+                    <Route path="activity/manage/:act_ID" element={<ManageActivity />} />
                     <Route path="addusers" element={<AddUsers />} />
                     <Route path="update" element={<UpdateUser />} />
                     <Route path="wallet" element={<Wallet />} />
@@ -61,6 +63,7 @@ export function Router() {
                     <Route path="profile" element={<Profile />} />
                     <Route path="history" element={<History />} />
                     <Route path="calendar" element={<Calendar />} />
+                    <Route path="detail/:act_ID" element={<DetailActivity />} />
                 </Route>
 
                 <Route path="/teacher" element={<LayoutT />}>
