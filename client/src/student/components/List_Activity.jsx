@@ -1,23 +1,36 @@
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import Web3 from "web3";
-import axios from 'axios'
-import contractAbi from '../../components/contract/abi.json';
+import Abi from '../../components/contract/abi.json';
+import { useNavigate } from 'react-router-dom';
 
-const ProductTable = () => {
+function Test() {
+    const [reserve, setReserve] = useState([]);
+    const [join, setJoin] = useState([]);
+    const [activity, setActivity] = useState([]);
+    const [status, setStatus] = useState('ไม่ได้ลงทะเบียน');
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
-    const [activity, setActivity] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
+<<<<<<< HEAD
     const [itemsPerPage, setItemsPerPage] = useState(10);
+=======
+    const [filter, setFilter] = useState("default");
+    const [itemsPerPage, setItemsPerPage] = useState(15);
+>>>>>>> 05718313b3f3f3e1be2025e819a787eba9229094
     const [currentPage, setCurrentPage] = useState(0);
     const [sortOrder, setSortOrder] = useState('latest'); // เพิ่ม state สำหรับการเรียงลำดับ
     const [filterStatus, setFilterStatus] = useState('all'); // เพิ่ม state สำหรับการกรองตามสถานะ
 
+<<<<<<< HEAD
     // reserve
     const [reserve, setReserve] = useState([]);
+=======
+    const navigate = useNavigate(); // Define the navigate function
+>>>>>>> 05718313b3f3f3e1be2025e819a787eba9229094
 
-    //web3
     const contractAddress = '0xF9322B9B17944cf80FA33Be311Ea472375698F90';
+<<<<<<< HEAD
     const [web3, setWeb3] = useState(null);
     const [contract, setContract] = useState(null);
     const [getAll, setGetAll] = useState([]);
@@ -80,10 +93,14 @@ const ProductTable = () => {
             console.error(err);
         }
     };
+=======
+    const stdID = localStorage.getItem('std_ID');
+>>>>>>> 05718313b3f3f3e1be2025e819a787eba9229094
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchManage = async () => {
             try {
+<<<<<<< HEAD
                 const activityResponse = await fetch('/api/list/activity');
                 const activityData = await activityResponse.json();
 
@@ -115,13 +132,70 @@ const ProductTable = () => {
         };
 
         fetchData();
+=======
+                const res = await axios.get('/api/manage');
+                setReserve(res.data);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        const fetchSmartContract = async () => {
+            try {
+                const web3 = new Web3('https://rpc.sepolia.org');
+                const contract = new web3.eth.Contract(Abi, contractAddress);
+                const res = await contract.methods.getAll().call();
+
+                const format = res[0].map((actID, index) => ({
+                    actID: Number(actID),
+                    stdIDs: res[1][index]
+                }));
+
+                setJoin(format);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        const fetchActivity = async () => {
+            try {
+                const res = await axios.get('/api/list/activity');
+                setActivity(res.data);
+            } catch (err) {
+                console.log(err);
+            }
+        };
+
+        fetchManage();
+        fetchSmartContract();
+        fetchActivity();
+        setIsLoaded(true);
+>>>>>>> 05718313b3f3f3e1be2025e819a787eba9229094
     }, []);
+
+    const getStatus = (activityID) => {
+        const joinEntry = join.find(j => j.actID == activityID && j.stdIDs.includes(BigInt(stdID)));
+        if (joinEntry) {
+            return 'เข้าร่วมกิจกรรมแล้ว';
+        }
+        const reserveEntry = reserve.find(r => r.act_ID == activityID && r.std_ID == stdID);
+        if (reserveEntry) {
+            return 'ลงทะเบียนสำเร็จ';
+        }
+        return 'ยังไม่ได้เข้าร่วมกิจกรรม';
+    };
 
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
-        setCurrentPage(0); // Reset currentPage when searching
+        setCurrentPage(0);
     };
 
+    const handleFilterChange = (event) => {
+        setFilter(event.target.value);
+        setCurrentPage(0);
+    };
+
+<<<<<<< HEAD
     const handleSortChange = (event) => {
         setSortOrder(event.target.value);
     };
@@ -136,6 +210,17 @@ const ProductTable = () => {
         } else {
             return new Date(a.act_dateStart) - new Date(b.act_dateStart);
         }
+=======
+    const filteredItems = activity.filter((item) => {
+        const status = getStatus(item.act_ID);
+        return (
+            item.act_title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+            (filter === "default" ||
+                (filter === "joinEntry" && status === 'เข้าร่วมกิจกรรมแล้ว') ||
+                (filter === "reserveEntry" && status === 'ลงทะเบียนสำเร็จ') ||
+                (filter === "notjoin" && status === 'ยังไม่ได้เข้าร่วมกิจกรรม'))
+        );
+>>>>>>> 05718313b3f3f3e1be2025e819a787eba9229094
     });
 
     const filteredItems = sortedItems.filter((item) => {
@@ -186,6 +271,7 @@ const ProductTable = () => {
                             </div>
                         </div>
 
+<<<<<<< HEAD
                         <div className="flex gap-2">
                             <div className="mt-1 pb-4 text-center">
                                 <label htmlFor="sortOrder" className="text-xs flex justify-center">เรียงตามวันที่</label>
@@ -215,6 +301,37 @@ const ProductTable = () => {
                                     <option value="notregistered">ยังไม่ลงทะเบียน</option>
                                 </select>
                             </div>
+=======
+                        <div className="pb-4 items-center">
+                            <label htmlFor="filter-activity-type" className="sr-only">Filter</label>
+                            <div className="relative mt-1">
+                                <select
+                                    value={filter}
+                                    onChange={handleFilterChange}
+                                    className='block p-2 text-sm border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500'
+                                >
+                                    <option value="default">All</option>
+                                    <option value="joinEntry">เข้าร่วมกิจกรรมแล้ว</option>
+                                    <option value="reserveEntry">ลงทะเบียนสำเร็จ</option>
+                                    <option value="notjoin">ยังไม่ได้เข้าร่วมกิจกรรม</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="mt-1 pb-4">
+                            <select
+                                value={itemsPerPage}
+                                onChange={(e) => {
+                                    setItemsPerPage(+e.target.value);
+                                    setCurrentPage(0);
+                                }}
+                                className="block ps-6 pt-1 pb-1 text-sm rounded-md w-20 bg-gray-200"
+                            >
+                                <option value={15}>15</option>
+                                <option value={25}>25</option>
+                                <option value={50}>50</option>
+                            </select>
+>>>>>>> 05718313b3f3f3e1be2025e819a787eba9229094
                         </div>
                     </div>
 
@@ -231,6 +348,7 @@ const ProductTable = () => {
                             </tr>
                         </thead>
                         <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
+<<<<<<< HEAD
                             {visibleItems.length === 0 ? (
                                 <tr className="border-b-2 flex w-full justify-center py-20">
                                     <td colSpan="6" className="px-6 py-3 text-center">ไม่พบข้อมูล</td>
@@ -254,10 +372,31 @@ const ProductTable = () => {
                                     </tr>
                                 ))
                             )}
+=======
+                            {visibleItems.map(item => (
+                                <tr key={item.act_ID} className="border-b-2 flex w-full">
+                                    <td className="px-6 py-3 w-1/6">{item.act_ID}</td>
+                                    <td className="px-6 py-3 w-1/6">{item.act_title}</td>
+                                    <td className="px-6 py-3 w-1/6">{item.act_location}</td>
+                                    <td className="px-6 py-3 w-1/6">{item.act_dateStart.slice(0, 10)}</td>
+                                    <td className={`px-6 py-3 w-1/6 ${getStatus(item.act_ID) === 'เข้าร่วมกิจกรรมแล้ว' ? 'text-green-500' : getStatus(item.act_ID) === 'ยังไม่ได้เข้าร่วมกิจกรรม' ? 'text-red-500' : ''}`}>
+                                        {getStatus(item.act_ID)}
+                                    </td>
+                                    <td className="px-6 py-3 w-1/6">
+                                        <button
+                                            className="text-blue-600 dark:text-blue-500 hover:underline"
+                                            onClick={() => navigate(`/activity/detail/${item.act_ID}`)} 
+                                        >
+                                            รายละเอียด
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+>>>>>>> 05718313b3f3f3e1be2025e819a787eba9229094
                         </tbody>
                     </table>
 
-                    <div className="flex items-center justify-between mt-4">
+                    <div className="flex justify-between mt-4">
                         <div>
                             <button
                                 onClick={() => {
@@ -308,6 +447,7 @@ const ProductTable = () => {
                                 Next
                             </button>
                         </div>
+<<<<<<< HEAD
 
                         <button onClick={handleGetAll} className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300">
                             Get All
@@ -328,11 +468,13 @@ const ProductTable = () => {
                                 <option value={500}>500</option>
                             </select>
                         </div>
+=======
+>>>>>>> 05718313b3f3f3e1be2025e819a787eba9229094
                     </div>
                 </div>
             </div>
         );
     }
-};
+}
 
-export default ProductTable;
+export default Test;
