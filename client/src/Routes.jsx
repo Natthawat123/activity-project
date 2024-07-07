@@ -28,6 +28,9 @@ import Activity from './admin/pages/Activity.jsx';
 import Wallet from './admin/pages/Wallet.jsx';
 import AddUsers from './admin/components/Add_users.jsx';
 import UpdateUser from './admin/components/Update_user.jsx';
+
+
+import UpdateActivity from './admin/components/Update_activity.jsx';
 // import Login from './pages/Login.jsx';
 
 
@@ -47,6 +50,7 @@ export function Router() {
                     <Route path="calendar" element={<CalendarA />} />
                     <Route path="listusers" element={<ListUsers />} />
                     <Route path="activity" element={<Activity />} />
+                    <Route path="activity/update/:act_ID" element={<UpdateActivity />} />
                     <Route path="addusers" element={<AddUsers />} />
                     <Route path="update" element={<UpdateUser />} />
                     <Route path="wallet" element={<Wallet />} />

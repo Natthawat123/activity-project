@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 const ProductTable = () => {
   const [error, setError] = useState(null);
@@ -11,6 +12,8 @@ const ProductTable = () => {
   const [currentPage, setCurrentPage] = useState(0);
 
   const [visibleStartPage, setVisibleStartPage] = useState(0);
+
+  const navigate = useNavigate();
 
 
 
@@ -49,6 +52,8 @@ const ProductTable = () => {
       item.act_location.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
+
+
 
   if (error) {
     return <div>Error: {error.message}</div>;
@@ -171,7 +176,7 @@ const ProductTable = () => {
                     {item.act_status === 1 ? "เปิด" : "ปิด"}
                   </td>
                   <td scope="col" className="px-6 py-3 w-3/12 text-left hover:text-green-500">
-                    <a href="#">เพิ่มเติม</a>
+                    <a onClick={() => navigate(`update/${item.act_ID}`)}>เพิ่มเติม</a>
                     {/* เหลือรายละเอียดกิจกรรม แสดงรายชื่อนศ และข้อมูลทั้งหมด ลิ้งอีกหน้าs */}
                   </td>
                 </tr>
