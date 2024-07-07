@@ -13,6 +13,8 @@ import DashUser from './student/pages/Dashboard.jsx';
 import Profile from './student/pages/Profile.jsx';
 import Calendar from './student/pages/Calendar.jsx';
 import History from './student/pages/History.jsx';
+import DetailActivity from './student/components/DetailActivity.jsx';
+
 
 import LayoutT from './teacher/components/Layout.jsx';
 import CalendarT from './teacher/pages/Calendar.jsx';
@@ -57,6 +59,7 @@ export function Router() {
                     <Route path="profile" element={<Profile />} />
                     <Route path="history" element={<History />} />
                     <Route path="calendar" element={<Calendar />} />
+                    <Route path="detail/:act_ID" element={<DetailActivity />} />
                 </Route>
 
                 <Route path="/teacher" element={<LayoutT />}>

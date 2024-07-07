@@ -1,128 +1,99 @@
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import Web3 from "web3";
-import axios from 'axios'
-import contractAbi from '../../components/contract/abi.json';
+import Abi from '../../components/contract/abi.json';
+import { useNavigate } from 'react-router-dom';
 
-const ProductTable = () => {
+function Test() {
+    const [reserve, setReserve] = useState([]);
+    const [join, setJoin] = useState([]);
+    const [activity, setActivity] = useState([]);
+    const [status, setStatus] = useState('ไม่ได้ลงทะเบียน');
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
-    const [activity, setActivity] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
+    const [filter, setFilter] = useState("default");
     const [itemsPerPage, setItemsPerPage] = useState(15);
     const [currentPage, setCurrentPage] = useState(0);
 
-    // reserve
-    const [reserve, setReserve] = useState([])
+    const navigate = useNavigate(); // Define the navigate function
 
-    //web3
     const contractAddress = '0xF9322B9B17944cf80FA33Be311Ea472375698F90';
-    const [web3, setWeb3] = useState(null);
-    const [contract, setContract] = useState(null);
-    const [getAll, setGetAll] = useState([]);
-    const [stdID, setStdID] = useState('');
-
-    // Connect to MetaMask 
-    const connectWallet = async () => {
-        if (window.ethereum) {
-            try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                const web3Instance = new Web3(window.ethereum);
-                setWeb3(web3Instance);
-                const contractInstance = new web3Instance.eth.Contract(contractAbi, contractAddress);
-                setContract(contractInstance);
-                return web3Instance; // Return the initialized web3 instance
-            } catch (err) {
-                console.error(err);
-                return null;
-            }
-        } else {
-            alert('Please install MetaMask');
-            return null;
-        }
-    };
-
-    // Function to handle getAll button click
-    const handleGetAll = async () => {
-        try {
-            const web3Instance = await connectWallet();
-    
-            if (!web3Instance || !contract) {
-                console.error('Contract or web3 not initialized.');
-                return;
-            }
-    
-            const allData = await contract.methods.getAll().call();
-            const formattedData = allData[0].map((actID, index) => ({
-                actID: Number(actID),
-                stdIDs: allData[1][index]
-            }));
-    
-            setGetAll(formattedData);
-            console.log(formattedData);
-    
-            // Update activity status based on blockchain data
-            const updatedActivity = activity.map(item => {
-                const blockchainParticipation = formattedData.find(
-                    data => data.actID === item.act_ID && data.stdIDs.includes(BigInt(stdID))
-                );
-                return {
-                    ...item,
-                    registrationStatus: blockchainParticipation 
-                        ? 'เข้าร่วม' 
-                        : (item.registrationStatus === 'ลงทะเบียนสำเร็จ' ? 'ไม่ได้เข้าร่วม' : 'ยังไม่ได้ลงทะเบียน')
-                };
-            });
-    
-            setActivity(updatedActivity);
-        } catch (err) {
-            console.error(err);
-        }
-    };
+    const stdID = localStorage.getItem('std_ID');
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchManage = async () => {
             try {
-                const activityResponse = await fetch('/api/list/activity');
-                const activityData = await activityResponse.json();
-    
-                const storedStdID = localStorage.getItem('std_ID');
-                setStdID(storedStdID);
-    
-                const manageResponse = await axios.get('/api/manage');
-                const reserveData = manageResponse.data;
-                setReserve(reserveData);
-                
-                
-                // Combine activity and reserve data
-                const activityWithStatus = activityData.map(activity => {
-                    const isRegistered = reserveData.some(
-                        reserve => reserve.std_ID === storedStdID && reserve.act_ID === activity.act_ID.toString()
-                    );
-                    return {
-                        ...activity,
-                        registrationStatus: isRegistered ? 'ลงทะเบียนสำเร็จ' : 'ยังไม่ได้ลงทะเบียน'
-                    };
-                });
-    
-                setActivity(activityWithStatus);
-                setIsLoaded(true);
-            } catch (error) {
-                setIsLoaded(true);
-                setError(error);
-                console.error("Error fetching data:", error);
+                const res = await axios.get('/api/manage');
+                setReserve(res.data);
+            } catch (err) {
+                console.error(err);
             }
         };
-    
-        fetchData();
+
+        const fetchSmartContract = async () => {
+            try {
+                const web3 = new Web3('https://rpc.sepolia.org');
+                const contract = new web3.eth.Contract(Abi, contractAddress);
+                const res = await contract.methods.getAll().call();
+
+                const format = res[0].map((actID, index) => ({
+                    actID: Number(actID),
+                    stdIDs: res[1][index]
+                }));
+
+                setJoin(format);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        const fetchActivity = async () => {
+            try {
+                const res = await axios.get('/api/list/activity');
+                setActivity(res.data);
+            } catch (err) {
+                console.log(err);
+            }
+        };
+
+        fetchManage();
+        fetchSmartContract();
+        fetchActivity();
+        setIsLoaded(true);
     }, []);
+
+    const getStatus = (activityID) => {
+        const joinEntry = join.find(j => j.actID == activityID && j.stdIDs.includes(BigInt(stdID)));
+        if (joinEntry) {
+            return 'เข้าร่วมกิจกรรมแล้ว';
+        }
+        const reserveEntry = reserve.find(r => r.act_ID == activityID && r.std_ID == stdID);
+        if (reserveEntry) {
+            return 'ลงทะเบียนสำเร็จ';
+        }
+        return 'ยังไม่ได้เข้าร่วมกิจกรรม';
+    };
 
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
-        setCurrentPage(0); // Reset currentPage when searching
+        setCurrentPage(0);
+    };
+
+    const handleFilterChange = (event) => {
+        setFilter(event.target.value);
+        setCurrentPage(0);
     };
 
     const filteredItems = activity.filter((item) => {
-        return item.act_title.toLowerCase().includes(searchTerm.toLowerCase());
+        const status = getStatus(item.act_ID);
+        return (
+            item.act_title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+            (filter === "default" ||
+                (filter === "joinEntry" && status === 'เข้าร่วมกิจกรรมแล้ว') ||
+                (filter === "reserveEntry" && status === 'ลงทะเบียนสำเร็จ') ||
+                (filter === "notjoin" && status === 'ยังไม่ได้เข้าร่วมกิจกรรม'))
+        );
     });
 
     if (error) {
@@ -157,6 +128,22 @@ const ProductTable = () => {
                             </div>
                         </div>
 
+                        <div className="pb-4 items-center">
+                            <label htmlFor="filter-activity-type" className="sr-only">Filter</label>
+                            <div className="relative mt-1">
+                                <select
+                                    value={filter}
+                                    onChange={handleFilterChange}
+                                    className='block p-2 text-sm border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500'
+                                >
+                                    <option value="default">All</option>
+                                    <option value="joinEntry">เข้าร่วมกิจกรรมแล้ว</option>
+                                    <option value="reserveEntry">ลงทะเบียนสำเร็จ</option>
+                                    <option value="notjoin">ยังไม่ได้เข้าร่วมกิจกรรม</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div className="mt-1 pb-4">
                             <select
                                 value={itemsPerPage}
@@ -185,26 +172,29 @@ const ProductTable = () => {
                             </tr>
                         </thead>
                         <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
-    {visibleItems.map(item => (
-        <tr key={item.act_ID} className="border-b-2 flex w-full">
-            <td className="px-6 py-3 w-1/6">{item.act_ID}</td>
-            <td className="px-6 py-3 w-1/6">{item.act_title}</td>
-            <td className="px-6 py-3 w-1/6">{item.act_location}</td>
-            <td className="px-6 py-3 w-1/6">{item.act_dateStart.slice(0, 10)}</td>
-            <td className={`px-6 py-3 w-1/6 ${
-                item.registrationStatus === 'ลงทะเบียนสำเร็จ' || item.registrationStatus === 'เข้าร่วม' 
-                    ? 'text-green-600' 
-                    : 'text-red-600'
-            }`}>
-                {item.registrationStatus}
-            </td>
-            <td className="px-6 py-3 w-1/6">เพิ่มเติม</td>
-        </tr>
-    ))}
-</tbody>
+                            {visibleItems.map(item => (
+                                <tr key={item.act_ID} className="border-b-2 flex w-full">
+                                    <td className="px-6 py-3 w-1/6">{item.act_ID}</td>
+                                    <td className="px-6 py-3 w-1/6">{item.act_title}</td>
+                                    <td className="px-6 py-3 w-1/6">{item.act_location}</td>
+                                    <td className="px-6 py-3 w-1/6">{item.act_dateStart.slice(0, 10)}</td>
+                                    <td className={`px-6 py-3 w-1/6 ${getStatus(item.act_ID) === 'เข้าร่วมกิจกรรมแล้ว' ? 'text-green-500' : getStatus(item.act_ID) === 'ยังไม่ได้เข้าร่วมกิจกรรม' ? 'text-red-500' : ''}`}>
+                                        {getStatus(item.act_ID)}
+                                    </td>
+                                    <td className="px-6 py-3 w-1/6">
+                                        <button
+                                            className="text-blue-600 dark:text-blue-500 hover:underline"
+                                            onClick={() => navigate(`/activity/detail/${item.act_ID}`)} 
+                                        >
+                                            รายละเอียด
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
                     </table>
 
-                    <div className="flex items-center justify-between mt-4">
+                    <div className="flex justify-between mt-4">
                         <div>
                             <button
                                 onClick={() => {
@@ -255,15 +245,11 @@ const ProductTable = () => {
                                 Next
                             </button>
                         </div>
-
-                        <button onClick={handleGetAll} className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                            Get All
-                        </button>
                     </div>
                 </div>
             </div>
         );
     }
-};
+}
 
-export default ProductTable;
+export default Test;

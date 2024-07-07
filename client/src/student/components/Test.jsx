@@ -36,6 +36,7 @@ function Test() {
                     actID: Number(actID),
                     stdIDs: res[1][index]
                 }));
+
                 setJoin(format)
             } catch (err) { console.error(err)}
         };
@@ -54,7 +55,7 @@ function Test() {
     }, []);
 
     const getStatus = (activityID) => {
-        const joinEntry = join.find(j => j.actID == activityID && j.stdIDs.includes(stdID));
+        const joinEntry = join.find(j => j.actID == activityID && j.stdIDs.includes(BigInt(stdID)));
         if (joinEntry) {
             return 'เข้าร่วมกิจกรรมแล้ว';
         }
@@ -106,6 +107,21 @@ function Test() {
                                 />
                             </div>
                         </div>
+
+                    {/* ช่วยทำให้หน่อยทำไม่เป็นแยกตามนี้เลย */}
+                        <div className="pb-4 items-center">
+                            <label htmlFor="filter-activity-type" className="sr-only">Search</label>
+                            <div className="relative mt-1">
+                                <select className=''>
+                                    <option value="all">All</option>
+                                    <option value="all">เข้าร่วมกิจกรรมแล้ว</option>
+                                    <option value="all">ลงทะเบียนสำเร็จ</option>
+                                    <option value="all">ยังไม่ได้เข้าร่วมกิจกรรม</option>
+                                </select>
+                            </div>
+                        </div>
+                    {/*  */}
+
 
                         <div className="mt-1 pb-4">
                             <select

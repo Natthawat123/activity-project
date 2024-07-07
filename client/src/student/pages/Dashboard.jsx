@@ -6,10 +6,10 @@ import Test from '../components/Test'
 function Dashboard() {
   return (
     <div className='mt-10'>
-      <Test/>
-      <hr className='m-[50px]'/>
-      {/* <DashCountAc />
-      <List_Activity /> */}
+      {/* <Test/>
+      <hr className='m-[50px]'/> */}
+      <DashCountAc />
+      <List_Activity />
     </div>
   )
 }
