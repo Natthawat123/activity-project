@@ -8,15 +8,16 @@ function Test() {
     const [reserve, setReserve] = useState([]);
     const [join, setJoin] = useState([]);
     const [activity, setActivity] = useState([]);
-    const [status, setStatus] = useState('ไม่ได้ลงทะเบียน');
+    //const [status, setStatus] = useState('ไม่ได้ลงทะเบียน');
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [filter, setFilter] = useState("default");
-    const [itemsPerPage, setItemsPerPage] = useState(15);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(0);
     const [sortOrder, setSortOrder] = useState('latest'); // State for sort order
-    const [filterStatus, setFilterStatus] = useState('all'); // State for status filter
+    //const [filterStatus, setFilterStatus] = useState('all'); // State for status filter
+    const [showPopup, setShowPopup] = useState(false);
 
     const navigate = useNavigate();
 
@@ -118,6 +119,16 @@ function Test() {
     const lastPage = Math.ceil(sortedItems.length / itemsPerPage) - 1;
     const visibleItems = sortedItems.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
 
+    const handleDetailClick = () => {
+        setShowPopup(true); // เมื่อคลิกที่ปุ่ม ตั้งค่าให้แสดง Popup
+    };
+
+    const handleClosePopup = () => {
+        setShowPopup(false); // ปิด Popup
+    };
+
+ 
+
     if (error) {
         return <div>Error: {error.message}</div>;
     } else if (!isLoaded) {
@@ -140,64 +151,59 @@ function Test() {
                                 <input
                                     type="text"
                                     id="table-search"
-                                    className='block p-2 text-sm border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                                 placeholder="Search for activity"
+                                    className='block pl-10 p-2 text-sm border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500'
+                                    placeholder="ค้นหากิจกรรม"
                                     value={searchTerm}
                                     onChange={handleSearch}
                                 />
                             </div>
                         </div>
-<div className='flex gap-3'>
-                        <div className="pb-4 items-center">
+                        <div className="flex gap-3 items-center">
+                        <div className="flex pb-4 items-center">
                             <label htmlFor="filter-activity-type" className="sr-only">Filter</label>
-                            <div className="relative mt-1">
+                            <div className="relative">
                                 <select
                                     value={filter}
                                     onChange={handleFilterChange}
-                                    className='block p-2 text-sm border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500'
+                                    className="text-xs block p-1.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 >
-                                    <option value="default">All</option>
+                                    <option value="default" className='text-center'>ทั้งหมด</option>
                                     <option value="joinEntry">เข้าร่วมกิจกรรมแล้ว</option>
                                     <option value="reserveEntry">ลงทะเบียนสำเร็จ</option>
                                     <option value="notjoin">ยังไม่ได้เข้าร่วมกิจกรรม</option>
                                 </select>
                             </div>
                         </div>
-
-
-                        <div className="pb-4 items-center">
-                            <button 
-                                onClick={handleSortChange} 
-                                className="p-2 bg-blue-500 text-white rounded-lg"
+                    
+                        <div className="flex pb-4 items-center">
+                            <button
+                                onClick={handleSortChange}
+                                className="block p-2 text-xs border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             >
-                                Sort by Date ({sortOrder === 'latest' ? 'Latest' : 'Oldest'})
+                                วันที่ ({sortOrder === 'latest' ? 'ล่าสุด' : 'ใหม่สุด'})
                             </button>
                         </div>
                     </div>
-</div>
-                    <table className="w-full text-sm text-gray-500 dark:text-gray-400">
-                        <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
-                            <tr className="flex w-full">
-                                <th scope="col" className="px-6 py-3 w-1/12"></th>
-                                <th scope="col" className="px-6 py-3 w-1/12">รหัสกิจกรรม</th>
-                                <th scope="col" className="px-6 py-3 w-2/12">ชื่อกิจกรรม</th>
-                                <th scope="col" className="px-6 py-3 w-2/12">สถานที่จัดกิจกรรม</th>
-                                <th scope="col" className="px-6 py-3 w-2/12">วันที่จัดกิจกรรม</th>
-                                <th scope="col" className="px-6 py-3 w-2/12">สถานะการเข้าร่วม</th>
-                                <th scope="col" className="px-6 py-3 w-2/12">รายละเอียด</th>
+                    
+                    </div>
+                    <table className="min-w-full bg-white dark:bg-gray-800">
+                        <thead className="bg-gray-200 dark:bg-gray-700">
+                            <tr className="w-96 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 uppercase text-left">
+                                <th className="px-4 py-3">ชื่อกิจกรรม</th>
+                                <th className="px-4 py-3">สถานที่</th>
+                                <th className="px-4 py-3">วันที่</th>
+                                <th className="px-4 py-3">สถานะ</th>
+                                <th className="px-4 py-3 w-2/12">การดำเนินการ</th>
                             </tr>
                         </thead>
-                        <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
-                            {visibleItems.map(item => (
-                                <tr key={item.act_ID} className="border-b-2 flex w-full">
-                                    <td className="px-6 py-3 w-1/6">{item.act_ID}</td>
-                                    <td className="px-6 py-3 w-1/6">{item.act_title}</td>
-                                    <td className="px-6 py-3 w-1/6">{item.act_location}</td>
-                                    <td className="px-6 py-3 w-1/6">{item.act_dateStart.slice(0, 10)}</td>
-                                    <td className={`px-6 py-3 w-1/6 ${getStatus(item.act_ID) === 'เข้าร่วมกิจกรรมแล้ว' ? 'text-green-500' : getStatus(item.act_ID) === 'ยังไม่ได้เข้าร่วมกิจกรรม' ? 'text-red-500' : ''}`}>
-                                        {getStatus(item.act_ID)}
-                                    </td>
-                                    <td className="px-6 py-3 w-1/6">
+                        <tbody className="text-sm divide-y divide-gray-200 dark:divide-gray-700">
+                            {visibleItems.map((item) => (
+                                <tr key={item.act_ID} className="text-gray-700 dark:text-gray-400">
+                                    <td className="px-4 py-3">{item.act_title}</td>
+                                    <td className="px-4 py-3">{item.act_location}</td>
+                                    <td className="px-4 py-3">{item.act_dateStart.slice(0, 10)}</td>
+                                    <td className="px-4 py-3">{getStatus(item.act_ID)}</td>
+                                    <td className="px-6 py-3">
                                         <button
                                             className="text-blue-600 dark:text-blue-500 hover:underline"
                                             onClick={() => navigate(`/activity/detail/${item.act_ID}`)} 
@@ -205,78 +211,44 @@ function Test() {
                                             รายละเอียด
                                         </button>
                                     </td>
+
                                 </tr>
                             ))}
                         </tbody>
                     </table>
+                
 
-                    <div className="flex justify-between mt-4">
-                        <div>
+                    <div className="flex justify-end mt-2">
+                        <div className="flex gap-2">
                             <button
-                                onClick={() => {
-                                    if (currentPage > 0) {
-                                        setCurrentPage(prev => prev - 1);
-                                    }
-                                }}
+                                onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
                                 disabled={currentPage === 0}
-                                className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-50 text-gray-500 dark:text-black focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === 0 ? 'cursor-not-allowed' : 'hover:bg-blue-200'}`}
                             >
-                                Previous
+                                ก่อนหน้า
                             </button>
-                        </div>
-
-                        <div className="flex space-x-2">
-                            {Array.from({ length: Math.ceil(sortedItems.length / itemsPerPage) }).slice(currentPage, currentPage + 4).map((_, i) => (
-                                <button
-                                    key={i + currentPage}
-                                    onClick={() => setCurrentPage(currentPage + i)}
-                                    className={`px-4 py-2 font-medium ${currentPage + i === currentPage ? "text-blue-600 bg-blue-100" : "text-gray-600 bg-gray-100"} border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300`}
-                                >
-                                    {currentPage + i + 1}
-                                </button>
-                            ))}
-
-                            {currentPage + 4 < lastPage && (
-                                <button
-                                    onClick={() => {
-                                        setCurrentPage(currentPage + 4);
-                                    }}
-                                    className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                                >
-                                    ...
-                                </button>
-                            )}
-                        </div>
-
-                        <div>
                             <button
-                                onClick={() => {
-                                    if (currentPage < lastPage) {
-                                        setCurrentPage(prev => prev + 1);
-                                    }
-                                }}
-                                disabled={currentPage >= lastPage}
-                                className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                                onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))}
+                                disabled={currentPage === lastPage}
+                                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-50 text-gray-500 dark:text-black focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === lastPage ? 'cursor-not-allowed' : 'hover:bg-blue-200'}`}
                             >
-                                Next
+                                ถัดไป
                             </button>
-                        </div>
-                        
-                        <div className="mt-1 pb-4">
                             <select
                                 value={itemsPerPage}
                                 onChange={(e) => {
                                     setItemsPerPage(+e.target.value);
                                     setCurrentPage(0);
                                 }}
-                                className="block ps-6 pt-1 pb-1 text-sm rounded-md w-20 bg-gray-200"
+                                className="px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-50 text-gray-500 dark:text-black focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             >
-                                <option value={15}>15</option>
-                                <option value={25}>25</option>
+                                <option value={10}>10</option>
+                                <option value={20}>20</option>
                                 <option value={50}>50</option>
                             </select>
                         </div>
                     </div>
+                
                 </div>
             </div>
         );
