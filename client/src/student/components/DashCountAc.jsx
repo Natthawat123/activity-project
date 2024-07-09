@@ -1,9 +1,19 @@
 import { useState, useEffect } from 'react'
+import axios from 'axios';
+import Web3 from "web3";
+import Abi from '../../components/contract/abi.json';
+import { useNavigate } from 'react-router-dom';
+
 function Dash_users() {
   const [activity, setActivity] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(null);
   const [countActivity, setCountActivity] = useState(0);
+  const [reserve, setReserve] = useState([]);
+  const [join, setJoin] = useState([]);
+  const [joinedCount, setJoinedCount] = useState(0);
+  const [registeredCount, setRegisteredCount] = useState(0);
+  const [notJoinedCount, setNotJoinedCount] = useState(0);
 
   useEffect(() => {
     fetch("/api/list/activity")
@@ -22,6 +32,77 @@ function Dash_users() {
       );
   }, []);
 
+  const navigate = useNavigate();
+
+  const contractAddress = '0xF9322B9B17944cf80FA33Be311Ea472375698F90';
+  const stdID = localStorage.getItem('std_ID');
+
+  useEffect(() => {
+      const fetchManage = async () => {
+          try {
+              const res = await axios.get('/api/manage');
+              setReserve(res.data);
+          } catch (err) {
+              console.error(err);
+          }
+      };
+
+      const fetchSmartContract = async () => {
+          try {
+              const web3 = new Web3('https://rpc.sepolia.org');
+              const contract = new web3.eth.Contract(Abi, contractAddress);
+              const res = await contract.methods.getAll().call();
+
+              const format = res[0].map((actID, index) => ({
+                  actID: Number(actID),
+                  stdIDs: res[1][index]
+              }));
+
+              setJoin(format);
+          } catch (err) {
+              console.error(err);
+          }
+      };
+
+      const fetchActivity = async () => {
+          try {
+              const res = await axios.get('/api/list/activity');
+              setActivity(res.data);
+          } catch (err) {
+              console.log(err);
+          }
+      };
+
+      fetchManage();
+      fetchSmartContract();
+      fetchActivity();
+      setIsLoaded(true);
+  }, []);
+
+  useEffect(() => {
+      if (activity.length > 0) {
+          const joined = activity.filter(item => getStatus(item.act_ID) === 'เข้าร่วมกิจกรรมแล้ว').length;
+          const registered = activity.filter(item => getStatus(item.act_ID) === 'ลงทะเบียนสำเร็จ').length;
+          const notJoined = activity.filter(item => getStatus(item.act_ID) === 'ยังไม่ได้เข้าร่วมกิจกรรม').length;
+
+          setJoinedCount(joined);
+          setRegisteredCount(registered);
+          setNotJoinedCount(notJoined);
+      }
+  }, [activity, join, reserve]);
+
+  const getStatus = (activityID) => {
+      const joinEntry = join.find(j => j.actID == activityID && j.stdIDs.includes(BigInt(stdID)));
+      if (joinEntry) {
+          return 'เข้าร่วมกิจกรรมแล้ว';
+      }
+      const reserveEntry = reserve.find(r => r.act_ID == activityID && r.std_ID == stdID);
+      if (reserveEntry) {
+          return 'ลงทะเบียนสำเร็จ';
+      }
+      return 'ยังไม่ได้เข้าร่วมกิจกรรม';
+  };
+
 
   return (
     <div className='container mx-auto px-10 md:px-20 mb-5'>
@@ -30,24 +111,26 @@ function Dash_users() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pr-2 pl-2 pt-3">
             <div className="bg-teal-600 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-blue-600">
               <div className='text-2xl flex items-center gap-2'>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-                </svg>
+        
 
                 <div className='text-sm font-semibold'>จำนวนกิจกรรมทั้งหมด</div>
               </div>
               <div className='text-center text-4xl font-bold'>{countActivity}</div>
             </div>
 
-            {/* <div className="bg-green-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-green-600">
-              <p className='text-sm font-semibold'>จำนวนกิจกรรมของสาขา</p>
-              <div className='text-center text-4xl font-bold'>EX</div>
+             <div className="bg-green-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-green-600">
+              <p className='text-sm font-semibold'>จำนวนกิจกรรมที่เข้าร่วมแล้ว</p>
+              <div className='text-center text-4xl font-bold'> {joinedCount}</div>
             </div>
 
             <div className="bg-green-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-green-600">
-              <p className='text-sm font-semibold'>จำนวนกิจกรรมจิตอาสา</p>
-              <div className='text-center text-4xl font-bold'>EX</div>
-            </div> */}
+              <p className='text-sm font-semibold'> จำนวนกิจกรรมที่ลงทะเบียนแล้ว </p>
+              <div className='text-center text-4xl font-bold'>{joinedCount}</div>
+            </div> 
+            <div className="bg-green-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-green-600">
+              <p className='text-sm font-semibold'>จำนวนกิจกรรมที่ยังไม่ได้เข้าร่วม </p>
+              <div className='text-center text-4xl font-bold'>{notJoinedCount}</div>
+            </div> 
 
 
           </div>

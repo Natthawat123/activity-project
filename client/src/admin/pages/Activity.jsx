@@ -1,4 +1,4 @@
-import React from 'react';
+
 import Dash_activity from '../components/Dash_activity';
 import ListActivity from '../components/ListActivity';
 import Popup from '../components/Popup_addAc';
@@ -12,9 +12,9 @@ function Activity() {
         <Popup />
       </div>
 
-      <div className='flex flex-col md:flex-row'>
-        <div className='w-full md:w-3/12 mb-4 md:mb-0 md:mr-4'><Dash_activity /></div>
-        <div className='w-full md:w-9/12'><ListActivity /></div>
+      <div className=''>
+        <div className='w-full  mb-4 md:mb-0 md:mr-4'><Dash_activity /></div>
+        <div className='w-full'><ListActivity /></div>
       </div>
     </div>
   );

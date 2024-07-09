@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Swal from "sweetalert2";
 import PropTypes from "prop-types";
 import CloseIcon from "@mui/icons-material/Close";
@@ -104,6 +104,7 @@ const Add_Users = ({ closeModal }) => {
           title: "เกิดข้อผิดพลาด!",
           text: error.response.data.message || "Something went wrong",
         });
+        closeModal();
       } else if (error.request) {
         // Request was made but no response was received
         console.error("Error request:", error.request);
@@ -112,6 +113,7 @@ const Add_Users = ({ closeModal }) => {
           title: "เกิดข้อผิดพลาด!",
           text: "No response from server",
         });
+        closeModal();
       } else {
         console.error("Error message:", error.message);
         Swal.fire({
@@ -119,6 +121,7 @@ const Add_Users = ({ closeModal }) => {
           title: "เกิดข้อผิดพลาด!",
           text: error.message,
         });
+        closeModal();
       }
     }
   };
