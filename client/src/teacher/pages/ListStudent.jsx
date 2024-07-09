@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const ProductTable = () => {
   const [error, setError] = useState(null);
@@ -8,6 +9,8 @@ const ProductTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [itemsPerPage, setItemsPerPage] = useState(15);
   const [currentPage, setCurrentPage] = useState(0);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch user data
@@ -70,7 +73,6 @@ const ProductTable = () => {
     return (
       <div className="mb-10 container mx-auto md:px-20">
         <div className=" overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
-
           <div className="text-lg font-bold mb-2">รายชื่อนักศึกษา</div>
           <div className="flex justify-between">
             <div className="pb-4 items-center">
@@ -106,7 +108,6 @@ const ProductTable = () => {
               </div>
             </div>
 
-
             <div className=" mt-1 pb-4">
               <select
                 value={itemsPerPage}
@@ -141,31 +142,31 @@ const ProductTable = () => {
                 <th scope="col" className="px-6 py-3 w-2/12">
                   รายละเอียด
                 </th>
-
               </tr>
             </thead>
             <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
               {visibleItems.map((item, index) => (
                 <tr key={index} className="border-b-2 flex w-full items-center">
-                  <td scope="col" className="px-6 py-3 w-4/12">{item.std_ID}</td>
-                  <td scope="col" className="px-6 py-3 w-2/12">{item.std_fname}</td>
-                  <td scope="col" className="px-6 py-3 w-2/12">{item.std_lname}</td>
-                  <td scope="col" className="px-6 py-3 w-2/12">{item.sec_name}</td>
+                  <td scope="col" className="px-6 py-3 w-4/12">
+                    {item.std_ID}
+                  </td>
                   <td scope="col" className="px-6 py-3 w-2/12">
-                    <button className=" hover:text-teal-700 px-2 py-1  ">
+                    {item.std_fname}
+                  </td>
+                  <td scope="col" className="px-6 py-3 w-2/12">
+                    {item.std_lname}
+                  </td>
+                  <td scope="col" className="px-6 py-3 w-2/12">
+                    {item.sec_name}
+                  </td>
+                  <td scope="col" className="px-6 py-3 w-2/12">
+                    <button
+                      className=" hover:text-teal-700 px-2 py-1  "
+                      onClick={() => navigate(`detail/student/${item.std_ID}`)}
+                    >
                       เพิ่มเติม
                     </button>
                   </td>
-                  {/* <td scope="col" className="px-6 py-3 w-2/12">{item.std_email}</td>
-                  <td scope="col" className="px-6 py-3 w-2/12">{item.std_mobile}</td>
-                  <td scope="col" className="px-6 py-3 w-2/12">
-                    {
-                      item.std_address + " ต." +
-                      item.subdistrict + " อ." +
-                      item.district + " จ." +
-                      item.province + " รหัสไปรษณีย์ " +
-                      item.zipcode}
-                  </td> */}
                 </tr>
               ))}
             </tbody>
@@ -187,17 +188,23 @@ const ProductTable = () => {
             </div>
 
             <div className="flex space-x-2">
-              {Array.from({ length: Math.ceil(filteredItems.length / itemsPerPage) }).slice(currentPage, currentPage + 4).map((_, i) => (
-                <button
-                  key={i + currentPage}
-                  onClick={() => setCurrentPage(currentPage + i)}
-                  className={`px-4 py-2 font-medium ${currentPage + i === currentPage ? "text-blue-600 bg-blue-100" : "text-gray-600 bg-gray-100"
+              {Array.from({
+                length: Math.ceil(filteredItems.length / itemsPerPage),
+              })
+                .slice(currentPage, currentPage + 4)
+                .map((_, i) => (
+                  <button
+                    key={i + currentPage}
+                    onClick={() => setCurrentPage(currentPage + i)}
+                    className={`px-4 py-2 font-medium ${
+                      currentPage + i === currentPage
+                        ? "text-blue-600 bg-blue-100"
+                        : "text-gray-600 bg-gray-100"
                     } border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300`}
-                >
-                  {currentPage + i + 1}
-                </button>
-              ))}
-
+                  >
+                    {currentPage + i + 1}
+                  </button>
+                ))}
 
               {currentPage + 4 < lastPage && (
                 <button
@@ -225,7 +232,6 @@ const ProductTable = () => {
               </button>
             </div>
           </div>
-
         </div>
       </div>
     );

@@ -145,6 +145,7 @@ function CalendarFull() {
             color: 'white',
             border: '0',
             display: 'block',
+            margin: '2px'            
         };
         return {
             style,
@@ -169,7 +170,7 @@ function CalendarFull() {
                 defaultDate={new Date()}
                 defaultView="month"
                 events={events}
-                style={{ height: "50vh" }}
+                style={{ height: "70vh"}}
                 eventPropGetter={eventStyleGetter}
                 onSelectEvent={handleEventClick}
             />
@@ -202,15 +203,29 @@ function CalendarFull() {
                         </p>
 
 
-<p style={{ color: selectedEvent.numStd == selectedEvent.numStdReserve ? 'red' : now >= selectedEvent.reserveStart && now <= selectedEvent.reserveEnd ? (selectedEvent.status == 1 ? 'green' : 'red') : 'gray' }}>
-    {selectedEvent.numStd == selectedEvent.numStdReserve
-        ? 'ลงทะเบียนเต็มแล้ว'
-        : now >= selectedEvent.reserveStart && now <= selectedEvent.reserveEnd
-            ? selectedEvent.status == 1 
-                ? 'เปิดลงทะเบียน'
-                : 'ปิดลงทะเบียน'
-            : 'ยังไม่ถึงช่วงเปิดลงทะเบียน'}
+                        <p style={{ 
+    color: selectedEvent.status == 2
+        ? 'blue'
+        : selectedEvent.numStd == selectedEvent.numStdReserve 
+            ? 'red' 
+            : now >= selectedEvent.reserveStart && now <= selectedEvent.reserveEnd 
+                ? selectedEvent.status == 1 
+                    ? 'green' 
+                    : 'red' 
+                : 'gray'
+}}>
+    {selectedEvent.status == 2
+        ? 'กิจกรรมสิ้นสุดแล้ว'
+        : selectedEvent.numStd == selectedEvent.numStdReserve
+            ? 'ลงทะเบียนเต็มแล้ว'
+            : now >= selectedEvent.reserveStart && now <= selectedEvent.reserveEnd
+                ? selectedEvent.status == 1 
+                    ? 'เปิดลงทะเบียน'
+                    : 'ปิดลงทะเบียน'
+                : 'ยังไม่ถึงช่วงเปิดลงทะเบียน'
+    }
 </p>
+
 
 
 {selectedEvent.numStd != selectedEvent.numStdReserve && now >= selectedEvent.reserveStart && now <= selectedEvent.reserveEnd && selectedEvent.status == 1 && (
