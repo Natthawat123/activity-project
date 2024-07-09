@@ -133,12 +133,10 @@ function Upload() {
       console.log('Transaction successful:', tx.transactionHash);
 
       try {
-        const res = await axios.delete('/api/reserve', {
-          params: {
-            act_ID: selectedActID,
-            std_ID: selectedStdIDs.join(',') 
-          }
-        })
+        
+        const res = await axios.delete('/api/reserve',selectedActID)
+        console.log(res)
+        
         Swal.fire({
           position: "top-end",
           icon: "บันทึกข้อมูลสำเร็จ",
@@ -146,9 +144,9 @@ function Upload() {
           showConfirmButton: false,
           timer: 1500
         });
-        setTimeout(() => {
-          window.location.reload();
-      }, 1500);
+      //   setTimeout(() => {
+      //     window.location.reload();
+      // }, 1500);
       } catch (err) {
         console.error('Error deleting reserve:', err);
         Swal.fire({

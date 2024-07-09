@@ -170,7 +170,14 @@ const ProductTable = () => {
                     {item.act_dateStart.slice(0, 10)}
                   </td>}
                   <td scope="col" className="px-6 py-3 w-3/12 text-left">
-                    {item.act_status === 1 ? "เปิด" : "ปิด"}
+                    {/* {item.act_status === 1 ? "เปิด" : "ปิด"} */}
+                    {item.act_status == 1 
+                      ? "เปิด" 
+                      : item.act_status == 3 
+                          ? "กิจกรรมจบแล้ว" 
+                          : "ปิด"
+                  }
+
                   </td>
                   {<td scope="col" className="px-6 py-3 w-3/12 text-left hover:text-red-500">
                     <a onClick={() => navigate(`manage/${item.act_ID}`)}>แก้ไขกิจกรรม</a>

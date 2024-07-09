@@ -72,7 +72,7 @@ function Test() {
         if (reserveEntry) {
             return 'ลงทะเบียนสำเร็จ';
         }
-        return 'ยังไม่ได้เข้าร่วมกิจกรรม';
+        return 'ยังไม่ได้ลงทะเบียน';
     };
 
     const handleSearch = (event) => {
@@ -92,7 +92,7 @@ function Test() {
             (filter === "default" ||
                 (filter === "joinEntry" && status === 'เข้าร่วมกิจกรรมแล้ว') ||
                 (filter === "reserveEntry" && status === 'ลงทะเบียนสำเร็จ') ||
-                (filter === "notjoin" && status === 'ยังไม่ได้เข้าร่วมกิจกรรม'))
+                (filter === "notjoin" && status === 'ยังไม่ได้ลงทะเบียน'))
         );
     });
 
@@ -139,7 +139,7 @@ function Test() {
                                     <option value="default">All</option>
                                     <option value="joinEntry">เข้าร่วมกิจกรรมแล้ว</option>
                                     <option value="reserveEntry">ลงทะเบียนสำเร็จ</option>
-                                    <option value="notjoin">ยังไม่ได้เข้าร่วมกิจกรรม</option>
+                                    <option value="notjoin">ยังไม่ได้ลงทะเบียน</option>
                                 </select>
                             </div>
                         </div>
@@ -178,7 +178,7 @@ function Test() {
                                     <td className="px-6 py-3 w-1/6">{item.act_title}</td>
                                     <td className="px-6 py-3 w-1/6">{item.act_location}</td>
                                     <td className="px-6 py-3 w-1/6">{item.act_dateStart.slice(0, 10)}</td>
-                                    <td className={`px-6 py-3 w-1/6 ${getStatus(item.act_ID) === 'เข้าร่วมกิจกรรมแล้ว' ? 'text-green-500' : getStatus(item.act_ID) === 'ยังไม่ได้เข้าร่วมกิจกรรม' ? 'text-red-500' : ''}`}>
+                                    <td className={`px-6 py-3 w-1/6 ${getStatus(item.act_ID) === 'เข้าร่วมกิจกรรมแล้ว' ? 'text-green-500' : getStatus(item.act_ID) === 'ยังไม่ได้ลงทะเบียน' ? 'text-red-500' : ''}`}>
                                         {getStatus(item.act_ID)}
                                     </td>
                                     <td className="px-6 py-3 w-1/6">

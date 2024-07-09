@@ -28,6 +28,8 @@ function CalendarFull() {
                 const eventList = data.map((item, index) => ({
                     start: moment(item.act_dateStart).toDate(),
                     end: moment(item.act_dateEnd).toDate(),
+                    reserveStart: moment(item.act_dateStart).subtract(2, 'weeks').toDate(),
+                    reserveEnd: moment(item.act_dateStart).subtract(1, 'day').toDate(),
                     title: item.act_title,
                     status: item.act_status,
                     location: item.act_location,
@@ -35,6 +37,7 @@ function CalendarFull() {
                     numStdReserve: item.act_numStdReserve,
                     id: item.act_ID,
                     color: index % 3 === 0 ? 'blue' : index % 3 === 1 ? 'green' : 'red',
+
                 }));
                 setEvents(eventList);
             })
@@ -42,8 +45,11 @@ function CalendarFull() {
                 console.error('เกิดข้อผิดพลาด: ', error);
             });
 
-    }, []);
+    }, []);   
     
+    const now = new Date();
+    const isInRegistrationPeriod = selectedEvent && now >= selectedEvent.reserveStart && now <= selectedEvent.reserveEnd;
+
 
     const handleReserve = async () => {
         try {
@@ -55,69 +61,75 @@ function CalendarFull() {
                 });
                 return;
             }
-    
-            if (selectedEvent.numStd == selectedEvent.numStdReserve) {
-                alert('เต็ม');
-                return;
-            } else if (selectedEvent.status == 0) {
-                alert('ปิดลงทะเบียน');
-                return;
-            }
-    
-            const reserve = {
-                man_status: selectedEvent.status,
-                std_ID: std_ID,
-                act_ID: selectedEvent.id
-            };
-    
-            let reservations = [];
-            try {
-                const checkResponse = await axios.get('/api/manage');
-                reservations = checkResponse.data;
-            } catch (error) {
-                console.log(error);
-            }
-    
-            if (Array.isArray(reservations) && reservations.length > 0) {
-                const alreadyReserved = reservations.some(reservation => 
-                    reservation.std_ID.toString() === std_ID.toString() && 
-                    reservation.act_ID.toString() === selectedEvent.id.toString()
-                );    
-                if (alreadyReserved) {
-                    Swal.fire({
-                        position: "top-end",
-                        icon: "info",
-                        title: "คุณได้ลงทะเบียนกิจกรรมนี้ไปเรียบร้อยแล้ว",
-                        showConfirmButton: false,
-                        timer: 1500,
-                    });
+            const now = new Date
+            if (now >= selectedEvent.reserveStart && now <= selectedEvent.reserveEnd){
+                if (selectedEvent.numStd == selectedEvent.numStdReserve) {
+                    alert('เต็ม');
+                    return;
+                } else if (selectedEvent.status == 0) {
+                    alert('ปิดลงทะเบียน');
                     return;
                 }
+        
+                const reserve = {
+                    man_status: selectedEvent.status,
+                    std_ID: std_ID,
+                    act_ID: selectedEvent.id
+                };
+        
+                let reservations = [];
+                try {
+                    const checkResponse = await axios.get('/api/manage');
+                    reservations = checkResponse.data;
+                } catch (error) {
+                    console.log(error);
+                }
+        
+                if (Array.isArray(reservations) && reservations.length > 0) {
+                    const alreadyReserved = reservations.some(reservation => 
+                        reservation.std_ID.toString() === std_ID.toString() && 
+                        reservation.act_ID.toString() === selectedEvent.id.toString()
+                    );    
+                    if (alreadyReserved) {
+                        Swal.fire({
+                            position: "top-end",
+                            icon: "info",
+                            title: "คุณได้ลงทะเบียนกิจกรรมนี้ไปเรียบร้อยแล้ว",
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
+                        return;
+                    }
+                }
+        
+                const reserveResponse = await axios.post('/api/reserve/activity', reserve);
+        
+                if (reserveResponse.data && (reserveResponse.data.success || reserveResponse.status === 200)) {
+                    const updatedNumStdReserve = selectedEvent.numStdReserve + 1;
+                    const setActNumStdReserve = await axios.put(`/api/reserve/numStdReserve`, {
+                        act_ID: selectedEvent.id,
+                        numStdReserve: updatedNumStdReserve
+                    });
+                    console.log(setActNumStdReserve);
+        
+                    Swal.fire({
+                        position: "top-end",
+                        icon: "success",
+                        title: "ลงทะเบียนสำเร็จ",
+                        showConfirmButton: false,
+                        timer: 1500
+                        
+                    });
+                    setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+        
+                }
+            }else{
+                alert('ไม่ได้อยู่ในช่วงละเทียน')
             }
-    
-            const reserveResponse = await axios.post('/api/reserve/activity', reserve);
-    
-            if (reserveResponse.data && (reserveResponse.data.success || reserveResponse.status === 200)) {
-                const updatedNumStdReserve = selectedEvent.numStdReserve + 1;
-                const setActNumStdReserve = await axios.put(`/api/reserve/numStdReserve`, {
-                    act_ID: selectedEvent.id,
-                    numStdReserve: updatedNumStdReserve
-                });
-                console.log(setActNumStdReserve);
-    
-                Swal.fire({
-                    position: "top-end",
-                    icon: "success",
-                    title: "ลงทะเบียนสำเร็จ",
-                    showConfirmButton: false,
-                    timer: 1500
-                    
-                });
-                setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
-    
-            }
+        
+            
         } catch (err) {
             console.log(err);
         }
@@ -175,6 +187,10 @@ function CalendarFull() {
                         <p>สถานที่ : {selectedEvent.location}</p>
                         <p>วันที่ : {selectedEvent.start.toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" })} - {selectedEvent.end.toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" })}
                         </p>
+                        <p>เปิดลงทะเบียน : {selectedEvent.reserveStart.toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" })} - {selectedEvent.reserveEnd.toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" })}</p>
+                    {/* <p style={{ color: isInRegistrationPeriod ? 'green' : 'red' }}>
+                        {isInRegistrationPeriod ? 'อยู่ในช่วงลงทะเบียน' : 'ไม่อยู่ในช่วงลงทะเบียน'}
+                    </p> */}
                         <p>
                             <span>จำนวนที่เปิดรับ :</span> 
                             <span style={{ color: selectedEvent.numStd == selectedEvent.numStdReserve ? 'red' : 'green' }}>
@@ -185,19 +201,25 @@ function CalendarFull() {
                             <span> คน</span>
                         </p>
 
-                        <p style={{ color: selectedEvent.numStd == selectedEvent.numStdReserve ? 'red' : selectedEvent.status === 1 ? 'green' : 'gray' }}>
-                                {selectedEvent.numStd == selectedEvent.numStdReserve
-                                    ? 'ลงทะเบียนเต็มแล้ว'
-                                    : selectedEvent.status === 1
-                                        ? 'เปิดลงทะเบียน'
-                                        : 'ปิดลงทะเบียน'}
-                            </p>
-                        <div className="text-end">
-                            <button className="btn px-2 py-1 bg-green-600 mt-4 text-center rounded-sm text-white" onClick={handleReserve}>
-                                จองกิจกรรม
-                            </button>
-                            
-                        </div>
+
+<p style={{ color: selectedEvent.numStd == selectedEvent.numStdReserve ? 'red' : now >= selectedEvent.reserveStart && now <= selectedEvent.reserveEnd ? (selectedEvent.status == 1 ? 'green' : 'red') : 'gray' }}>
+    {selectedEvent.numStd == selectedEvent.numStdReserve
+        ? 'ลงทะเบียนเต็มแล้ว'
+        : now >= selectedEvent.reserveStart && now <= selectedEvent.reserveEnd
+            ? selectedEvent.status == 1 
+                ? 'เปิดลงทะเบียน'
+                : 'ปิดลงทะเบียน'
+            : 'ยังไม่ถึงช่วงเปิดลงทะเบียน'}
+</p>
+
+
+{selectedEvent.numStd != selectedEvent.numStdReserve && now >= selectedEvent.reserveStart && now <= selectedEvent.reserveEnd && selectedEvent.status == 1 && (
+    <div className="text-end">
+        <button className="btn px-2 py-1 bg-green-600 mt-4 text-center rounded-sm text-white" onClick={handleReserve}>
+            จองกิจกรรม
+        </button>                            
+    </div>
+)}
                     </div>
                 </div>
             )}

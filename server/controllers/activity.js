@@ -21,12 +21,11 @@ export const manage = (req, res) => {
 export const reserve = (req, res) => {
     const {
         act_ID,
-        std_ID
-    } = req.query;
+    } = req.body;
 
-    const sql = 'DELETE FROM manage WHERE act_ID = ? AND std_ID = ?';
+    const sql = 'DELETE FROM manage WHERE act_ID = ? ';
 
-    db.query(sql, [act_ID, std_ID], (err, result) => {
+    db.query(sql, [act_ID], (err, result) => {
         if (err) {
             return res.status(500).json({
                 error: err.message
