@@ -1,6 +1,6 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams , useNavigate} from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Web3 from 'web3';
 import Abi from '../../components/contract/abi.json';
 
@@ -11,12 +11,13 @@ function DetailStudent() {
     const [reserve, setReserve] = useState([]);
     const [section, setSection] = useState([]);
     const [staff, setStaff] = useState([]);
+    const [sortOrder, setSortOrder] = useState('latest');
 
-    const [searchTerm, setSearchTerm] = useState("");
-    const [filter, setFilter] = useState("default");
-    const [itemsPerPage, setItemsPerPage] = useState(15);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filter, setFilter] = useState('default');
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(0);
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const { std_ID } = useParams();
     const contractAddress = '0xF9322B9B17944cf80FA33Be311Ea472375698F90';
@@ -33,7 +34,7 @@ function DetailStudent() {
 
         const fetchActivity = async () => {
             try {
-                const response = await axios.get(`/api/activity`); // Assuming this API endpoint is correct
+                const response = await axios.get(`/api/activity`);
                 setActivity(response.data);
             } catch (error) {
                 console.error(error);
@@ -91,18 +92,19 @@ function DetailStudent() {
         fetchSection();
         fetchStaff();
     }, [std_ID]);
-    const sectionName = section.find(s => s.sec_ID == student.sec_ID)
+
+    const sectionName = section.find(s => s.sec_ID == student.sec_ID);
 
     const getStatus = (activityID) => {
         const joinEntry = join.find(j => j.actID == activityID && j.stdIDs.includes(BigInt(std_ID)));
         if (joinEntry) {
-            return 'เข้าร่วมกิจกรรมแล้ว';
+            return 'Joined';
         }
         const reserveEntry = reserve.find(r => r.act_ID == activityID && r.std_ID == std_ID);
         if (reserveEntry) {
-            return 'ลงทะเบียนสำเร็จ';
+            return 'Reserved';
         }
-        return 'ยังไม่ได้เข้าร่วมกิจกรรม';
+        return 'Not joined';
     };
 
     const handleSearch = (event) => {
@@ -115,47 +117,53 @@ function DetailStudent() {
         setCurrentPage(0);
     };
 
+    
+    const handleSortChange = () => {
+        setSortOrder(prevOrder => prevOrder === 'latest' ? 'oldest' : 'latest');
+    };
+
     const filteredItems = activity.filter((item) => {
         const status = getStatus(item.act_ID);
         return (
             item.act_title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-            (filter === "default" ||
-                (filter === "joinEntry" && status === 'เข้าร่วมกิจกรรมแล้ว') ||
-                (filter === "reserveEntry" && status === 'ลงทะเบียนสำเร็จ') ||
-                (filter === "notjoin" && status === 'ยังไม่ได้เข้าร่วมกิจกรรม'))
+            (filter === 'default' ||
+                (filter === 'joinEntry' && status === 'Joined') ||
+                (filter === 'reserveEntry' && status === 'Reserved') ||
+                (filter === 'notjoin' && status === 'Not joined'))
         );
     });
 
     const lastPage = Math.ceil(filteredItems.length / itemsPerPage) - 1;
-        const visibleItems = filteredItems.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+    const visibleItems = filteredItems.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
 
     return (
-        <div>
-            {/* resume */}
-            <div>
-                <h1 className='text-5xl'>อยากได้ภาษาไทย </h1>
-                <h1>Student ID: {student.std_ID}</h1>
-                <p>Name: {student.std_fname} {student.std_lname}</p>
-                <p>Section: 
-            {sectionName 
-                ? `${sectionName.sec_name}`
-                : 'Not found'
-            }
-        </p>                  <p>Email: {student.std_email}</p>
-                <p>Mobile: {student.std_mobile}</p>
-                <p>Address: {student.std_address}</p>
-                <p>Province: {student.province}</p>
-                <p>District: {student.district}</p>
-                <p>Sub District: {student.subdistrict}</p>
-                <p>Zipcode: {student.zipcode}</p>
-                    
-            </div>
+        <div className="mb-10 container mx-auto md:px-20">
+        <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
+            <div className='p-6'>
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-8 mb-6'>
+                        <div>
+                            <h1 className='text-lg font-bold'>Student Information</h1>
+                            <p className='text-base'>Student ID: {student.std_ID}</p>
+                            <p className='text-base'>Name: {student.std_fname} {student.std_lname}</p>
+                            <p className='text-base'>Section: {sectionName ? sectionName.sec_name : 'Not found'}</p>
+                        </div>
 
-            {/* activity */}   
-            <div className="mb-10 container mx-auto md:px-20">
-                <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
-                    <div className="text-lg font-bold mb-2">ประวัติการทำกิจกรรม</div>
-                    <div className="flex justify-between">
+                        <div>
+                            <h1 className='text-lg font-bold'>Contact Information</h1>
+                            <p className='text-base'>Email: {student.std_email}</p>
+                            <p className='text-base'>Mobile: {student.std_mobile}</p>
+                            <p className='text-base'>Address: {student.std_address}</p>
+                            <p className='text-base'>Province: {student.province}</p>
+                            <p className='text-base'>District: {student.district}</p>
+                            <p className='text-base'>Sub District: {student.subdistrict}</p>
+                            <p className='text-base'>Zipcode: {student.zipcode}</p>
+                        </div>
+                    </div>
+
+                    <div className='mb-6'>
+                        <h1 className='text-lg font-bold'>Activity History</h1>
+                        <div className="flex justify-between">
+
                         <div className="pb-4 items-center">
                             <label htmlFor="table-search" className="sr-only">Search</label>
                             <div className="relative mt-1">
@@ -167,136 +175,114 @@ function DetailStudent() {
                                 <input
                                     type="text"
                                     id="table-search"
-                                    className="pb-2 block pt-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                    placeholder="Search for activity"
+                                    className='block pl-10 p-2 text-sm border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500'
+                                    placeholder="ค้นหากิจกรรม"
                                     value={searchTerm}
                                     onChange={handleSearch}
                                 />
                             </div>
                         </div>
+                        <div className="flex gap-3 items-center">
+                            <div className="flex pb-4 items-center">
+                                <label htmlFor="filter-activity-type" className="sr-only">Filter</label>
+                                <div className="relative">
+                                    <select
+                                        value={filter}
+                                        onChange={handleFilterChange}
+                                        className="text-xs block p-1.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    >
+                                        <option value="default" className='text-center'>ทั้งหมด</option>
+                                        <option value="joinEntry">เข้าร่วมกิจกรรมแล้ว</option>
+                                        <option value="reserveEntry">ลงทะเบียนสำเร็จ</option>
+                                        <option value="notjoin">ยังไม่ได้ลงทะเบียน</option>
+                                    </select>
+                                </div>
+                            </div>
 
-                        <div className="pb-4 items-center">
-                            <label htmlFor="filter-activity-type" className="sr-only">Filter</label>
-                            <div className="relative mt-1">
-                                <select
-                                    value={filter}
-                                    onChange={handleFilterChange}
-                                    className='block p-2 text-sm border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500'
+                            <div className="flex pb-4 items-center">
+                                <button
+                                    onClick={handleSortChange}
+                                    className="block p-2 text-xs border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 >
-                                    <option value="default">All</option>
-                                    <option value="joinEntry">เข้าร่วมกิจกรรมแล้ว</option>
-                                    <option value="reserveEntry">ลงทะเบียนสำเร็จ</option>
-                                    <option value="notjoin">ยังไม่ได้เข้าร่วมกิจกรรม</option>
-                                </select>
+                                    วันที่ ({sortOrder === 'latest' ? 'ล่าสุด' : 'ใหม่สุด'})
+                                </button>
                             </div>
                         </div>
 
-                        <div className="mt-1 pb-4">
-                            <select
-                                value={itemsPerPage}
-                                onChange={(e) => {
-                                    setItemsPerPage(+e.target.value);
-                                    setCurrentPage(0);
-                                }}
-                                className="block ps-6 pt-1 pb-1 text-sm rounded-md w-20 bg-gray-200"
-                            >
-                                <option value={15}>15</option>
-                                <option value={25}>25</option>
-                                <option value={50}>50</option>
-                            </select>
-                        </div>
                     </div>
 
-                    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                        <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
-                            <tr className="flex w-full">
-                                <th scope="col" className="px-6 py-3 w-1/6">รหัสกิจกรรม</th>
-                                <th scope="col" className="px-6 py-3 w-1/6">ชื่อกิจกรรม</th>
-                                <th scope="col" className="px-6 py-3 w-1/6">สถานที่จัดกิจกรรม</th>
-                                <th scope="col" className="px-6 py-3 w-1/6">วันที่จัดกิจกรรม</th>
-                                <th scope="col" className="px-6 py-3 w-1/6">สถานะการเข้าร่วม</th>
-                                <th scope="col" className="px-6 py-3 w-1/6">รายละเอียด</th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
-                            {visibleItems.map(item => (
-                                <tr key={item.act_ID} className="border-b-2 flex w-full">
-                                    <td className="px-6 py-3 w-1/6">{item.act_ID}</td>
-                                    <td className="px-6 py-3 w-1/6">{item.act_title}</td>
-                                    <td className="px-6 py-3 w-1/6">{item.act_location}</td>
-                                    <td className="px-6 py-3 w-1/6">{item.act_dateStart.slice(0, 10)}</td>
-                                    <td className={`px-6 py-3 w-1/6 ${getStatus(item.act_ID) === 'เข้าร่วมกิจกรรมแล้ว' ? 'text-green-500' : getStatus(item.act_ID) === 'ยังไม่ได้เข้าร่วมกิจกรรม' ? 'text-red-500' : ''}`}>
-                                        {getStatus(item.act_ID)}
-                                    </td>
-                                    <td className="px-6 py-3 w-1/6">
-                                        <button
-                                            className="text-blue-600 dark:text-blue-500 hover:underline"
-                                            onClick={() => navigate(`/activity/detail/${item.act_ID}`)} 
-                                        >
-                                            รายละเอียด
-                                        </button>
-                                    </td>
+                        <table className='w-full mt-4 text-sm text-gray-800'>
+                            <thead className='bg-gray-200'>
+                                <tr className='text-left'>
+                                    <th className='px-6 py-3'>Activity ID</th>
+                                    <th className='px-6 py-3'>Title</th>
+                                    <th className='px-6 py-3'>Location</th>
+                                    <th className='px-6 py-3'>Date</th>
+                                    <th className='px-6 py-3'>Status</th>
+                                    <th className='px-6 py-3'>Details</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {visibleItems.map((item) => (
+                                    <tr key={item.act_ID} className='border-t'>
+                                        <td className='px-6 py-4'>{item.act_ID}</td>
+                                        <td className='px-6 py-4'>{item.act_title}</td>
+                                        <td className='px-6 py-4'>{item.act_location}</td>
+                                        <td className='px-6 py-4'>{item.act_dateStart.slice(0, 10)}</td>
+                                        <td className={`px-6 py-4 ${getStatus(item.act_ID) === 'Joined' ? 'text-green-500' : getStatus(item.act_ID) === 'Not joined' ? 'text-red-500' : ''}`}>
+                                            {getStatus(item.act_ID)}
+                                        </td>
+                                        <td className='px-6 py-4'>
+                                            <button
+                                                className='text-blue-500 hover:underline focus:outline-none'
+                                                onClick={() => navigate(`/activity/detail/${item.act_ID}`)}
+                                            >
+                                                Details
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
 
-                    <div className="flex justify-between mt-4">
-                        <div>
+                        <div className='flex justify-end mt-4'>
                             <button
                                 onClick={() => {
                                     if (currentPage > 0) {
-                                        setCurrentPage(prev => prev - 1);
+                                        setCurrentPage((prev) => prev - 1);
                                     }
                                 }}
                                 disabled={currentPage === 0}
-                                className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                                className={`px-4 py-2 mx-1 text-sm bg-gray-50 rounded-lg font-medium ${currentPage === 0 ? 'text-gray-400  cursor-not-allowed' : 'text-gray-700 hover:text-gray-900'}`}
                             >
-                                Previous
+                                ก่อนหน้า
                             </button>
-                        </div>
 
-                        <div className="flex space-x-2">
-                            {Array.from({ length: Math.ceil(filteredItems.length / itemsPerPage) }).slice(currentPage, currentPage + 4).map((_, i) => (
+                            {Array.from({ length: Math.min(5, lastPage + 1) }).map((_, index) => (
                                 <button
-                                    key={i + currentPage}
-                                    onClick={() => setCurrentPage(currentPage + i)}
-                                    className={`px-4 py-2 font-medium ${currentPage + i === currentPage ? "text-blue-600 bg-blue-100" : "text-gray-600 bg-gray-100"} border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300`}
+                                    key={index}
+                                    onClick={() => setCurrentPage(index)}
+                                    className={`px-4 py-2 mx-1 text-sm rounded-lg font-medium ${currentPage === index ? 'text-blue-500 bg-blue-100' : 'text-gray-700 hover:text-gray-900'}`}
                                 >
-                                    {currentPage + i + 1}
+                                    {index + 1}
                                 </button>
                             ))}
 
-                            {currentPage + 4 < lastPage && (
-                                <button
-                                    onClick={() => {
-                                        setCurrentPage(currentPage + 4);
-                                    }}
-                                    className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                                >
-                                    ...
-                                </button>
-                            )}
-                        </div>
-
-                        <div>
                             <button
                                 onClick={() => {
                                     if (currentPage < lastPage) {
-                                        setCurrentPage(prev => prev + 1);
+                                        setCurrentPage((prev) => prev + 1);
                                     }
                                 }}
                                 disabled={currentPage >= lastPage}
-                                className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                                className={`px-4 py-2 mx-1 text-sm bg-gray-50 rounded-lg font-medium ${currentPage === lastPage ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:text-gray-900 bg-gray-50'}`}
                             >
-                                Next
+                                ถัดไป
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-
-
         </div>
     );
 }
