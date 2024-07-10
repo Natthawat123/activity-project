@@ -127,13 +127,13 @@ const ProductTable = () => {
           <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead className=" text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
               <tr className="flex w-full">
-                <th scope="col" className="px-6 py-3 w-4/12">
+                <th scope="col" className="px-6 py-3 w-2/12">
                   รหัสนักศึกษา
                 </th>
-                <th scope="col" className="px-6 py-3 w-2/12">
+                <th scope="col" className="px-6 py-3 w-3/12">
                   ชื่อ
                 </th>
-                <th scope="col" className="px-6 py-3 w-2/12">
+                <th scope="col" className="px-6 py-3 w-3/12">
                   นามสกุล
                 </th>
                 <th scope="col" className="px-6 py-3 w-2/12">
@@ -147,13 +147,13 @@ const ProductTable = () => {
             <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
               {visibleItems.map((item, index) => (
                 <tr key={index} className="border-b-2 flex w-full items-center">
-                  <td scope="col" className="px-6 py-3 w-4/12">
+                  <td scope="col" className="px-6 py-3 w-2/12">
                     {item.std_ID}
                   </td>
-                  <td scope="col" className="px-6 py-3 w-2/12">
+                  <td scope="col" className="px-6 py-3 w-3/12">
                     {item.std_fname}
                   </td>
-                  <td scope="col" className="px-6 py-3 w-2/12">
+                  <td scope="col" className="px-6 py-3 w-3/12">
                     {item.std_lname}
                   </td>
                   <td scope="col" className="px-6 py-3 w-2/12">

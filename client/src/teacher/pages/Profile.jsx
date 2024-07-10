@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import Swal from 'sweetalert2'
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import Swal from "sweetalert2";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { Link } from "react-router-dom";
 
 const StudentForm = () => {
-
   const [provinces, setProvinces] = useState([]);
   const [amphures, setAmphures] = useState([]);
   const [tambons, setTambons] = useState([]);
@@ -13,24 +12,24 @@ const StudentForm = () => {
     province_id: undefined,
     amphure_id: undefined,
     tambon_id: undefined,
-    zip_code: undefined
+    zip_code: undefined,
   });
 
   const onChangeHandle = (id, selectedValue) => {
     if (id === "province_id") {
       setValue((prev) => ({
         ...prev,
-        province: selectedValue
+        province: selectedValue,
       }));
     } else if (id === "amphure_id") {
       setValue((prev) => ({
         ...prev,
-        district: selectedValue
+        district: selectedValue,
       }));
     } else if (id === "tambon_id") {
       setValue((prev) => ({
         ...prev,
-        subdistrict: selectedValue
+        subdistrict: selectedValue,
       }));
     }
   };
@@ -41,7 +40,7 @@ const StudentForm = () => {
     child,
     childsId = [],
     setChilds = [],
-    addressValue_PDS
+    addressValue_PDS,
   }) => {
     const onChangeHandleLocal = (event) => {
       setChilds.forEach((setChild) => setChild([]));
@@ -63,60 +62,66 @@ const StudentForm = () => {
         }
       }
 
-      const selectedValue = list.find((item) => item.id === dependId)?.name_th || '';
+      const selectedValue =
+        list.find((item) => item.id === dependId)?.name_th || "";
       onChangeHandle(id, selectedValue);
     };
 
     return (
       <>
-        <select value={selected[id]} onChange={onChangeHandleLocal} className="mt-1 p-2 border w-full rounded-md">
-          <option key={selected[id]} value={selected[id]} label={addressValue_PDS} />
+        <select
+          value={selected[id]}
+          onChange={onChangeHandleLocal}
+          className="mt-1 p-2 border w-full rounded-md"
+        >
+          <option
+            key={selected[id]}
+            value={selected[id]}
+            label={addressValue_PDS}
+          />
 
-          {list && list.map((item) => (
-            <option
-              key={item.id}
-              value={item.id}
-              label={item.name_th}
-            >
-              {item.name_th}
-            </option>
-          ))}
+          {list &&
+            list.map((item) => (
+              <option key={item.id} value={item.id} label={item.name_th}>
+                {item.name_th}
+              </option>
+            ))}
         </select>
       </>
     );
   };
 
   const [value, setValue] = useState({
-    staff_ID: '',
-    staff_fname: '',
-    std_lname: '',
-    staff_mobile: '',
-    staff_email: '',
-    staff_address: '',
-    province: '',
-    district: '',
-    subdistrict: '',
-    zipcode: ''
+    staff_ID: "",
+    staff_fname: "",
+    std_lname: "",
+    staff_mobile: "",
+    staff_email: "",
+    staff_address: "",
+    province: "",
+    district: "",
+    subdistrict: "",
+    zipcode: "",
   });
 
-  const staff_ID = localStorage.getItem('staff_ID');
+  const staff_ID = localStorage.getItem("staff_ID");
 
   useEffect(() => {
-    fetch('/api/resume/staff?id=' + staff_ID)
-      .then(response => {
+    fetch("/api/resume/staff?id=" + staff_ID)
+      .then((response) => {
         if (!response.ok) {
-          throw new Error('Error fetching data');
+          throw new Error("Error fetching data");
         }
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
         setValue((prev) => ({
           ...prev,
           ...data,
         }));
       })
-      .catch(error => {
-        console.error('Error:', error);
+      .catch((error) => {
+        console.error("Error:", error);
       });
 
     fetch(
@@ -130,13 +135,12 @@ const StudentForm = () => {
         );
         setProvinces(sortedProvinces);
       });
-
   }, [staff_ID]);
 
   const handlechange = (e) => {
     setValue((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -145,38 +149,38 @@ const StudentForm = () => {
 
     const updatedValue = {
       ...value,
-      zipcode: zipcodeS || value.zipcode
+      zipcode: zipcodeS || value.zipcode,
     };
 
-    fetch('/api/update/staff/' + staff_ID, {
-      method: 'PUT',
+    fetch("/api/update/staff/" + staff_ID, {
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(updatedValue),
     })
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
-          throw new Error('Error updating data');
+          throw new Error("Error updating data");
         }
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
         Swal.fire({
-          title: 'แก้ไขประวัติส่วนตัวเสร็จสิ้น',
-          icon: 'success',
+          title: "แก้ไขประวัติส่วนตัวเสร็จสิ้น",
+          icon: "success",
         });
         setTimeout(() => {
-          window.location = '/teacher/profile';
+          window.location = "/teacher/profile";
         }, 1500);
       })
-      .catch(error => {
-        console.error('Error:', error);
+      .catch((error) => {
+        console.error("Error:", error);
         Swal.fire({
-          title: 'Oops...something went wrong!',
-          icon: 'error',
+          title: "Oops...something went wrong!",
+          icon: "error",
           text: `Error occurred! ${error.message}`,
-          confirmButtonText: 'OK',
+          confirmButtonText: "OK",
         });
       });
   };
@@ -187,25 +191,12 @@ const StudentForm = () => {
 
   return (
     <div className="w-full lg:w-2/3 mx-auto mt-10 p-4 bg-white shadow-md rounded-md">
-      <Link to='/teacher/calendar'>
-        <div className="items-center mb-5"><ArrowBackIosNewIcon />ย้อนกลับ</div>
-      </Link>
-      <form className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:px-10">
+      <form className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:px-10">
         <div className="mb-4">
-          <label htmlFor="studentId" className="block text-sm font-medium text-gray-600">
-            รหัสนักศึกษา
-          </label>
-          <input
-            type="text"
-            id="username"
-            name="staff_ID"
-            value={value.staff_ID}
-            readOnly
-            className="mt-1 p-2 border w-full rounded-md" />
-        </div>
-
-        <div className="mb-4">
-          <label htmlFor="firstName" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="firstName"
+            className="block text-sm font-medium text-gray-600"
+          >
             ชื่อ
           </label>
           <input
@@ -214,11 +205,15 @@ const StudentForm = () => {
             name="staff_fname"
             onChange={handlechange}
             value={value.staff_fname}
-            className="mt-1 p-2 border w-full rounded-md" />
+            className="mt-1 p-2 border w-full rounded-md"
+          />
         </div>
 
         <div className="mb-4">
-          <label htmlFor="lastName" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="lastName"
+            className="block text-sm font-medium text-gray-600"
+          >
             นามสกุล
           </label>
           <input
@@ -227,11 +222,15 @@ const StudentForm = () => {
             name="staff_lname"
             onChange={handlechange}
             value={value.staff_lname}
-            className="mt-1 p-2 border w-full rounded-md" />
+            className="mt-1 p-2 border w-full rounded-md"
+          />
         </div>
 
         <div className="mb-4">
-          <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="phoneNumber"
+            className="block text-sm font-medium text-gray-600"
+          >
             เบอร์โทร
           </label>
           <input
@@ -240,11 +239,15 @@ const StudentForm = () => {
             name="staff_mobile"
             onChange={handlechange}
             value={value.staff_mobile}
-            className="mt-1 p-2 border w-full rounded-md" />
+            className="mt-1 p-2 border w-full rounded-md"
+          />
         </div>
 
         <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-600"
+          >
             อีเมลล์
           </label>
           <input
@@ -253,11 +256,15 @@ const StudentForm = () => {
             name="staff_email"
             onChange={handlechange}
             value={value.staff_email}
-            className="mt-1 p-2 border w-full rounded-md" />
+            className="mt-1 p-2 border w-full rounded-md"
+          />
         </div>
 
         <div className="mb-4">
-          <label htmlFor="address" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="address"
+            className="block text-sm font-medium text-gray-600"
+          >
             ที่อยู่
           </label>
           <input
@@ -265,11 +272,15 @@ const StudentForm = () => {
             name="staff_address"
             onChange={handlechange}
             value={value.staff_address}
-            className="mt-1 p-2 border w-full rounded-md" />
+            className="mt-1 p-2 border w-full rounded-md"
+          />
         </div>
 
         <div className="mb-4">
-          <label htmlFor="province" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="province"
+            className="block text-sm font-medium text-gray-600"
+          >
             จังหวัด
           </label>
           <DropdownList
@@ -283,7 +294,10 @@ const StudentForm = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="district" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="district"
+            className="block text-sm font-medium text-gray-600"
+          >
             อำเภอ
           </label>
           <DropdownList
@@ -297,7 +311,10 @@ const StudentForm = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="province" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="province"
+            className="block text-sm font-medium text-gray-600"
+          >
             ตำบล
           </label>
           <DropdownList
@@ -311,7 +328,10 @@ const StudentForm = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="zipcode" className="block text-sm font-medium text-gray-600">
+          <label
+            htmlFor="zipcode"
+            className="block text-sm font-medium text-gray-600"
+          >
             รหัสไปรษณีย์
           </label>
           <input
@@ -320,11 +340,16 @@ const StudentForm = () => {
             name="zipcode"
             onChange={handlechange}
             value={zipcodeS ?? value.zipcode}
-            className="mt-1 p-2 border w-full rounded-md" />
+            className="mt-1 p-2 border w-full rounded-md"
+          />
         </div>
 
         <div className="flex justify-end items-center">
-          <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-1/8 h-1/2" onClick={updateClick}>
+          <button
+            type="submit"
+            className="flex justify-center items-center p-5 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-1/8 h-1/2"
+            onClick={updateClick}
+          >
             แก้ไข
           </button>
         </div>

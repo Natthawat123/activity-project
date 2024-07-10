@@ -142,10 +142,12 @@ function DetailStudent() {
       {/* resume */}
       <div className="container mb-10  mx-auto md:px-20 ">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
-          <h1 className="text-lg font-bold mb-2">ประวัติส่วนตัว</h1>
-          <div className="items-center mb-5">
-            <ArrowBackIosNewIcon />
-            ย้อนกลับ
+          <div className="flex justify-between">
+            <h1 className="text-lg font-bold mb-2">ประวัติส่วนตัว</h1>
+            <div className="items-center mb-5" onClick={() => navigate(-1)}>
+              <ArrowBackIosNewIcon />
+              ย้อนกลับ
+            </div>
           </div>
           <hr className="mb-3" />
           <div className="grid grid-cols-2 gap-4">

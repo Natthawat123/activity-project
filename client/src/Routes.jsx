@@ -68,7 +68,7 @@ export function Router() {
           <Route path="profile" element={<Profile />} />
           <Route path="history" element={<History />} />
           <Route path="calendar" element={<Calendar />} />
-          <Route path="detail/:act_ID" element={<DetailActivity />} />
+          <Route path="detail2/:act_ID" element={<DetailActivity />} />
         </Route>
 
         <Route path="/teacher" element={<LayoutT />}>

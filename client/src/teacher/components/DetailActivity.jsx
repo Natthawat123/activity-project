@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import Web3 from "web3";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 
@@ -10,6 +10,7 @@ function DetailActivity() {
   const [reserve, setReserve] = useState([]);
   const [join, setJoin] = useState([]);
   const [student, setStudent] = useState([]);
+  const navigate = useNavigate();
   const [activity, setActivity] = useState({
     act_title: "",
     act_desc: "",
@@ -101,7 +102,7 @@ function DetailActivity() {
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
           <div className="flex justify-between">
             <h1 className="text-lg font-bold mb-2">รายละเอียดกิจกรรม</h1>
-            <div className="items-center mb-5">
+            <div className="items-center mb-5" onClick={() => navigate(-1)}>
               <ArrowBackIosNewIcon />
               ย้อนกลับ
             </div>
