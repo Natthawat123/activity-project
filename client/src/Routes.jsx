@@ -36,6 +36,8 @@ import DetailStudent from './admin/components/DetailStudent.jsx';
 
 
 import ManageActivity from './admin/components/Manage_activity.jsx';
+
+import Show_importFile from './admin/components/Show_importFile.jsx';
 // import Login from './pages/Login.jsx';
 
 
@@ -60,6 +62,7 @@ export function Router() {
                     <Route path="/admin/dashboard/detail/student/:std_ID" element={<DetailStudent />} />                    <Route path="addusers" element={<AddUsers />} />
                     <Route path="update" element={<UpdateUser />} />
                     <Route path="wallet" element={<Wallet />} />
+                    <Route path="dashboard/import" element={<Show_importFile />} />
                 </Route>
 
                 <Route path="/activity" element={<Layout />}>
