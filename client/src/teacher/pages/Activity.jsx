@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import BuildIcon from "@mui/icons-material/Build";
 import ListAltIcon from "@mui/icons-material/ListAlt";
+import moment from "moment";
 
 const ProductTable = () => {
+  const now = new Date();
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -156,18 +158,38 @@ const ProductTable = () => {
                     className="px-6 py-3 w-2/12 text-center"
                     style={{
                       color:
-                        item.act_status == 1
-                          ? "green"
-                          : item.act_status == 2
+                        item.act_status == 2
                           ? "blue"
-                          : "red",
+                          : item.act_numStd == item.act_numStdReserve
+                          ? "red"
+                          : now >=
+                              moment(item.act_dateStart)
+                                .subtract(2, "weeks")
+                                .toDate() &&
+                            now <=
+                              moment(item.act_dateStart)
+                                .subtract(1, "day")
+                                .toDate()
+                          ? item.act_status == 1
+                            ? "green"
+                            : "red"
+                          : "grey",
                     }}
                   >
-                    {item.act_status == 1
-                      ? "เปิดลงทะเบียน"
-                      : item.act_status == 2
-                      ? "กิจกรรมจบแล้ว"
-                      : "ปิดลงทะเบียน"}
+                    {item.act_status == 2
+                      ? "กิจกรรมสิ้นสุดแล้ว"
+                      : item.act_numStd == item.act_numStdReserve
+                      ? "ลงทะเบียนเต็มแล้ว"
+                      : now >=
+                          moment(item.act_dateStart)
+                            .subtract(2, "weeks")
+                            .toDate() &&
+                        now <=
+                          moment(item.act_dateStart).subtract(1, "day").toDate()
+                      ? item.act_status == 1
+                        ? "เปิดลงทะเบียน"
+                        : "ปิดลงทะเบียน"
+                      : "ยังไม่ถึงช่วงเปิดลงทะเบียน"}
                   </td>
 
                   <td
