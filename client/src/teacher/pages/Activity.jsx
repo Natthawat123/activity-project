@@ -1,40 +1,38 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import BuildIcon from "@mui/icons-material/Build";
+import ListAltIcon from "@mui/icons-material/ListAlt";
+import moment from "moment";
 
 const ProductTable = () => {
+  const now = new Date()
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [users, setUsers] = useState([]);
-  const [sections, setSections] = useState([]);
+
+  const [activity, setActivity] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [itemsPerPage, setItemsPerPage] = useState(15);
   const [currentPage, setCurrentPage] = useState(0);
 
+  const [visibleStartPage, setVisibleStartPage] = useState(0);
+
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Fetch user data
-    fetch("/api/list/student")
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          setIsLoaded(true);
-          setUsers(result); // Update state with fetched user data
-        },
-        (error) => {
-          setIsLoaded(true);
-          setError(error);
-        }
-      );
+  const updateVisibleStartPage = (newCurrentPage) => {
+    const newVisibleStartPage = Math.floor(newCurrentPage / 4) * 4;
+    setVisibleStartPage(newVisibleStartPage);
+  };
 
-    // Fetch section data
-    fetch("/api/list/section")
+  useEffect(() => {
+    fetch("/api/list/activity")
       .then((res) => res.json())
       .then(
         (result) => {
-          setSections(result); // Update state with fetched section data
+          setIsLoaded(true);
+          setActivity(result);
         },
         (error) => {
+          setIsLoaded(true);
           setError(error);
         }
       );
@@ -42,28 +40,21 @@ const ProductTable = () => {
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
-    setCurrentPage(0);
+    setCurrentPage(0); // Reset current page to 0 on search
   };
+
+  const filteredItems = activity.filter((item) => {
+    return (
+      item.act_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.act_location.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
 
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {
     return <div>Loading...</div>;
   } else {
-    // Map sec_ID to sec_name
-    const mappedUsers = users.map((user) => {
-      const section = sections.find((sec) => sec.sec_ID === user.sec_ID);
-      return { ...user, sec_name: section ? section.sec_name : "" };
-    });
-
-    const filteredItems = mappedUsers.filter((item) => {
-      return (
-        item.std_fname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.std_lname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.sec_name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    });
-
     const lastPage = Math.ceil(filteredItems.length / itemsPerPage) - 1;
     const visibleItems = filteredItems.slice(
       currentPage * itemsPerPage,
@@ -71,9 +62,12 @@ const ProductTable = () => {
     );
 
     return (
-      <div className="mb-10 container mx-auto md:px-20">
+      <div className=" mb-10 container mx-auto">
         <div className=" overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
-          <div className="text-lg font-bold mb-2">รายชื่อนักศึกษา</div>
+          <div className="flex justify-between">
+            <div className="text-lg font-bold mb-2">รายชื่อกิจกรรม</div>
+          </div>
+          <hr className="m-3" />
           <div className="flex justify-between">
             <div className="pb-4 items-center">
               <label htmlFor="table-search" className="sr-only">
@@ -101,7 +95,7 @@ const ProductTable = () => {
                   type="text"
                   id="table-search"
                   className="pb-2 block pt-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="Search for student"
+                  placeholder="ค้นหากิจกรรม"
                   value={searchTerm}
                   onChange={handleSearch}
                 />
@@ -124,48 +118,85 @@ const ProductTable = () => {
             </div>
           </div>
 
-          <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+          <table className="text-center w-full text-sm rtl:text-center text-gray-500 dark:text-gray-400">
             <thead className=" text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
               <tr className="flex w-full">
-                <th scope="col" className="px-6 py-3 w-2/12">
-                  รหัสนักศึกษา
+                <th scope="col" className="px-6 py-3 w-1/12 text-center">
+                  ลำดับ
                 </th>
-                <th scope="col" className="px-6 py-3 w-3/12">
-                  ชื่อ
+                <th scope="col" className="px-6 py-3 w-4/12 text-center">
+                  ชื่อกิจกรรม
                 </th>
-                <th scope="col" className="px-6 py-3 w-3/12">
-                  นามสกุล
+                <th scope="col" className="px-6 py-3 w-3/12 text-center">
+                  วัน
                 </th>
-                <th scope="col" className="px-6 py-3 w-2/12">
-                  หมู่เรียน
+                <th scope="col" className="px-6 py-3 w-2/12 text-center">
+                  สถานะ
                 </th>
-                <th scope="col" className="px-6 py-3 w-2/12">
-                  รายละเอียด
+                <th scope="col" className="px-6 py-3 w-2/12 text-center">
+                  เพิ่มเติม
                 </th>
               </tr>
             </thead>
             <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
               {visibleItems.map((item, index) => (
-                <tr key={index} className="border-b-2 flex w-full items-center">
-                  <td scope="col" className="px-6 py-3 w-2/12">
-                    {item.std_ID}
+                <tr key={item.act_ID} className="border-b-2 flex w-full ">
+                  <td scope="col" className="px-6 py-3 w-1/12 text-center">
+                    {index + 1}
                   </td>
-                  <td scope="col" className="px-6 py-3 w-3/12">
-                    {item.std_fname}
+                  <td scope="col" className="px-6 py-3 w-4/12 text-start">
+                    {item.act_title}
                   </td>
-                  <td scope="col" className="px-6 py-3 w-3/12">
-                    {item.std_lname}
-                  </td>
-                  <td scope="col" className="px-6 py-3 w-2/12">
-                    {item.sec_name}
-                  </td>
-                  <td scope="col" className="px-6 py-3 w-2/12">
-                    <button
-                      className=" hover:text-teal-700 px-2 py-1  "
-                      onClick={() => navigate(`detail/student/${item.std_ID}`)}
+                  {
+                    <td scope="col" className="px-6 py-3 w-3/12 text-center">
+                      {item.act_dateStart.slice(0, 10)} -{" "}
+                      {item.act_dateEnd.slice(0, 10)}
+                    </td>
+                  }
+                  <td
+                      scope="col"
+                      className="px-6 py-3 w-2/12 text-center"
+                      style={{
+                        color:
+                        item.act_status == 2
+                        ? "blue"
+                        : item.act_numStd == item.act_numStdReserve
+                          ? "red"
+                          : now >= moment(item.act_dateStart)
+                          .subtract(2, "weeks")
+                          .toDate() && now <= moment(item.act_dateStart)
+                          .subtract(1, "day")
+                          .toDate()
+                            ? item.act_status == 1
+                              ? "green"
+                              : "red"
+                            : "grey",
+                      }}
                     >
-                      เพิ่มเติม
-                    </button>
+                      {item.act_status == 2
+                        ? "กิจกรรมสิ้นสุดแล้ว"
+                        : item.act_numStd == item.act_numStdReserve
+                          ? "ลงทะเบียนเต็มแล้ว"
+                          : now >= moment(item.act_dateStart)
+                          .subtract(2, "weeks")
+                          .toDate() && now <= moment(item.act_dateStart)
+                          .subtract(1, "day")
+                          .toDate()
+                            ? item.act_status == 1
+                              ? "เปิดลงทะเบียน"
+                              : "ปิดลงทะเบียน"
+                            : "ยังไม่ถึงช่วงเปิดลงทะเบียน"}
+                    </td>
+
+                  <td
+                    scope="col"
+                    className="px-6 py-3 w-2/12 text-center hover:text-green-500 text-teal-700"
+                  >
+                    <ListAltIcon
+                      onClick={() => {
+                        navigate(`detail/${item.act_ID}`);
+                      }}
+                    />
                   </td>
                 </tr>
               ))}
@@ -178,6 +209,7 @@ const ProductTable = () => {
                 onClick={() => {
                   if (currentPage > 0) {
                     setCurrentPage((prev) => prev - 1);
+                    updateVisibleStartPage(currentPage - 1);
                   }
                 }}
                 disabled={currentPage === 0}
@@ -191,25 +223,31 @@ const ProductTable = () => {
               {Array.from({
                 length: Math.ceil(filteredItems.length / itemsPerPage),
               })
-                .slice(currentPage, currentPage + 4)
+                .slice(visibleStartPage, visibleStartPage + 4)
                 .map((_, i) => (
                   <button
-                    key={i + currentPage}
-                    onClick={() => setCurrentPage(currentPage + i)}
+                    key={i + visibleStartPage}
+                    onClick={() => {
+                      const newCurrentPage = visibleStartPage + i;
+                      setCurrentPage(newCurrentPage);
+                      updateVisibleStartPage(newCurrentPage);
+                    }}
                     className={`px-4 py-2 font-medium ${
-                      currentPage + i === currentPage
+                      currentPage === visibleStartPage + i
                         ? "text-blue-600 bg-blue-100"
                         : "text-gray-600 bg-gray-100"
                     } border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300`}
                   >
-                    {currentPage + i + 1}
+                    {visibleStartPage + i + 1}
                   </button>
                 ))}
 
-              {currentPage + 4 < lastPage && (
+              {visibleStartPage + 4 < lastPage && (
                 <button
                   onClick={() => {
-                    setCurrentPage(currentPage + 4);
+                    const newVisibleStartPage = visibleStartPage + 4;
+                    setVisibleStartPage(newVisibleStartPage);
+                    setCurrentPage(newVisibleStartPage);
                   }}
                   className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
                 >
@@ -223,6 +261,7 @@ const ProductTable = () => {
                 onClick={() => {
                   if (currentPage < lastPage) {
                     setCurrentPage((prev) => prev + 1);
+                    updateVisibleStartPage(currentPage + 1);
                   }
                 }}
                 disabled={currentPage === lastPage}

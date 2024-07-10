@@ -21,7 +21,7 @@ export const manage = (req, res) => {
 export const reserve = (req, res) => {
     const {
         act_ID,
-    } = req.body;
+    } = req.params;
 
     const sql = 'DELETE FROM manage WHERE act_ID = ? ';
 
@@ -141,3 +141,22 @@ export const deleteActivity = (req, res) => {
         });
     });
 }
+
+// update status
+export const updateStatus = (req, res) => {
+    const id = req.params.id;
+    const status = 2;
+    const sql = 'UPDATE activity SET act_status = ? WHERE act_ID = ?';
+
+    db.query(sql, [status, id], (err, result) => {
+        if (err) {
+            return res.status(500).json({
+                error: err.message
+            });
+        }
+        return res.json({
+            message: 'Activity updated successfully',
+            result
+        });
+    });
+};

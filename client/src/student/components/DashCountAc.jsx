@@ -81,9 +81,9 @@ function Dash_users() {
 
   useEffect(() => {
       if (activity.length > 0) {
-          const joined = activity.filter(item => getStatus(item.act_ID) === 'เข้าร่วมกิจกรรมแล้ว').length;
-          const registered = activity.filter(item => getStatus(item.act_ID) === 'ลงทะเบียนสำเร็จ').length;
-          const notJoined = activity.filter(item => getStatus(item.act_ID) === 'ยังไม่ได้เข้าร่วมกิจกรรม').length;
+          const joined = activity.filter(item => getStatus(item.act_ID) == 'เข้าร่วมกิจกรรมแล้ว').length;
+          const registered = activity.filter(item => getStatus(item.act_ID) == 'ลงทะเบียนสำเร็จ').length;
+          const notJoined = activity.filter(item => getStatus(item.act_ID) == 'ยังไม่ได้เข้าร่วมกิจกรรม').length;
 
           setJoinedCount(joined);
           setRegisteredCount(registered);
@@ -125,7 +125,7 @@ function Dash_users() {
 
             <div className="bg-green-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-green-600">
               <p className='text-sm font-semibold'> จำนวนกิจกรรมที่ลงทะเบียนแล้ว </p>
-              <div className='text-center text-4xl font-bold'>{joinedCount}</div>
+              <div className='text-center text-4xl font-bold'>{registeredCount}</div>
             </div> 
             <div className="bg-green-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-green-600">
               <p className='text-sm font-semibold'>จำนวนกิจกรรมที่ยังไม่ได้เข้าร่วม </p>

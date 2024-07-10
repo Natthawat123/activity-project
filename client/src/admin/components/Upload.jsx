@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import contractAbi from '../contract/abi.json';
-import Web3 from 'web3';
-import Swal from 'sweetalert2';
+import { useState, useEffect } from "react";
+import axios from "axios";
+import contractAbi from "../contract/abi.json";
+import Web3 from "web3";
+import Swal from "sweetalert2";
 
 function Upload() {
   const [data, setData] = useState([]);
@@ -14,7 +14,7 @@ function Upload() {
   const [searchTerm, setSearchTerm] = useState("");
 
   // Web3 and contract
-  const contractAddress = '0xF9322B9B17944cf80FA33Be311Ea472375698F90';
+  const contractAddress = "0xF9322B9B17944cf80FA33Be311Ea472375698F90";
   const [web3, setWeb3] = useState(null);
   const [contract, setContract] = useState(null);
 
@@ -24,10 +24,10 @@ function Upload() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get('/api/list/upload');
+        const res = await axios.get("/api/list/upload");
         setData(res.data);
       } catch (err) {
-        console.error('Error fetching data:', err);
+        console.error("Error fetching data:", err);
       }
     };
     fetchData();
@@ -41,143 +41,129 @@ function Upload() {
     return acc;
   }, {});
 
-  const sortedActivities = Object.keys(groupedData).map(actTitle => ({
-    actTitle,
-    activities: groupedData[actTitle],
-  })).sort((a, b) => a.activities[0].act_ID - b.activities[0].act_ID);
+  const sortedActivities = Object.keys(groupedData)
+    .map((actTitle) => ({
+      actTitle,
+      activities: groupedData[actTitle],
+    }))
+    .sort((a, b) => a.activities[0].act_ID - b.activities[0].act_ID);
 
-  const filteredActivities = sortedActivities.map(group => ({
-    ...group,
-    activities: group.activities.filter(
-      item =>
-        item.std_ID.includes(searchTerm) ||
-        item.std_fname.includes(searchTerm) ||
-        item.std_lname.includes(searchTerm)
-    ),
-  })).filter(group => group.activities.length > 0);
+  const filteredActivities = sortedActivities
+    .map((group) => ({
+      ...group,
+      activities: group.activities.filter(
+        (item) =>
+          item.std_ID.includes(searchTerm) ||
+          item.std_fname.includes(searchTerm) ||
+          item.std_lname.includes(searchTerm)
+      ),
+    }))
+    .filter((group) => group.activities.length > 0);
 
   const handleCheckboxChange = (stdID, actID) => {
-    const isSelected = selectedItems.some(item => item.stdID === stdID && item.actID === actID);
+    const isSelected = selectedItems.some(
+      (item) => item.stdID === stdID && item.actID === actID
+    );
     if (isSelected) {
-      setSelectedItems(prev => prev.filter(item => !(item.stdID === stdID && item.actID === actID)));
-      setSelectedStdIDs(prev => prev.filter(id => id !== stdID));
+      setSelectedItems((prev) =>
+        prev.filter((item) => !(item.stdID === stdID && item.actID === actID))
+      );
+      setSelectedStdIDs((prev) => prev.filter((id) => id !== stdID));
       setSelectedActID(null);
     } else {
-      setSelectedItems(prev => [...prev, { stdID, actID }]);
-      setSelectedStdIDs(prev => [...prev, stdID]);
+      setSelectedItems((prev) => [...prev, { stdID, actID }]);
+      setSelectedStdIDs((prev) => [...prev, stdID]);
       setSelectedActID(actID);
-    }
-  };
-
-  // Connect to MetaMask and set up contract instance
-  const connectWallet = async () => {
-    if (window.ethereum) {
-      try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-        const web3 = new Web3(window.ethereum);
-        setWeb3(web3);
-
-        const contract = new web3.eth.Contract(contractAbi, contractAddress);
-        setContract(contract);
-
-      } catch (err) {
-        console.error(err);
-      }
-    } else {
-      alert('Please install MetaMask');
-    }
-  };
-
-  // Function to handle getAll button click
-  const handleGetAll = async () => {
-    try {
-      await connectWallet();
-
-      if (!contract || !web3) {
-        console.error('Contract or web3 not initialized.');
-        return;
-      }
-
-      const allData = await contract.methods.getAll().call();
-
-      // Format the getAll data
-      const formattedData = allData[0].map((actID, index) => ({
-        actID: Number(actID),
-        stdIDs: allData[1][index]
-      }));
-
-      setGetAll(formattedData);
-    } catch (err) {
-      console.error(err);
     }
   };
 
   // Function to handle upload button click
   const handleUpload = async () => {
     try {
-      await connectWallet();
+      // Check if MetaMask is installed and connected
+      if (!window.ethereum) {
+        alert("Please install MetaMask");
+        return;
+      }
 
+      // Request accounts from MetaMask
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+
+      // Initialize web3 and contract
+      const web3 = new Web3(window.ethereum);
+      const contract = new web3.eth.Contract(contractAbi, contractAddress);
+
+      // Set states for web3 and contract
+      setWeb3(web3);
+      setContract(contract);
+
+      // Check if contract or web3 failed to initialize
       if (!contract || !web3) {
-        console.error('Contract or web3 not initialized.');
+        console.error("Contract or web3 not initialized.");
         return;
       }
 
-      if (selectedActID === null || selectedStdIDs.length === 0) {
-        console.error('No activity or students selected.');
+      // Check if activity and students are selected
+      if (!selectedActID || selectedStdIDs.length === 0) {
+        console.error("No activity or students selected.");
         return;
       }
 
-      const accounts = await web3.eth.getAccounts();
-      const tx = await contract.methods.Upload(selectedActID, selectedStdIDs).send({ from: accounts[0] });
-      console.log('Transaction successful:', tx.transactionHash);
-
+      // Proceed with transaction
       try {
-        
-        const res = await axios.delete('/api/reserve',selectedActID)
-        console.log(res)
-        
+        const accounts = await web3.eth.getAccounts();
+        const tx = await contract.methods
+          .Upload(selectedActID, selectedStdIDs)
+          .send({ from: accounts[0] });
+
+        console.log("Transaction successful:", tx.transactionHash);
+
+        // Perform additional actions after successful transaction
+        await axios.delete(`/api/reserve/${selectedActID}`);
+        await axios.put(`/api/updateStatus/${selectedActID}`);
+
         Swal.fire({
           position: "top-end",
-          icon: "บันทึกข้อมูลสำเร็จ",
-          title: `transaction: ${tx.transactionHash}`,
+          icon: "success",
+          title: `Transaction: ${tx.transactionHash}`,
           showConfirmButton: false,
-          timer: 1500
+          timer: 1500,
         });
-      //   setTimeout(() => {
-      //     window.location.reload();
-      // }, 1500);
       } catch (err) {
-        console.error('Error deleting reserve:', err);
+        console.error("Error performing transaction:", err);
         Swal.fire({
           position: "top-end",
           icon: "error",
-          title: "Error deleting reserve",
+          title: "Error performing transaction",
           showConfirmButton: false,
-          timer: 1500
-
+          timer: 1500,
         });
-
       }
-
     } catch (err) {
-      console.error(err);
+      console.error("Error handling upload:", err);
       Swal.fire({
         position: "top-end",
         icon: "error",
-        title: "Error uploading",
+        title: "Error handling upload",
         showConfirmButton: false,
-        timer: 1500
+        timer: 1500,
       });
     }
   };
-
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
     // setCurrentPage(0); // ตั้งค่าหน้าปัจจุบันเป็น 0 เมื่อมีการค้นหา
   };
 
+  // const test = async () => {
+  //   try{
+  //     const res = await axios.put(`/api/updateStatus/${selectedActID}`);
+  //       console.log(res);
+  //   }catch(err){console.log(err)}
+  // }
 
   return (
     <div className="mb-10 container mx-auto md:px-20">
@@ -215,12 +201,10 @@ function Upload() {
               />
             </div>
           </div>
-
         </div>
         {filteredActivities.map(({ actTitle, activities }) => (
           <div key={actTitle} className="mb-8">
             <div className="text-lg font-bold mb-2">Activity: {actTitle}</div>
-
 
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
               <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
@@ -234,7 +218,10 @@ function Upload() {
               </thead>
               <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
                 {activities.map((item, index) => (
-                  <tr key={item.id} className="border-b-2 flex w-full items-center">
+                  <tr
+                    key={item.id}
+                    className="border-b-2 flex w-full items-center"
+                  >
                     <td className="px-6 py-3 w-1/6 text-center">{index + 1}</td>
                     <td className="px-6 py-3 w-1/6">{item.std_ID}</td>
                     <td className="px-6 py-3 w-1/6">{item.std_fname}</td>
@@ -243,8 +230,13 @@ function Upload() {
                     <td className="px-6 py-3 w-1/6 ml-7">
                       <input
                         type="checkbox"
-                        checked={selectedItems.some(si => si.stdID === item.std_ID && si.actID === item.act_ID)}
-                        onChange={() => handleCheckboxChange(item.std_ID, item.act_ID)}
+                        checked={selectedItems.some(
+                          (si) =>
+                            si.stdID === item.std_ID && si.actID === item.act_ID
+                        )}
+                        onChange={() =>
+                          handleCheckboxChange(item.std_ID, item.act_ID)
+                        }
                       />
                     </td>
                   </tr>
@@ -260,43 +252,11 @@ function Upload() {
         >
           Submit
         </button>
-
-        <hr className="my-8" />
-        <button
-          onClick={handleGetAll}
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-        >
-          getAll
-        </button>
-        <div className="mt-4">
-
-          <h2 className="text-xl font-bold mb-2">getAll Results</h2>
-          <table className="min-w-full bg-white border border-gray-200">
-            <thead>
-              <tr>
-                <th className="py-2 px-4 border-b border-gray-200">Activity ID</th>
-                <th className="py-2 px-4 border-b border-gray-200">Student IDs</th>
-              </tr>
-            </thead>
-            <tbody>
-              {getAll.map((item, idx) => (
-                <tr key={idx} className="bg-gray-50 odd:bg-white">
-                  <td className="py-2 px-4 border-b border-gray-200">{item.actID}</td>
-                  <td className="py-2 px-4 border-b border-gray-200">{item.stdIDs.join(' ')}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-
+        {/* <button onClick={test}>test</button> */}
       </div>
-
-
     </div>
-
-  // </div >
   );
 }
+55555;
 
 export default Upload;

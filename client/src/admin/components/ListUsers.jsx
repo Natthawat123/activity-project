@@ -1,87 +1,74 @@
-import { useState, useEffect } from "react";
-import { Link ,useNavigate} from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const ProductTable = () => {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const navigate = useNavigate();
-
-  const [users, setUsers] = useState([]);
-  const [sections, setSections] = useState([]);
-  const [roles, setRole] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [itemsPerPage, setItemsPerPage] = useState(15); // จำนวนรายการต่อหน้า
+  const [itemsPerPage, setItemsPerPage] = useState(15);
   const [currentPage, setCurrentPage] = useState(0);
-
   const [visibleStartPage, setVisibleStartPage] = useState(0);
 
-
-  const userParams = (item) => {
-    localStorage.removeItem('userParams');
-    try {
-      localStorage.setItem('userParams', item.username);
-      console.log(item.username);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const updateVisibleStartPage = (newCurrentPage) => {
-    const newVisibleStartPage = Math.floor(newCurrentPage / 4) * 4;
-    setVisibleStartPage(newVisibleStartPage);
-  };
+  const [login, setLogin] = useState([]);
+  const [student, setStudent] = useState([]);
+  const [staff, setStaff] = useState([]);
+  const [section, setSection] = useState([]);
 
   useEffect(() => {
-    fetch("/api/list/student")
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          setIsLoaded(true);
-          setUsers(result);
-        },
-        (error) => {
-          setIsLoaded(true);
-          setError(error);
-        }
-      );
+    const fetchData = async () => {
+      try {
+        const [loginRes, studentRes, staffRes, sectionRes] = await Promise.all([
+          axios.get("/api/list/login"),
+          axios.get("/api/list/student"),
+          axios.get("/api/list/staff"),
+          axios.get("/api/list/section"),
+        ]);
+        setLogin(loginRes.data);
+        setStudent(studentRes.data);
+        setStaff(staffRes.data);
+        setSection(sectionRes.data);
+        setIsLoaded(true);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setIsLoaded(false);
+        setError(error);
+      }
+    };
 
-    fetch("/api/list/section")
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          setSections(result); // Update state with fetched section data
-        },
-        (error) => {
-          setError(error);
-        }
-      );
-
-    fetch("/api/list/login") // Fetch roles from the correct endpoint
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          setRole(result); // Update state with fetched roles data
-        },
-        (error) => {
-          setError(error);
-        }
-      );
+    fetchData();
   }, []);
-
-
-
+  console.log(staff);
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
-    setCurrentPage(0); // ตั้งค่าหน้าปัจจุบันเป็น 0 เมื่อมีการค้นหา
+    setCurrentPage(0);
   };
 
-  const filteredItems = users.filter((item) => {
+  const filteredItems = login.filter((item) => {
+    const studentData = student.find((std) => std.std_ID == item.username);
+    const staffData = staff.find((stf) => stf.login_ID == item.login_ID);
     return (
-      item.std_ID.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.std_fname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.std_lname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.sec_ID.toLowerCase().includes(searchTerm.toLowerCase())
+      item.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (studentData &&
+        (studentData.std_fname
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+          studentData.std_lname
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          studentData.sec_ID
+            .toString()
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()))) ||
+      (staffData &&
+        (staffData.staff_fname
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+          staffData.staff_lname
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())))
     );
   });
 
@@ -90,21 +77,52 @@ const ProductTable = () => {
   } else if (!isLoaded) {
     return <div>Loading...</div>;
   } else {
-    // Map sec_ID to sec_name
-    const mappedUsers = users.map((user) => {
-      const section = sections.find((sec) => sec.sec_ID === user.sec_ID);
-      const userRole = roles.find((role) => role.username === user.username); // Find the corresponding role for the user
-      return { ...user, sec_name: section ? section.sec_name : "", role: userRole ? userRole.role : "" }; // Include the role in the mapped user object
+    const mappedUsers = filteredItems.map((item) => {
+      const studentData = student.find((std) => std.std_ID == item.username);
+      const staffData = staff.find((stf) => stf.login_ID == item.login_ID);
 
+      if (studentData) {
+        return {
+          ...item,
+          std_ID: studentData.std_ID,
+          std_fname: studentData.std_fname,
+          std_lname: studentData.std_lname,
+          sec_ID: studentData.sec_ID,
+          sec_name: "",
+          role: "นักศึกษา",
+        };
+      } else if (staffData) {
+        return {
+          ...item,
+          std_ID: staffData.staff_ID,
+          std_fname: staffData.staff_fname,
+          std_lname: staffData.staff_lname,
+          sec_ID: "",
+          sec_name: "",
+          role: "อาจารย์",
+        };
+      } else {
+        return {
+          ...item,
+          std_ID: "",
+          std_fname: "",
+          std_lname: "",
+          sec_ID: "",
+          sec_name: "",
+          role: "unknown",
+        };
+      }
     });
 
     const lastPage = Math.ceil(filteredItems.length / itemsPerPage) - 1;
-    const visibleItems = filteredItems.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+    const visibleItems = mappedUsers.slice(
+      currentPage * itemsPerPage,
+      (currentPage + 1) * itemsPerPage
+    );
 
     return (
       <div className="mb-10 container mx-auto md:px-20">
         <div className=" overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
-
           <div className="text-lg font-bold mb-2">รายชื่อผู้ใช้งานระบบ</div>
           <div className="flex justify-between">
             <div className="pb-4 items-center">
@@ -140,8 +158,6 @@ const ProductTable = () => {
               </div>
             </div>
 
-
-
             <div className=" mt-1 pb-4">
               <select
                 value={itemsPerPage}
@@ -160,60 +176,58 @@ const ProductTable = () => {
 
           <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             {/* ... ส่วนหัวตาราง ... */}
-            <thead className=" text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
+            <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
               <tr className="flex w-full">
-                {/* <th scope="col" className="px-6 py-3 w-1/12">
-
-                </th> */}
-                <th scope="col" className="px-6 py-3 w-2/12">
+                <th scope="col" className="px-6 py-3 w-1/12 text-center">
+                  ลำดับ
+                </th>
+                <th scope="col" className="px-6 py-3 w-3/12 text-center">
                   รหัสนักศึกษา
                 </th>
-                <th scope="col" className="px-6 py-3 w-2/12">
-                  ชื่อ
+                <th scope="col" className="px-6 py-3 w-4/12 text-center">
+                  ชื่อ-นามสกุล
                 </th>
-                <th scope="col" className="px-6 py-3 w-2/12">
-                  นามสกุล
-                </th>
-                <th scope="col" className="px-6 py-3 w-2/12">
-                  หมู่เรียน
-                </th>
-                <th scope="col" className="px-6 py-3 w-2/12">
+                <th scope="col" className="px-6 py-3 w-2/12 text-center">
                   บทบาท
                 </th>
-                <th scope="col" className=" -ml-6 pr-12 py-3 w-2/12 text-center">
-                 รายละเอียด
+                <th scope="col" className="px-6 py-3 w-2/12 text-center">
+                  รายละเอียด
                 </th>
               </tr>
             </thead>
             <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
-              {mappedUsers.map((item) => {
-                return (
-                  <tr key={item.std_ID} className="border-b-2 flex w-full items-center">
-                    <td scope="col" className="px-6 py-3 w-2/12">
-                      {item.std_ID}
-                    </td>
-                    <td scope="col" className="px-6 py-3 w-2/12">
-                      {item.std_fname}
-                    </td>
-                    <td scope="col" className="px-6 py-3 w-2/12">
-                      {item.std_lname}
-                    </td>
-                    <td scope="col" className="px-6 py-3 w-2/12">
-                      {item.sec_name}
-                    </td>
-                    <td scope="col" className="px-6 py-3 w-2/12">
-                      student
-                    </td>
-                    <td scope="col" className="ml-10  py-3 w-2/12 text-center">
-                      <button className="bg-cyan-400 hover:bg-cyan-500 px-2 py-1 text-white rounded">
-                      <a onClick={() => navigate(`detail/student/${item.std_ID}`)}>เรียกดู</a>
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
+              {visibleItems.map((item, index) => (
+                <tr
+                  key={item.std_ID}
+                  className="border-b-2 flex w-full items-center"
+                >
+                  <td scope="col" className="px-6 py-3 w-1/12 text-center">
+                    {index + 1}
+                  </td>
+                  <td scope="col" className="px-6 py-3 w-3/12 text-center">
+                    {item.std_ID}
+                  </td>
+                  <td scope="col" className="px-6 py-3 w-4/12">
+                    {item.std_fname} {item.std_lname}
+                  </td>
+                  <td scope="col" className="px-6 py-3 w-2/12 text-center">
+                    {item.role}
+                  </td>
+                  <td scope="col" className="px-6 py-3 w-2/12 text-center">
+                    <button className="bg-cyan-400 hover:bg-cyan-500 px-2 py-1 text-white rounded">
+                      {item.role == ""}
+                      <a
+                        onClick={() =>
+                          navigate(`detail/student/${item.std_ID}`)
+                        }
+                      >
+                        เรียกดู
+                      </a>
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
-
           </table>
 
           <div className="flex items-center justify-between mt-4">
@@ -222,65 +236,33 @@ const ProductTable = () => {
                 onClick={() => {
                   if (currentPage > 0) {
                     setCurrentPage((prev) => prev - 1);
-                    updateVisibleStartPage(currentPage - 1);
+                    setVisibleStartPage((prev) => prev - 1);
                   }
                 }}
                 disabled={currentPage === 0}
                 className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
               >
-                Previous
+                {"<"}
               </button>
-            </div>
-
-            <div className="flex space-x-2">
-              {Array.from({ length: Math.ceil(filteredItems.length / itemsPerPage) }).slice(visibleStartPage, visibleStartPage + 4).map((_, i) => (
-                <button
-                  key={i + visibleStartPage}
-                  onClick={() => {
-                    const newCurrentPage = visibleStartPage + i;
-                    setCurrentPage(newCurrentPage);
-                    updateVisibleStartPage(newCurrentPage);
-                  }}
-                  className={`px-4 py-2 font-medium ${currentPage === visibleStartPage + i ? "text-blue-600 bg-blue-100" : "text-gray-600 bg-gray-100"
-                    } border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300`}
-                >
-                  {visibleStartPage + i + 1}
-                </button>
-              ))}
-
-              {visibleStartPage + 4 < lastPage && (
-                <button
-                  onClick={() => {
-                    const newVisibleStartPage = visibleStartPage + 4;
-                    setVisibleStartPage(newVisibleStartPage);
-                    setCurrentPage(newVisibleStartPage);
-                  }}
-                  className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                >
-                  ...
-                </button>
-              )}
-            </div>
-
-            <div>
               <button
                 onClick={() => {
                   if (currentPage < lastPage) {
                     setCurrentPage((prev) => prev + 1);
-                    updateVisibleStartPage(currentPage + 1);
+                    if (currentPage >= visibleStartPage + 2) {
+                      setVisibleStartPage((prev) => prev + 1);
+                    }
                   }
                 }}
                 disabled={currentPage === lastPage}
                 className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
               >
-                Next
+                {">"}
               </button>
             </div>
+            <div className="text-sm text-gray-500">
+              หน้า {currentPage + 1} / {lastPage + 1}
+            </div>
           </div>
-
-
-
-
         </div>
       </div>
     );
