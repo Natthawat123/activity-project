@@ -1,5 +1,5 @@
 import express from 'express'
-import cors from 'cors'
+//import cors from 'cors'
 
 import authRoutes from './routes/auth.js'
 import listRoutes from './routes/list.js'
@@ -8,6 +8,7 @@ import resumeRoutes from './routes/resume.js'
 import updateRoutes from './routes/update.js'
 import reserveRoutes from './routes/reserve.js'
 import activityRoutes from './routes/activity.js'
+import studentRoutes from './routes/student.js'
 
 const app = express()
 app.use(express.json())
@@ -20,6 +21,7 @@ app.use('/resume', resumeRoutes)
 app.use('/update', updateRoutes)
 app.use('/reserve', reserveRoutes)
 app.use('/', activityRoutes)
+app.use('/', studentRoutes)
 
 app.listen(3000, () => console.log('server on port 3000'))
 
