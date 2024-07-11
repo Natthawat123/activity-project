@@ -66,12 +66,12 @@ const Add_Users = ({ closeModal }) => {
         if (additionalDataResponse.status !== "ok") {
           throw new Error(`Failed to create ${jsonData.role}`);
         }
-      } else if (jsonData.role === "teacher") {
+      } else if (jsonData.role === "teacher" || jsonData.role === "admin") {
         const additionalData = {
           login_ID: loginID,
-          staff_fname: data.get("firstName") || "กรุณาเปลี่ยนชื่อของคุณ",
-          staff_lname: data.get("lastName") || "กรุณาเปลี่ยนนามสกุลของคุณ",
-          staff_email: data.get('email') || `${data.get("username")}@webmail.npru.ac.th`,
+          staff_fname: jsonData.role === "admin" ? "admin" : (data.get("firstName") || "กรุณาเปลี่ยนชื่อของคุณ") ,
+          staff_lname: jsonData.role === "admin" ? null : (data.get("lastName") || "กรุณาเปลี่ยนนามสกุลของคุณ"),
+          staff_email: jsonData.role ===  data.get('email') || `${data.get("username")}${jsonData.role === "admin" ? "@ITinfo.npru.ac.th" : "@webmail.npru.ac.th"}`,
           staff_mobile: data.get('phoneNumber') || null,
           staff_address: null,
           province: null,
@@ -153,7 +153,7 @@ const Add_Users = ({ closeModal }) => {
 
     return (
       <>
-        <input type="file" onChange={handleFileChange} />
+        <input type="file" onChange={handleFileChange} className="mt-1 p-1 w-full border-b-2 rounded-md" />
       </>
     );
   };
@@ -199,6 +199,7 @@ const Add_Users = ({ closeModal }) => {
             subdistrict: null,
             zipcode: null,
           });
+
         }else {
           const registerUser = registerData[index];
           if (!registerUser || !registerUser.login_ID) {
@@ -259,11 +260,7 @@ const Add_Users = ({ closeModal }) => {
   };
   
   
-  
-  
-  
 
-  // console.log(csvTojsondata);
 
   return (
     <div className="flex justify-center items-center bg-gray-100 rounded-lg">
@@ -281,7 +278,7 @@ const Add_Users = ({ closeModal }) => {
             }`}
             onClick={() => handleTabChange("single")}
           >
-            เพิ่มผู้ใช้เดียว
+            เพิ่มผู้ใช้คนเดียว
           </button>
           <button
             className={`p-2 w-1/2 ${
@@ -416,7 +413,7 @@ const Add_Users = ({ closeModal }) => {
               htmlFor="csvFile"
               className="block text-sm font-medium text-gray-600 mb-4"
             >
-              อัปโหลดไฟล์ CSV
+              อัปโหลดไฟล์ CSV เพื่อเพิ่มผู้ใช้งานแบบครั้งละหลายคน
             </label>
             <UploadFile onFileLoad={handleFileLoad} />
           </div>
