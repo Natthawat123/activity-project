@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 
-import Papa from 'papaparse';
+import Papa from "papaparse";
 
 const Add_Users = ({ closeModal }) => {
   const [selectedRole, setSelectedRole] = useState("");
@@ -46,8 +46,8 @@ const Add_Users = ({ closeModal }) => {
           std_fname: data.get("firstName") || "กรุณาเปลี่ยนชื่อของคุณ",
           std_lname: data.get("lastName") || "กรุณาเปลี่ยนนามสกุลของคุณ",
           sec_ID: 1,
-          std_email: `${data.get("username")}@webmail.npru.ac.th`,
-          std_mobile: null,
+          std_email: data.get('email') || `${data.get("username")}@webmail.npru.ac.th`,
+          std_mobile: data.get('phoneNumber') || null,
           std_address: null,
           province: null,
           district: null,
@@ -56,21 +56,23 @@ const Add_Users = ({ closeModal }) => {
         };
 
         // Insert into student or teacher table
-        const additionalResponse = await axios.post("/api/create/student", additionalData);
+        const additionalResponse = await axios.post(
+          "/api/create/student",
+          additionalData
+        );
         const additionalDataResponse = additionalResponse.data;
         console.log("Additional response:", additionalDataResponse);
 
         if (additionalDataResponse.status !== "ok") {
           throw new Error(`Failed to create ${jsonData.role}`);
         }
-      } else if (jsonData.role === 'teacher') {
+      } else if (jsonData.role === "teacher") {
         const additionalData = {
-          staff_ID: data.get("username"),
           login_ID: loginID,
           staff_fname: data.get("firstName") || "กรุณาเปลี่ยนชื่อของคุณ",
           staff_lname: data.get("lastName") || "กรุณาเปลี่ยนนามสกุลของคุณ",
-          staff_email: `${data.get("username")}@webmail.npru.ac.th`,
-          staff_mobile: null,
+          staff_email: data.get('email') || `${data.get("username")}@webmail.npru.ac.th`,
+          staff_mobile: data.get('phoneNumber') || null,
           staff_address: null,
           province: null,
           district: null,
@@ -78,7 +80,10 @@ const Add_Users = ({ closeModal }) => {
           zipcode: null,
         };
 
-        const additionalResponse = await axios.post("/api/create/staff", additionalData);
+        const additionalResponse = await axios.post(
+          "/api/create/staff",
+          additionalData
+        );
         const additionalDataResponse = additionalResponse.data;
         console.log("Additional response:", additionalDataResponse);
 
@@ -130,10 +135,10 @@ const Add_Users = ({ closeModal }) => {
     }
   };
 
-  const UploadFile = ({onFileLoad}) => {
+  const UploadFile = ({ onFileLoad }) => {
     const handleFileChange = (e) => {
       const file = e.target.files[0];
-  
+
       if (file) {
         Papa.parse(file, {
           complete: (result) => {
@@ -153,60 +158,112 @@ const Add_Users = ({ closeModal }) => {
     );
   };
 
-
   const handleFileLoad = async (csvData) => {
     try {
-        console.log('CSV Data:', csvData);
+  
+      const jsonData = csvData.map((item) => ({
+        username: item.username,
+        password: `${item.password}`,
+        role: item.role,
+      }));
+  
+      const registerResponse = await axios.post("/api/auth/arrayregister", jsonData);
+      const registerData = registerResponse.data;
+  
+      if (registerData.some((response) => response.status !== "ok")) {
+        throw new Error("Failed to register some users");
+      }
+  
+      const studentsData = [];
+      const staffsData = [];
+  
+      jsonData.forEach((user, index) => {
+        if (user.role === "student") {
+          const registerUser = registerData[index];
+          if (!registerUser || !registerUser.login_ID) {
+            throw new Error(`Missing login_ID for user ${user.username}`);
+          }
+  
+          const loginID = registerUser.login_ID;
+          studentsData.push({
+            std_ID: user.username,
+            login_ID: loginID,
+            std_fname: csvData[index].std_fname || "กรุณาเปลี่ยนชื่อของคุณ",
+            std_lname: csvData[index].std_lname || "กรุณาเปลี่ยนนามสกุลของคุณ",
+            sec_ID: 1,
+            std_email: csvData[index].email,
+            std_mobile: csvData[index].phone || null,
+            std_address: null,
+            province: null,
+            district: null,
+            subdistrict: null,
+            zipcode: null,
+          });
+        }else {
+          const registerUser = registerData[index];
+          if (!registerUser || !registerUser.login_ID) {
+            throw new Error(`Missing login_ID for user ${user.username}`);
+          }
 
-        // Transform CSV data into desired JSON format
-        const jsonData = csvData.map(item => ({
-            username: item.username,
-            password: `${item.password}`,
-            role: item.role,
-        }));
-
-        console.log('JSON Data:', jsonData);
-
-        // Send JSON data to backend for registration
-        const registerResponse = await axios.post('/api/auth/arrayregister', jsonData);
-        const registerData = registerResponse.data;
-        console.log('Register response:', registerData);
-
-        if (registerData.some(response => response.status !== 'ok')) {
-            throw new Error('Failed to register some users');
+          const loginID = registerUser.login_ID;
+          staffsData.push({
+            login_ID: loginID,
+            staff_fname: csvData[index].std_fname || "กรุณาเปลี่ยนชื่อของคุณ",
+            staff_lname: csvData[index].std_lname || "กรุณาเปลี่ยนนามสกุลของคุณ",
+            staff_email: csvData[index].email,
+            staff_mobile: csvData[index].phone || null,
+            staff_address: null,
+            province: null,
+            district: null,
+            subdistrict: null,
+            ipcode: null,
+          }) 
         }
+      });
 
-        // Success message using SweetAlert2
-        Swal.fire({
-            icon: 'success',
-            title: 'เพิ่มผู้ใช้สำเร็จ!',
-            showConfirmButton: false,
-            timer: 1500,
-        });
+      const createStudentResponse = await axios.post('/api/create/students', studentsData);
+      const createStudentData = createStudentResponse.data;
+  
+      if (createStudentData.status !== 'ok') {
+        throw new Error("Unexpected response format from /api/create/students");
+      }
 
-        closeModal();
-        setTimeout(() => {
-            window.location.reload(); // Refresh the screen
-        }, 2000);
+      const createStaffResponse = await axios.post('/api/create/staffs', staffsData);
+      const createStaffData = createStaffResponse.data;
+  
+      if (createStaffData.status !== 'ok') {
+        throw new Error("Unexpected response format from /api/create/staffs");
+      }
+  
+      Swal.fire({
+        icon: "success",
+        title: "เพิ่มผู้ใช้สำเร็จ!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+  
+      closeModal();
+      setTimeout(() => {
+        window.location.reload(); // Refresh the screen
+      }, 2000);
     } catch (error) {
-        console.error('Error:', error);
-
-        // Error handling using SweetAlert2
-        Swal.fire({
-            icon: 'error',
-            title: 'เกิดข้อผิดพลาด!',
-            text: error.message || 'Something went wrong',
-        });
-        closeModal();
+      console.error("Error:", error);
+  
+      Swal.fire({
+        icon: "error",
+        title: "เกิดข้อผิดพลาด!",
+        text: error.message || "Something went wrong",
+      });
+      closeModal();
     }
-};
+  };
+  
+  
+  
+  
   
 
-
-
   // console.log(csvTojsondata);
-
-
 
   return (
     <div className="flex justify-center items-center bg-gray-100 rounded-lg">
@@ -217,13 +274,19 @@ const Add_Users = ({ closeModal }) => {
         </div>
         <div className="flex mb-6">
           <button
-            className={`p-2 w-1/2 ${activeTab === "single" ? "bg-purple-600 text-white" : "bg-gray-200"}`}
+            className={`p-2 w-1/2 ${
+              activeTab === "single"
+                ? "bg-purple-600 text-white"
+                : "bg-gray-200"
+            }`}
             onClick={() => handleTabChange("single")}
           >
             เพิ่มผู้ใช้เดียว
           </button>
           <button
-            className={`p-2 w-1/2 ${activeTab === "bulk" ? "bg-purple-600 text-white" : "bg-gray-200"}`}
+            className={`p-2 w-1/2 ${
+              activeTab === "bulk" ? "bg-purple-600 text-white" : "bg-gray-200"
+            }`}
             onClick={() => handleTabChange("bulk")}
           >
             อัปโหลด CSV
@@ -232,7 +295,10 @@ const Add_Users = ({ closeModal }) => {
         {activeTab === "single" ? (
           <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-2">
             <div className="mb-4">
-              <label htmlFor="username" className="block text-sm font-medium text-gray-600">
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-gray-600"
+              >
                 Username
               </label>
               <input
@@ -243,7 +309,10 @@ const Add_Users = ({ closeModal }) => {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-600">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-600"
+              >
                 Password
               </label>
               <input
@@ -254,7 +323,10 @@ const Add_Users = ({ closeModal }) => {
               />
             </div>
             <div className="mb-4 col-span-2">
-              <label htmlFor="role" className="block text-sm font-medium text-gray-600">
+              <label
+                htmlFor="role"
+                className="block text-sm font-medium text-gray-600"
+              >
                 Role
               </label>
               <select
@@ -272,7 +344,10 @@ const Add_Users = ({ closeModal }) => {
             {selectedRole === "student" || selectedRole === "teacher" ? (
               <>
                 <div className="mb-4">
-                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-600">
+                  <label
+                    htmlFor="firstName"
+                    className="block text-sm font-medium text-gray-600"
+                  >
                     First Name
                   </label>
                   <input
@@ -283,7 +358,10 @@ const Add_Users = ({ closeModal }) => {
                   />
                 </div>
                 <div className="mb-4">
-                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-600">
+                  <label
+                    htmlFor="lastName"
+                    className="block text-sm font-medium text-gray-600"
+                  >
                     Last Name
                   </label>
                   <input
@@ -293,8 +371,36 @@ const Add_Users = ({ closeModal }) => {
                     className="mt-1 p-1 w-full border-b-2 rounded-md"
                   />
                 </div>
+                <div className="mb-4">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-600"
+                  >
+                    Email
+                  </label>
+                  <input
+                    type="text"
+                    id="email"
+                    name="email"
+                    className="mt-1 p-1 w-full border-b-2 rounded-md"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label
+                    htmlFor="phoneNumber"
+                    className="block text-sm font-medium text-gray-600"
+                  >
+                    Phone
+                  </label>
+                  <input
+                    type="text"
+                    id="phoneNumber"
+                    name="phoneNumber"
+                    className="mt-1 p-1 w-full border-b-2 rounded-md"
+                  />
+                </div>
               </>
-            ) : null}
+            ) :null}
             <div className="col-span-2 text-right">
               <button
                 type="submit"
@@ -306,10 +412,13 @@ const Add_Users = ({ closeModal }) => {
           </form>
         ) : (
           <div className="flex flex-col items-center">
-            <label htmlFor="csvFile" className="block text-sm font-medium text-gray-600 mb-4">
+            <label
+              htmlFor="csvFile"
+              className="block text-sm font-medium text-gray-600 mb-4"
+            >
               อัปโหลดไฟล์ CSV
             </label>
-            < UploadFile onFileLoad={handleFileLoad}/>
+            <UploadFile onFileLoad={handleFileLoad} />
           </div>
         )}
       </div>
