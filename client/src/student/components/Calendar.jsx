@@ -272,7 +272,7 @@ function CalendarFull() {
                 ? selectedEvent.status == 1
                   ? "เปิดลงทะเบียน"
                   : "ปิดลงทะเบียน"
-                : "ยังไม่ถึงช่วงเปิดลงทะเบียน"}
+                : "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"}
             </p>
 
             {selectedEvent.numStd != selectedEvent.numStdReserve &&
