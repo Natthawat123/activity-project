@@ -141,8 +141,6 @@ const ProductTable = () => {
             </thead>
             <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
               {visibleItems.map((item, index) => {
-
-
                 return (
                   <tr key={item.act_ID} className="border-b-2 flex w-full">
                     <td scope="col" className="px-6 py-3 w-1/12 text-center">

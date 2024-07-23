@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Web3 from "web3";
 import Abi from "../../components/contract/abi.json";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import Swal from "sweetalert2";
 
 function DetailStudent() {
   const [activity, setActivity] = useState([]);
@@ -12,6 +13,7 @@ function DetailStudent() {
   const [reserve, setReserve] = useState([]);
   const [section, setSection] = useState([]);
   const [staff, setStaff] = useState([]);
+  const [login, setLogin] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("default");
@@ -20,7 +22,7 @@ function DetailStudent() {
   const navigate = useNavigate();
 
   const { std_ID } = useParams();
-  const contractAddress = "0xF9322B9B17944cf80FA33Be311Ea472375698F90";
+  const contractAddress = "0x9A00B0CB3A626c44c19f868b85A3819C8b630494";
 
   useEffect(() => {
     const fetchStudent = async () => {
@@ -84,7 +86,6 @@ function DetailStudent() {
         console.error(error);
       }
     };
-
     fetchActivity();
     fetchStudent();
     fetchSmartContract();
@@ -137,6 +138,44 @@ function DetailStudent() {
     (currentPage + 1) * itemsPerPage
   );
 
+  const handleDelete = async () => {
+    try {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      });
+
+      if (result.isConfirmed) {
+        const response = await axios.delete(`/api/student/${student.login_ID}`);
+
+        if (response.status === 200) {
+          Swal.fire({
+            title: "Deleted!",
+            text: "The student has been deleted.",
+            icon: "success",
+          });
+          setTimeout(() => {
+            navigate(-1);
+          }, 1500);
+        } else {
+          throw new Error("Delete operation failed");
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        title: "Error!",
+        text: "An error occurred while deleting the student.",
+        icon: "error",
+      });
+    }
+  };
+
   return (
     <div>
       {/* resume */}
@@ -166,6 +205,14 @@ function DetailStudent() {
             <p>อำเภอ: {student.district}</p>
             <p>ตำบล: {student.subdistrict}</p>
             <p>รหัสไปรษณีย์: {student.zipcode}</p>
+          </div>
+          <div className="mt-5">
+            <button
+              className="btn btn-warning px-6 py-4 text-white"
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
           </div>
         </div>
       </div>

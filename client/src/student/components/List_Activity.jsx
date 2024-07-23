@@ -19,7 +19,7 @@ function Test() {
 
   const navigate = useNavigate();
 
-  const contractAddress = "0xF9322B9B17944cf80FA33Be311Ea472375698F90";
+  const contractAddress = "0x9A00B0CB3A626c44c19f868b85A3819C8b630494";
   const stdID = localStorage.getItem("std_ID");
 
   useEffect(() => {
