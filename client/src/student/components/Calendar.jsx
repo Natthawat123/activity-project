@@ -24,20 +24,32 @@ function CalendarFull() {
                 }
                 return response.json();
             })
-            .then(data => {
-                const eventList = data.map((item, index) => ({
-                    start: moment(item.act_dateStart).toDate(),
-                    end: moment(item.act_dateEnd).toDate(),
-                    reserveStart: moment(item.act_dateStart).subtract(2, 'weeks').toDate(),
-                    reserveEnd: moment(item.act_dateStart).subtract(1, 'day').toDate(),
-                    title: item.act_title,
-                    status: item.act_status,
-                    location: item.act_location,
-                    numStd: item.act_numStd,
-                    numStdReserve: item.act_numStdReserve,
-                    id: item.act_ID,
-                    color: index % 3 === 0 ? 'blue' : index % 3 === 1 ? 'green' : 'red',
-
+            .then((data) => {
+                const eventList = data.map((item) => ({
+                  start: moment(item.act_dateStart).toDate(),
+                  end: moment(item.act_dateEnd).toDate(),
+                  reserveStart: moment(item.act_dateStart)
+                    .subtract(2, "weeks")
+                    .toDate(),
+                  reserveEnd: moment(item.act_dateStart).subtract(1, "day").toDate(),
+                  title: item.act_title,
+                  status: item.act_status,
+                  location: item.act_location,
+                  numStd: item.act_numStd,
+                  numStdReserve: item.act_numStdReserve,
+                  id: item.act_ID,
+                  color:
+                    item.act_status == 2
+                      ? "blue"
+                      : item.act_numStd == item.act_numStdReserve
+                      ? "red"
+                      : now >=
+                          moment(item.act_dateStart).subtract(2, "weeks").toDate() &&
+                        now <= moment(item.act_dateStart).subtract(1, "day").toDate()
+                      ? item.act_status == 1
+                        ? "green"
+                        : "red"
+                      : "gray",
                 }));
                 setEvents(eventList);
             })
@@ -174,6 +186,25 @@ function CalendarFull() {
                 eventPropGetter={eventStyleGetter}
                 onSelectEvent={handleEventClick}
             />
+
+<div className="flex my-3 gap-5">
+        <div className="flex items-center">
+          <div className="me-1 bg-green-600 h-[18px] w-[18px] rounded-sm"></div>
+          <p className="me-2">เปิดลงทะเบียน</p>
+        </div>
+        <div className="flex items-center">
+          <div className="me-1 bg-red-600 h-[18px] w-[18px] rounded-sm"></div>
+          <p className="me-2">ลงทะเบียนเต็มแล้ว/ปิดลงทะเบียน</p>
+        </div>
+        <div className="flex items-center">
+          <div className="me-1 bg-blue-600 h-[18px] w-[18px] rounded-sm"></div>
+          <p className="me-2">กิจกรรมจบลงแล้ว</p>
+        </div>
+        <div className="flex items-center">
+          <div className="me-1 bg-gray-600 h-[18px] w-[18px] rounded-sm"></div>
+          <p className="me-2">ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน</p>
+        </div>
+      </div>
 
             {selectedEvent && showPopup && (
                 <div className="fixed w-72 md:w-fit top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg z-50">

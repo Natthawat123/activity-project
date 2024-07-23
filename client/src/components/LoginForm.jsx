@@ -28,7 +28,8 @@ export default function SignInSide() {
         localStorage.setItem('token', result.token);
         localStorage.setItem('role', result.role);
         if (result.role === 'admin') {
-          window.location = '/admin/dashboard'; // Redirect to admin dashboard
+          window.location = '/admin/dashboard';
+          localStorage.setItem('staff_ID', result.staff_ID) // Redirect to admin dashboard
         } else if (result.role === 'teacher') {
           window.location = '/teacher/calendar'; // Redirect to teacher dashboard
           localStorage.setItem('staff_ID', result.staff_ID);
