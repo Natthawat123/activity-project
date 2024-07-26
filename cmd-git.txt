@@ -3,11 +3,7 @@
 git checkout -b pond //ใช้ครั้งแรกในการสร้าง branch
 git add .
 git commit -m "commit"
-<<<<<<< HEAD
 git push origin pond
-=======
-git push
->>>>>>> ca386fc0fdac689cf5b197f833250d8a1661d678
 
 //คำสั่งใช้ดึงข้อมูลลงมาจาก git
 git pull origin main 
