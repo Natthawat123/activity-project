@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Popup from "../components/Popup_addAc";
 import BuildIcon from "@mui/icons-material/Build";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import moment from "moment";
 
 const ProductTable = () => {
-  const now = new Date();
-
+  const now = new Date()
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
+
   const [activity, setActivity] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [itemsPerPage, setItemsPerPage] = useState(15);
   const [currentPage, setCurrentPage] = useState(0);
+
   const [visibleStartPage, setVisibleStartPage] = useState(0);
 
   const navigate = useNavigate();
@@ -62,11 +62,10 @@ const ProductTable = () => {
     );
 
     return (
-      <div className="mb-10 container mx-auto">
-        <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
+      <div className=" mb-10 container mx-auto">
+        <div className=" overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
           <div className="flex justify-between">
             <div className="text-lg font-bold mb-2">รายชื่อกิจกรรม</div>
-            <Popup />
           </div>
           <hr className="m-3" />
           <div className="flex justify-between">
@@ -103,14 +102,14 @@ const ProductTable = () => {
               </div>
             </div>
 
-            <div className="mt-1 pb-4">
+            <div className=" mt-1 pb-4">
               <select
                 value={itemsPerPage}
                 onChange={(e) => {
                   setItemsPerPage(+e.target.value);
                   setCurrentPage(0);
                 }}
-                className="block ps-6 pt-1 pb-1 text-sm text-gray-900 border rounded-md w-20 bg-orange-500-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-black-400 dark:text-gray-950 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="block ps-6 pt-1 pb-1 text-sm text-gray-900 border  rounded-md w-20 bg-orange-500-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-black-400 dark:text-gray-950 dark:focus:ring-blue-500 dark:focus:border-blue-500"
               >
                 <option value={15}>15</option>
                 <option value={25}>25</option>
@@ -120,7 +119,7 @@ const ProductTable = () => {
           </div>
 
           <table className="text-center w-full text-sm rtl:text-center text-gray-500 dark:text-gray-400">
-            <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
+            <thead className=" text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
               <tr className="flex w-full">
                 <th scope="col" className="px-6 py-3 w-1/12 text-center">
                   ลำดับ
@@ -140,20 +139,21 @@ const ProductTable = () => {
               </tr>
             </thead>
             <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
-              {visibleItems.map((item, index) => {
-                return (
-                  <tr key={item.act_ID} className="border-b-2 flex w-full">
-                    <td scope="col" className="px-6 py-3 w-1/12 text-center">
-                      {currentPage * itemsPerPage + index + 1}
-                    </td>
-                    <td scope="col" className="px-6 py-3 w-4/12 text-start">
-                      {item.act_title}
-                    </td>
+              {visibleItems.map((item, index) => (
+                <tr key={item.act_ID} className="border-b-2 flex w-full ">
+                  <td scope="col" className="px-6 py-3 w-1/12 text-center">
+                    {index + 1}
+                  </td>
+                  <td scope="col" className="px-6 py-3 w-4/12 text-start">
+                    {item.act_title}
+                  </td>
+                  {
                     <td scope="col" className="px-6 py-3 w-3/12 text-center">
                       {item.act_dateStart.slice(0, 10)} -{" "}
                       {item.act_dateEnd.slice(0, 10)}
                     </td>
-                    <td
+                  }
+                  <td
                       scope="col"
                       className="px-6 py-3 w-2/12 text-center"
                       style={{
@@ -187,25 +187,19 @@ const ProductTable = () => {
                               : "ปิดลงทะเบียน"
                             : "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"}
                     </td>
-                    <td
-                      scope="col"
-                      className="px-6 py-3 w-1/12 text-end hover:text-red-500 text-indigo-800"
-                    >
-                      <BuildIcon
-                        onClick={() => navigate(`manage/${item.act_ID}`)}
-                      />
-                    </td>
-                    <td
-                      scope="col"
-                      className="px-6 py-3 w-1/12 text-start hover:text-green-500 text-teal-700"
-                    >
-                      <ListAltIcon
-                        onClick={() => navigate(`detail/${item.act_ID}`)}
-                      />
-                    </td>
-                  </tr>
-                );
-              })}
+
+                  <td
+                    scope="col"
+                    className="px-6 py-3 w-2/12 text-center hover:text-green-500 text-teal-700"
+                  >
+                    <ListAltIcon
+                      onClick={() => {
+                        navigate(`detail/${item.act_ID}`);
+                      }}
+                    />
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
 

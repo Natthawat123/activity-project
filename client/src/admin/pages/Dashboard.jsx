@@ -1,18 +1,14 @@
-
-import Dash_users from '../components/Dash_users'
-import ListUsers from '../components/ListUsers'
-
+import Dash_users from "../components/Dash_users";
+import ListUsers from "../components/ListUsers";
 
 function Dashboard() {
-
-
- 
   return (
     <div>
+      {/* <Test/> */}
       <Dash_users />
       <ListUsers />
     </div>
-  )
+  );
 }
 
-export default Dashboard
+export default Dashboard;
