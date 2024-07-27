@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Popup from "../components/Popup_addAc";
+// import Popup from "../components/Popup_addAc";
 import BuildIcon from "@mui/icons-material/Build";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import moment from "moment";
@@ -14,6 +14,7 @@ const ProductTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
+  const [sortOrder, setSortOrder] = useState("latest");
   // const [visibleStartPage, setVisibleStartPage] = useState(0);
 
   const navigate = useNavigate();
@@ -59,13 +60,30 @@ const ProductTable = () => {
     pageNumbers.push(i);
   }
 
+  const handleSortChange = () => {
+    setSortOrder((prevOrder) => (prevOrder === "latest" ? "oldest" : "latest"));
+  };
+
+  const sortItems = (items) => {
+    return items.sort((a, b) => {
+      const dateA = new Date(a.act_dateStart);
+      const dateB = new Date(b.act_dateStart);
+      if (sortOrder === "latest") {
+        return dateB - dateA;
+      } else {
+        return dateA - dateB;
+      }
+    });
+  };
+
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {
     return <div>Loading...</div>;
   } else {
-    const lastPage = Math.ceil(filteredItems.length / itemsPerPage) - 1;
-    const visibleItems = filteredItems.slice(
+    const sortedItems = sortItems(filteredItems);
+    const lastPage = Math.ceil(sortedItems.length / itemsPerPage) - 1;
+    const visibleItems = sortedItems.slice(
       currentPage * itemsPerPage,
       (currentPage + 1) * itemsPerPage
     );
@@ -75,9 +93,9 @@ const ProductTable = () => {
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
           <div className="flex justify-between">
             <div className="text-lg font-bold mb-2">รายชื่อกิจกรรม</div>
-            
+
           </div>
-      {/*<hr className="m-3" /> */}
+          {/*<hr className="m-3" /> */}
           <div className="flex justify-between">
             <div className="pb-4 items-center">
               <label htmlFor="table-search" className="sr-only">
@@ -112,8 +130,13 @@ const ProductTable = () => {
               </div>
             </div>
 
-            <div className="mt-1 pb-4">
-              
+            <div className="flex pb-4 items-center">
+              <button
+                onClick={handleSortChange}
+                className="block p-1.5 text-xs border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                วันที่ ({sortOrder === "latest" ? "ใหม่สุด" : "เก่าสุด"})
+              </button>
             </div>
           </div>
 
@@ -156,19 +179,19 @@ const ProductTable = () => {
                       className="px-6 py-3 w-2/12 text-center"
                       style={{
                         color:
-                        item.act_status == 2
-                        ? "blue"
-                        : item.act_numStd == item.act_numStdReserve
-                          ? "red"
-                          : now >= moment(item.act_dateStart)
-                          .subtract(2, "weeks")
-                          .toDate() && now <= moment(item.act_dateStart)
-                          .subtract(1, "day")
-                          .toDate()
-                            ? item.act_status == 1
-                              ? "green"
-                              : "red"
-                            : "grey",
+                          item.act_status == 2
+                            ? "blue"
+                            : item.act_numStd == item.act_numStdReserve
+                              ? "red"
+                              : now >= moment(item.act_dateStart)
+                                .subtract(2, "weeks")
+                                .toDate() && now <= moment(item.act_dateStart)
+                                  .subtract(1, "day")
+                                  .toDate()
+                                ? item.act_status == 1
+                                  ? "green"
+                                  : "red"
+                                : "grey",
                       }}
                     >
                       {item.act_status == 2
@@ -176,10 +199,10 @@ const ProductTable = () => {
                         : item.act_numStd == item.act_numStdReserve
                           ? "ลงทะเบียนเต็มแล้ว"
                           : now >= moment(item.act_dateStart)
-                          .subtract(2, "weeks")
-                          .toDate() && now <= moment(item.act_dateStart)
-                          .subtract(1, "day")
-                          .toDate()
+                            .subtract(2, "weeks")
+                            .toDate() && now <= moment(item.act_dateStart)
+                              .subtract(1, "day")
+                              .toDate()
                             ? item.act_status == 1
                               ? "เปิดลงทะเบียน"
                               : "ปิดลงทะเบียน"

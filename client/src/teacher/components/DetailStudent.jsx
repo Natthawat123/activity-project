@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Web3 from "web3";
 import Abi from "../../components/contract/abi.json";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import Swal from "sweetalert2";
 
 function DetailStudent() {
   const [activity, setActivity] = useState([]);
@@ -12,10 +13,12 @@ function DetailStudent() {
   const [reserve, setReserve] = useState([]);
   const [section, setSection] = useState([]);
   const [staff, setStaff] = useState([]);
+  // const [login, setLogin] = useState([]);
 
+  const [sortOrder, setSortOrder] = useState("latest");
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("default");
-  const [itemsPerPage, setItemsPerPage] = useState(15);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
   const navigate = useNavigate();
 
@@ -84,7 +87,6 @@ function DetailStudent() {
         console.error(error);
       }
     };
-
     fetchActivity();
     fetchStudent();
     fetchSmartContract();
@@ -131,16 +133,64 @@ function DetailStudent() {
     );
   });
 
+  const handleSortChange = () => {
+    setSortOrder((prevOrder) => (prevOrder === "latest" ? "oldest" : "latest"));
+  };
+
+
   const lastPage = Math.ceil(filteredItems.length / itemsPerPage) - 1;
   const visibleItems = filteredItems.slice(
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
   );
 
+  const pageNumbers = [];
+  for (let i = 0; i <= lastPage; i++) {
+    pageNumbers.push(i);
+  }
+
+  const handleDelete = async () => {
+    try {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      });
+
+      if (result.isConfirmed) {
+        const response = await axios.delete(`/api/student/${student.login_ID}`);
+
+        if (response.status === 200) {
+          Swal.fire({
+            title: "Deleted!",
+            text: "The student has been deleted.",
+            icon: "success",
+          });
+          setTimeout(() => {
+            navigate(-1);
+          }, 1500);
+        } else {
+          throw new Error("Delete operation failed");
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        title: "Error!",
+        text: "An error occurred while deleting the student.",
+        icon: "error",
+      });
+    }
+  };
+
   return (
     <div>
       {/* resume */}
-      <div className="container mb-10  mx-auto md:px-20 ">
+      <div className="container mb-10  mx-auto md:px-20">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
           <div className="flex justify-between">
             <h1 className="text-lg font-bold mb-2">ประวัติส่วนตัว</h1>
@@ -167,6 +217,14 @@ function DetailStudent() {
             <p>ตำบล: {student.subdistrict}</p>
             <p>รหัสไปรษณีย์: {student.zipcode}</p>
           </div>
+          <div className="mt-5">
+            <button
+              className="btn btn-warning px-6 py-4 text-white"
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
+          </div>
         </div>
       </div>
 
@@ -176,9 +234,7 @@ function DetailStudent() {
           <div className="text-lg font-bold mb-2">ประวัติการทำกิจกรรม</div>
           <div className="flex justify-between">
             <div className="pb-4 items-center">
-              <label htmlFor="table-search" className="sr-only">
-                Search
-              </label>
+              <label htmlFor="table-search" className="sr-only">Search</label>
               <div className="relative mt-1">
                 <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                   <svg
@@ -200,45 +256,37 @@ function DetailStudent() {
                 <input
                   type="text"
                   id="table-search"
-                  className="pb-2 block pt-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="Search for activity"
+                  className="block pl-10 p-2 text-sm border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  placeholder="ค้นหากิจกรรม"
                   value={searchTerm}
                   onChange={handleSearch}
                 />
               </div>
             </div>
-
-            <div className="pb-4 items-center">
-              <label htmlFor="filter-activity-type" className="sr-only">
-                Filter
-              </label>
-              <div className="relative mt-1">
-                <select
-                  value={filter}
-                  onChange={handleFilterChange}
-                  className="block p-2 text-sm border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                >
-                  <option value="default">ทั้งหมด</option>
-                  <option value="joinEntry">เข้าร่วมกิจกรรมแล้ว</option>
-                  <option value="reserveEntry">ลงทะเบียนสำเร็จ</option>
-                  <option value="notjoin">ยังไม่ได้เข้าร่วมกิจกรรม</option>
-                </select>
+            <div className="flex gap-3 items-center">
+              <div className="flex pb-4 items-center">
+                <label htmlFor="filter-activity-type" className="sr-only">Filter</label>
+                <div className="relative">
+                  <select
+                    value={filter}
+                    onChange={handleFilterChange}
+                    className="text-xs block p-1.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  >
+                    <option value="default" className="text-center">กิจกรรมทั้งหมด</option>
+                    <option value="joinEntry">เข้าร่วมกิจกรรมแล้ว</option>
+                    <option value="reserveEntry">ลงทะเบียนสำเร็จ</option>
+                    <option value="notjoin">ยังไม่ได้ลงทะเบียน</option>
+                  </select>
+                </div>
               </div>
-            </div>
-
-            <div className="mt-1 pb-4">
-              <select
-                value={itemsPerPage}
-                onChange={(e) => {
-                  setItemsPerPage(+e.target.value);
-                  setCurrentPage(0);
-                }}
-                className="block ps-6 pt-1 pb-1 text-sm rounded-md w-20 bg-gray-200"
-              >
-                <option value={15}>15</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-              </select>
+              <div className="flex pb-4 items-center">
+                <button
+                  onClick={handleSortChange}
+                  className="block p-2 text-xs border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                >
+                  วันที่ ({sortOrder === "latest" ? "ใหม่สุด" : "เก่าสุด"})
+                </button>
+              </div>
             </div>
           </div>
 
@@ -301,66 +349,51 @@ function DetailStudent() {
             </tbody>
           </table>
 
-          <div className="flex justify-between mt-4">
-            <div>
+          <div className="flex justify-between mt-2">
+          <div className="flex gap-2 w-24"></div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
+              disabled={currentPage === 0}
+              className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
+                }`}
+            >
+              ก่อนหน้า
+            </button>
+            {pageNumbers.map((pageNumber) => (
               <button
-                onClick={() => {
-                  if (currentPage > 0) {
-                    setCurrentPage((prev) => prev - 1);
-                  }
-                }}
-                disabled={currentPage === 0}
-                className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                key={pageNumber}
+                onClick={() => setCurrentPage(pageNumber)}
+                className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${pageNumber === currentPage ? "bg-blue-200" : ""
+                  }`}
               >
-                Previous
+                {pageNumber + 1}
               </button>
-            </div>
-
-            <div className="flex space-x-2">
-              {Array.from({
-                length: Math.ceil(filteredItems.length / itemsPerPage),
-              })
-                .slice(currentPage, currentPage + 4)
-                .map((_, i) => (
-                  <button
-                    key={i + currentPage}
-                    onClick={() => setCurrentPage(currentPage + i)}
-                    className={`px-4 py-2 font-medium ${
-                      currentPage + i === currentPage
-                        ? "text-blue-600 bg-blue-100"
-                        : "text-gray-600 bg-gray-100"
-                    } border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300`}
-                  >
-                    {currentPage + i + 1}
-                  </button>
-                ))}
-
-              {currentPage + 4 < lastPage && (
-                <button
-                  onClick={() => {
-                    setCurrentPage(currentPage + 4);
-                  }}
-                  className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
-                >
-                  ...
-                </button>
-              )}
-            </div>
-
-            <div>
-              <button
-                onClick={() => {
-                  if (currentPage < lastPage) {
-                    setCurrentPage((prev) => prev + 1);
-                  }
-                }}
-                disabled={currentPage >= lastPage}
-                className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
-              >
-                Next
-              </button>
-            </div>
+            ))}
+            <button
+              onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))}
+              disabled={currentPage === lastPage}
+              className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === lastPage ? "cursor-not-allowed" : "hover:bg-blue-200"
+                }`}
+            >
+              ถัดไป
+            </button></div>
+          <div className="flex gap-2">
+            <select
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(+e.target.value);
+                setCurrentPage(0);
+              }}
+              className="px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
           </div>
+
+        </div>
         </div>
       </div>
     </div>

@@ -113,16 +113,41 @@ function DetailActivity() {
             </div>
           </div>
           <hr className="mb-3" />
-          <div className="grid grid-cols-2 gap-4">
-            <h1>title : {activity.act_title}</h1>
-            <p>desc : {activity.act_desc}</p>
-            <p>Location: {activity.act_location}</p>
-            <p>Start Date: {activity.act_dateStart}</p>
-            <p>End Date: {activity.act_dateEnd}</p>
-            <p>Number of Students: {activity.act_numStd}</p>
-            <p>Status: {activity.act_status}</p>
-            <p>Staff ID: {activity.staff_ID}</p>
-          </div>
+          <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+      
+              <tbody className="bg-white divide-y divide-gray-200 text-md">
+                  <tr>
+                      <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">ชื่อกิจกรรม</td>
+                      <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_title}</td>               
+                      <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">รายละเอียด</td>
+                      <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_desc}</td>
+                  </tr>
+                  <tr>
+                      <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">สถานที่</td>
+                      <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_location}</td>
+                  
+                      <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">เริ่มวันที่</td>
+                      <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_dateStart}</td>
+                  </tr>
+                  <tr>
+                      <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">สิ้นสุดวันที่</td>
+                      <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_dateEnd}</td>
+                  
+                      <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">Number of Students</td>
+                      <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_numStd}</td>
+                  </tr>
+                  <tr>
+                      <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">Status</td>
+                      <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_status}</td>
+
+                      <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">Staff ID</td>
+                      <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.staff_ID}</td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+      
         </div>
       </div>
 

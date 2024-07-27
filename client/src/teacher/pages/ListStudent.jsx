@@ -1,43 +1,38 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import GroupIcon from '@mui/icons-material/Group';
 
-const ProductTable = () => {
+const ListStudents = () => {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [users, setUsers] = useState([]);
-  const [sections, setSections] = useState([]);
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [itemsPerPage, setItemsPerPage] = useState(15);
   const [currentPage, setCurrentPage] = useState(0);
-
-  const navigate = useNavigate();
+  const [students, setStudents] = useState([]);
+  const [sections, setSections] = useState([]);
+  const [selectedSection, setSelectedSection] = useState("all");
+  const [sortOrder, setSortOrder] = useState("asc");
 
   useEffect(() => {
-    // Fetch user data
-    fetch("/api/list/student")
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          setIsLoaded(true);
-          setUsers(result); // Update state with fetched user data
-        },
-        (error) => {
-          setIsLoaded(true);
-          setError(error);
-        }
-      );
+    const fetchData = async () => {
+      try {
+        const [studentsRes, sectionsRes] = await Promise.all([
+          axios.get("/api/list/student"),
+          axios.get("/api/list/section"),
+        ]);
+        setStudents(studentsRes.data);
+        setSections(sectionsRes.data);
+        setIsLoaded(true);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setIsLoaded(false);
+        setError(error);
+      }
+    };
 
-    // Fetch section data
-    fetch("/api/list/section")
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          setSections(result); // Update state with fetched section data
-        },
-        (error) => {
-          setError(error);
-        }
-      );
+    fetchData();
   }, []);
 
   const handleSearch = (event) => {
@@ -45,35 +40,51 @@ const ProductTable = () => {
     setCurrentPage(0);
   };
 
+  const handleSortChange = (event) => {
+    setSortOrder(event.target.value);
+  };
+
+  const filteredStudents = students.filter((student) => {
+    const matchesSearchTerm =
+      student.std_ID.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.std_fname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.std_lname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.sec_ID.toString().toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesFilter = selectedSection === "all" || student.sec_ID.toString() === selectedSection;
+
+    return matchesSearchTerm && matchesFilter;
+  });
+
+  // Sorting logic
+  const sortedStudents = filteredStudents.sort((a, b) => {
+    const idA = String(a.std_ID || ""); // Convert to string if std_ID is undefined or null
+    const idB = String(b.std_ID || ""); // Convert to string if std_ID is undefined or null
+
+    return sortOrder === "asc"
+      ? idA.localeCompare(idB)
+      : idB.localeCompare(idA);
+  });
+
+  const lastPage = Math.ceil(filteredStudents.length / itemsPerPage) - 1;
+  const visibleStudents = sortedStudents.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
+  const pageNumbers = Array.from({ length: lastPage + 1 }, (_, i) => i);
+
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {
     return <div>Loading...</div>;
   } else {
-    // Map sec_ID to sec_name
-    const mappedUsers = users.map((user) => {
-      const section = sections.find((sec) => sec.sec_ID === user.sec_ID);
-      return { ...user, sec_name: section ? section.sec_name : "" };
-    });
-
-    const filteredItems = mappedUsers.filter((item) => {
-      return (
-        item.std_fname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.std_lname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.sec_name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    });
-
-    const lastPage = Math.ceil(filteredItems.length / itemsPerPage) - 1;
-    const visibleItems = filteredItems.slice(
-      currentPage * itemsPerPage,
-      (currentPage + 1) * itemsPerPage
-    );
-
     return (
       <div className="mb-10 container mx-auto md:px-20">
-        <div className=" overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
-          <div className="text-lg font-bold mb-2">รายชื่อนักศึกษา</div>
+        <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
+          <div className="text-lg font-bold mb-2 gap-2 flex">
+            <h1>รายชื่อนักศึกษา</h1>
+            <GroupIcon />
+          </div>
           <div className="flex justify-between">
             <div className="pb-4 items-center">
               <label htmlFor="table-search" className="sr-only">
@@ -101,70 +112,71 @@ const ProductTable = () => {
                   type="text"
                   id="table-search"
                   className="pb-2 block pt-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="Search for student"
+                  placeholder="ค้นหานักศึกษา"
                   value={searchTerm}
                   onChange={handleSearch}
                 />
               </div>
             </div>
 
-            <div className=" mt-1 pb-4">
-              <select
-                value={itemsPerPage}
-                onChange={(e) => {
-                  setItemsPerPage(+e.target.value);
-                  setCurrentPage(0);
-                }}
-                className="block ps-6 pt-1 pb-1 text-sm text-gray-900 border  rounded-md w-20 bg-orange-500-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-black-400 dark:text-gray-950 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              >
-                <option value={15}>15</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-              </select>
+            <div className="flex pb-4 items-center gap-2">
+              <div className="items-center justify-center">
+                <label htmlFor="sort-order" className="text-xs">เรียงตามรหัสนศ.</label>
+                <div className="relative justify-center flex">
+                  <select
+                    value={sortOrder}
+                    onChange={handleSortChange}
+                    className="text-xs block p-1 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  >
+                    <option value="asc">น้อยไปมาก</option>
+                    <option value="desc">มากไปน้อย</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="items-center justify-center text-center">
+                <label htmlFor="filter-section" className="text-xs">หมู่เรียน</label>
+                <div className="relative justify-center flex">
+                  <select
+                    id="filter-section"
+                    value={selectedSection}
+                    onChange={(e) => setSelectedSection(e.target.value)}
+                    className="text-xs block p-1 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  >
+                    <option value="all">ทั้งหมด</option>
+                    {sections.map((sec) => (
+                      <option key={sec.sec_ID} value={sec.sec_ID}>
+                        {sec.sec_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
           </div>
 
           <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead className=" text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
+            <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
               <tr className="flex w-full">
-                <th scope="col" className="px-6 py-3 w-2/12">
-                  รหัสนักศึกษา
-                </th>
-                <th scope="col" className="px-6 py-3 w-3/12">
-                  ชื่อ
-                </th>
-                <th scope="col" className="px-6 py-3 w-3/12">
-                  นามสกุล
-                </th>
-                <th scope="col" className="px-6 py-3 w-2/12">
-                  หมู่เรียน
-                </th>
-                <th scope="col" className="px-6 py-3 w-2/12">
-                  รายละเอียด
-                </th>
+                <th scope="col" className="px-6 py-3 w-1/12 text-center">ลำดับ</th>
+                <th scope="col" className="px-6 py-3 w-3/12 text-center">รหัสนักศึกษา</th>
+                <th scope="col" className="px-6 py-3 w-4/12 text-center">ชื่อ-นามสกุล</th>
+                <th scope="col" className="px-6 py-3 w-2/12 text-center">หมู่เรียน</th>
+                <th scope="col" className="px-6 py-3 w-2/12 text-center">รายละเอียด</th>
               </tr>
             </thead>
             <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
-              {visibleItems.map((item, index) => (
-                <tr key={index} className="border-b-2 flex w-full items-center">
-                  <td scope="col" className="px-6 py-3 w-2/12">
-                    {item.std_ID}
+              {visibleStudents.map((student, index) => (
+                <tr key={student.std_ID} className="border-b-2 flex w-full items-center">
+                  <td className="px-6 py-3 w-1/12 text-center">{index + 1}</td>
+                  <td className="px-6 py-3 w-3/12 text-center">{student.std_ID}</td>
+                  <td className="px-6 py-3 w-4/12">{student.std_fname} {student.std_lname}</td>
+                  <td className="px-6 py-3 w-2/12 text-center">
+                    {sections.find(sec => sec.sec_ID === student.sec_ID)?.sec_name || "N/A"}
                   </td>
-                  <td scope="col" className="px-6 py-3 w-3/12">
-                    {item.std_fname}
-                  </td>
-                  <td scope="col" className="px-6 py-3 w-3/12">
-                    {item.std_lname}
-                  </td>
-                  <td scope="col" className="px-6 py-3 w-2/12">
-                    {item.sec_name}
-                  </td>
-                  <td scope="col" className="px-6 py-3 w-2/12">
-                    <button
-                      className=" hover:text-teal-700 px-2 py-1  "
-                      onClick={() => navigate(`detail/student/${item.std_ID}`)}
-                    >
-                      เพิ่มเติม
+                  <td className="px-6 py-3 w-2/12 text-center">
+                    <button className="bg-cyan-400 hover:bg-cyan-500 px-2 py-1 text-white rounded">
+                      <a onClick={() => navigate(`detail/student/${student.std_ID}`)}>เรียกดู</a>
                     </button>
                   </td>
                 </tr>
@@ -172,64 +184,49 @@ const ProductTable = () => {
             </tbody>
           </table>
 
-          <div className="flex items-center justify-between mt-4">
-            <div>
+          <div className="flex justify-between mt-2">
+            <div className="flex gap-2 w-24"></div>
+            <div className="flex gap-2">
               <button
-                onClick={() => {
-                  if (currentPage > 0) {
-                    setCurrentPage((prev) => prev - 1);
-                  }
-                }}
+                onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
                 disabled={currentPage === 0}
-                className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
+                  }`}
               >
-                Previous
+                ก่อนหน้า
               </button>
-            </div>
-
-            <div className="flex space-x-2">
-              {Array.from({
-                length: Math.ceil(filteredItems.length / itemsPerPage),
-              })
-                .slice(currentPage, currentPage + 4)
-                .map((_, i) => (
-                  <button
-                    key={i + currentPage}
-                    onClick={() => setCurrentPage(currentPage + i)}
-                    className={`px-4 py-2 font-medium ${
-                      currentPage + i === currentPage
-                        ? "text-blue-600 bg-blue-100"
-                        : "text-gray-600 bg-gray-100"
-                    } border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300`}
-                  >
-                    {currentPage + i + 1}
-                  </button>
-                ))}
-
-              {currentPage + 4 < lastPage && (
+              {pageNumbers.map((pageNumber) => (
                 <button
-                  onClick={() => {
-                    setCurrentPage(currentPage + 4);
-                  }}
-                  className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                  key={pageNumber}
+                  onClick={() => setCurrentPage(pageNumber)}
+                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${pageNumber === currentPage ? "bg-blue-200" : ""
+                    }`}
                 >
-                  ...
+                  {pageNumber + 1}
                 </button>
-              )}
-            </div>
-
-            <div>
+              ))}
               <button
-                onClick={() => {
-                  if (currentPage < lastPage) {
-                    setCurrentPage((prev) => prev + 1);
-                  }
-                }}
+                onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))}
                 disabled={currentPage === lastPage}
-                className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === lastPage ? "cursor-not-allowed" : "hover:bg-blue-200"
+                  }`}
               >
-                Next
+                ถัดไป
               </button>
+            </div>
+            <div className="flex gap-2">
+              <select
+                value={itemsPerPage}
+                onChange={(e) => {
+                  setItemsPerPage(+e.target.value);
+                  setCurrentPage(0);
+                }}
+                className="px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
             </div>
           </div>
         </div>
@@ -238,4 +235,4 @@ const ProductTable = () => {
   }
 };
 
-export default ProductTable;
+export default ListStudents;

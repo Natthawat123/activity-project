@@ -190,7 +190,7 @@ const StudentForm = () => {
   }
 
   return (
-    <div className="w-full lg:w-2/3 mx-auto mt-10 p-4 bg-white shadow-md rounded-md">
+    <div className="w-full lg:w-2/3 mx-auto mt-10 p-4 bg-white shadow-md rounded-md py-14 mb-16">
       <form className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:px-10">
         <div className="mb-4">
           <label
