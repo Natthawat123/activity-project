@@ -12,16 +12,16 @@ const ProductTable = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [activity, setActivity] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [itemsPerPage, setItemsPerPage] = useState(15);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
-  const [visibleStartPage, setVisibleStartPage] = useState(0);
+  // const [visibleStartPage, setVisibleStartPage] = useState(0);
 
   const navigate = useNavigate();
 
-  const updateVisibleStartPage = (newCurrentPage) => {
-    const newVisibleStartPage = Math.floor(newCurrentPage / 4) * 4;
-    setVisibleStartPage(newVisibleStartPage);
-  };
+  // const updateVisibleStartPage = (newCurrentPage) => {
+  //   const newVisibleStartPage = Math.floor(newCurrentPage / 4) * 4;
+  //   setVisibleStartPage(newVisibleStartPage);
+  // };
 
   useEffect(() => {
     fetch("/api/list/activity")
@@ -49,6 +49,15 @@ const ProductTable = () => {
       item.act_location.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
+  const lastPage = Math.ceil(filteredItems.length / itemsPerPage) - 1;
+  // const visibleItems = filteredItems.slice(
+  //   currentPage * itemsPerPage,
+  //   (currentPage + 1) * itemsPerPage
+  // );
+  const pageNumbers = [];
+  for (let i = 0; i <= lastPage; i++) {
+    pageNumbers.push(i);
+  }
 
   if (error) {
     return <div>Error: {error.message}</div>;
@@ -66,9 +75,9 @@ const ProductTable = () => {
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
           <div className="flex justify-between">
             <div className="text-lg font-bold mb-2">รายชื่อกิจกรรม</div>
-            <Popup />
+            
           </div>
-          <hr className="m-3" />
+      {/*<hr className="m-3" /> */}
           <div className="flex justify-between">
             <div className="pb-4 items-center">
               <label htmlFor="table-search" className="sr-only">
@@ -104,18 +113,7 @@ const ProductTable = () => {
             </div>
 
             <div className="mt-1 pb-4">
-              <select
-                value={itemsPerPage}
-                onChange={(e) => {
-                  setItemsPerPage(+e.target.value);
-                  setCurrentPage(0);
-                }}
-                className="block ps-6 pt-1 pb-1 text-sm text-gray-900 border rounded-md w-20 bg-orange-500-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-black-400 dark:text-gray-950 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              >
-                <option value={15}>15</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-              </select>
+              
             </div>
           </div>
 
@@ -209,73 +207,50 @@ const ProductTable = () => {
             </tbody>
           </table>
 
-          <div className="flex items-center justify-between mt-4">
-            <div>
+          <div className="flex justify-between mt-2">
+            <div className="flex gap-2 w-24"></div>
+            <div className="flex gap-2">
               <button
-                onClick={() => {
-                  if (currentPage > 0) {
-                    setCurrentPage((prev) => prev - 1);
-                    updateVisibleStartPage(currentPage - 1);
-                  }
-                }}
+                onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
                 disabled={currentPage === 0}
-                className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
+                  }`}
               >
-                Previous
+                ก่อนหน้า
               </button>
-            </div>
-
-            <div className="flex space-x-2">
-              {Array.from({
-                length: Math.ceil(filteredItems.length / itemsPerPage),
-              })
-                .slice(visibleStartPage, visibleStartPage + 4)
-                .map((_, i) => (
-                  <button
-                    key={i + visibleStartPage}
-                    onClick={() => {
-                      const newCurrentPage = visibleStartPage + i;
-                      setCurrentPage(newCurrentPage);
-                      updateVisibleStartPage(newCurrentPage);
-                    }}
-                    className={`px-4 py-2 font-medium ${
-                      currentPage === visibleStartPage + i
-                        ? "text-blue-600 bg-blue-100"
-                        : "text-gray-600 bg-gray-100"
-                    } border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300`}
-                  >
-                    {visibleStartPage + i + 1}
-                  </button>
-                ))}
-
-              {visibleStartPage + 4 < lastPage && (
+              {pageNumbers.map((pageNumber) => (
                 <button
-                  onClick={() => {
-                    const newVisibleStartPage = visibleStartPage + 4;
-                    setVisibleStartPage(newVisibleStartPage);
-                    setCurrentPage(newVisibleStartPage);
-                  }}
-                  className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
+                  key={pageNumber}
+                  onClick={() => setCurrentPage(pageNumber)}
+                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${pageNumber === currentPage ? "bg-blue-200" : ""
+                    }`}
                 >
-                  ...
+                  {pageNumber + 1}
                 </button>
-              )}
+              ))}
+              <button
+                onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))}
+                disabled={currentPage === lastPage}
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === lastPage ? "cursor-not-allowed" : "hover:bg-blue-200"
+                  }`}
+              >
+                ถัดไป
+              </button></div>
+            <div className="flex gap-2">
+              <select
+                value={itemsPerPage}
+                onChange={(e) => {
+                  setItemsPerPage(+e.target.value);
+                  setCurrentPage(0);
+                }}
+                className="px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
             </div>
 
-            <div>
-              <button
-                onClick={() => {
-                  if (currentPage < lastPage) {
-                    setCurrentPage((prev) => prev + 1);
-                    updateVisibleStartPage(currentPage + 1);
-                  }
-                }}
-                disabled={currentPage === lastPage}
-                className="px-4 py-2 font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300"
-              >
-                Next
-              </button>
-            </div>
           </div>
         </div>
       </div>

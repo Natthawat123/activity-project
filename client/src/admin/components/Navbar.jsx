@@ -56,7 +56,7 @@ const NavBar = () => {
     }`;
 
   return (
-    <div className="3xl:container 3xl:mx-auto">
+    <div className="3xl:container 3xl:mx-auto top-0 fixed w-full z-10">
       <div className="bg-white rounded shadow-lg py-5 px-7 md:pl-28 md:pr-28">
         <nav className="flex justify-between">
           <div className="flex items-center space-x-3 lg:pr-16 pr-6">

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 
 const UpdateActivity = () => {
   const { act_ID } = useParams();
@@ -95,10 +96,13 @@ const UpdateActivity = () => {
   }
 
   return (
-    <div className="container mx-auto mb-10 md:px-20">
+    <div className="container mx-auto mb-10 md:px-20 pt-20">
       <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
         <div className="flex justify-between">
+        <div className="flex gap-2">
           <h1 className="text-lg font-bold mb-2">แก้ไขกิจกรรม</h1>
+          <DriveFileRenameOutlineIcon />
+          </div>
           <div className="items-center mb-5" onClick={() => navigate(-1)}>
             <ArrowBackIosNewIcon />
             ย้อนกลับ
@@ -106,7 +110,9 @@ const UpdateActivity = () => {
         </div>
         <hr className="mb-3" />
         <form onSubmit={handleSubmit}>
-          <div className="w-1/2 ">
+          
+          <div className="grid grid-cols-2 gap-4 mt-2">
+          <div>
             <label>ชื่อกิจกรรม:</label>
             <input
               type="text"
@@ -116,7 +122,6 @@ const UpdateActivity = () => {
               onChange={handleChange}
             />
           </div>
-          <div className="grid grid-cols-2 gap-4 mt-2">
             <div>
               <label>รายละเอียดกิจกรรม:</label>
               <input
@@ -198,6 +203,7 @@ const UpdateActivity = () => {
               </select>
             </div>
           </div>
+          <div className="flex justify-center">
           <button
             type="submit"
             className="mt-4 bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
@@ -211,6 +217,7 @@ const UpdateActivity = () => {
           >
             Delete Activity
           </button>
+          </div>
         </form>
       </div>
     </div>

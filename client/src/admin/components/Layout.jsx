@@ -10,10 +10,7 @@ function Layout() {
     <main>
       <Navbar />
       <Margin />
-
-        <Outlet />
-
-
+      <Outlet />
       <Footer />
     </main>
   )

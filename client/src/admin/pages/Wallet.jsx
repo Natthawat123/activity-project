@@ -1,10 +1,10 @@
-import React from 'react'
-import ToContract from '../components/ToContract'
+// import React from 'react'
+// import ToContract from '../components/ToContract'
 import Upload from '../components/Upload'
 
 function Wallet() {
     return (
-        <div>
+        <div className="pt-20">
             {<Upload />}
         </div>
 

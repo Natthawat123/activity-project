@@ -15,7 +15,6 @@ function Test() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
   const [sortOrder, setSortOrder] = useState("latest");
-  const [showPopup, setShowPopup] = useState(false);
 
   const navigate = useNavigate();
 
@@ -124,13 +123,10 @@ function Test() {
     (currentPage + 1) * itemsPerPage
   );
 
-  // const handleDetailClick = () => {
-  //   setShowPopup(true);
-  // };
-
-  // const handleClosePopup = () => {
-  //   setShowPopup(false);
-  // };
+  const pageNumbers = [];
+  for (let i = 0; i <= lastPage; i++) {
+    pageNumbers.push(i);
+  }
 
   if (error) {
     return <div>Error: {error.message}</div>;
@@ -139,13 +135,11 @@ function Test() {
   } else {
     return (
       <div className="mb-10 container mx-auto md:px-20">
-        <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
+        <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4" >
           <div className="text-lg font-bold mb-2">ประวัติการทำกิจกรรม</div>
           <div className="flex justify-between">
             <div className="pb-4 items-center">
-              <label htmlFor="table-search" className="sr-only">
-                Search
-              </label>
+              <label htmlFor="table-search" className="sr-only">Search</label>
               <div className="relative mt-1">
                 <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                   <svg
@@ -176,18 +170,14 @@ function Test() {
             </div>
             <div className="flex gap-3 items-center">
               <div className="flex pb-4 items-center">
-                <label htmlFor="filter-activity-type" className="sr-only">
-                  Filter
-                </label>
+                <label htmlFor="filter-activity-type" className="sr-only">Filter</label>
                 <div className="relative">
                   <select
                     value={filter}
                     onChange={handleFilterChange}
                     className="text-xs block p-1.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value="default" className="text-center">
-                      ทั้งหมด
-                    </option>
+                    <option value="default" className="text-center">ทั้งหมด</option>
                     <option value="joinEntry">เข้าร่วมกิจกรรมแล้ว</option>
                     <option value="reserveEntry">ลงทะเบียนสำเร็จ</option>
                     <option value="notjoin">ยังไม่ได้ลงทะเบียน</option>
@@ -199,12 +189,12 @@ function Test() {
                   onClick={handleSortChange}
                   className="block p-2 text-xs border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
-                  วันที่ ({sortOrder === "latest" ? "ล่าสุด" : "ใหม่สุด"})
+                  วันที่ ({sortOrder === "latest" ? "ใหม่สุด" : "เก่าสุด"})
                 </button>
               </div>
             </div>
           </div>
-          <table className="min-w-full bg-white dark:bg-gray-800">
+          <table className="min-w-full bg-white dark:bg-gray-800"  style={{maxHeight: '50vh' }}>
             <thead className="bg-gray-200 dark:bg-gray-700">
               <tr className="w-96 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 uppercase text-left">
                 <th className="px-4 py-3">ชื่อกิจกรรม</th>
@@ -218,24 +208,17 @@ function Test() {
               {visibleItems.map((item) => {
                 const status = getStatus(item.act_ID);
                 return (
-                  <tr
-                    key={item.act_ID}
-                    className="text-gray-700 dark:text-gray-400"
-                  >
+                  <tr key={item.act_ID} className="text-gray-700 dark:text-gray-400">
                     <td className="px-4 py-3">{item.act_title}</td>
                     <td className="px-4 py-3">{item.act_location}</td>
-                    <td className="px-4 py-3">
-                      {item.act_dateStart.slice(0, 10)}
-                    </td>
+                    <td className="px-4 py-3">{item.act_dateStart.slice(0, 10)}</td>
                     <td className="px-4 py-3" style={{ color: status.color }}>
                       {status.message}
                     </td>
                     <td className="px-6 py-3">
                       <button
                         className="text-blue-600 dark:text-blue-500 hover:underline"
-                        onClick={() =>
-                          navigate(`/activity/detail2/${item.act_ID}`)
-                        }
+                        onClick={() => navigate(`/activity/detail2/${item.act_ID}`)}
                       >
                         รายละเอียด
                       </button>
@@ -245,45 +228,53 @@ function Test() {
               })}
             </tbody>
           </table>
-          <div className="flex justify-end mt-2">
+          <div className="flex justify-between mt-2">
+          <div className="flex gap-2 w-24"></div>
             <div className="flex gap-2">
               <button
-                onClick={() =>
-                  setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))
-                }
+                onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
                 disabled={currentPage === 0}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-50 text-gray-500 dark:text-black focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500 dark:text-black focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
                   currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
                 }`}
               >
                 ก่อนหน้า
               </button>
+              {pageNumbers.map((pageNumber) => (
+                <button
+                  key={pageNumber}
+                  onClick={() => setCurrentPage(pageNumber)}
+                  className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500 dark:text-black focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                    pageNumber === currentPage ? "bg-blue-200" : ""
+                  }`}
+                >
+                  {pageNumber + 1}
+                </button>
+              ))}
               <button
-                onClick={() =>
-                  setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))
-                }
+                onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))}
                 disabled={currentPage === lastPage}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-50 text-gray-500 dark:text-black focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
-                  currentPage === lastPage
-                    ? "cursor-not-allowed"
-                    : "hover:bg-blue-200"
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500 dark:text-black focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                  currentPage === lastPage ? "cursor-not-allowed" : "hover:bg-blue-200"
                 }`}
               >
                 ถัดไป
-              </button>
+              </button></div>
+              <div className="flex gap-2">
               <select
                 value={itemsPerPage}
                 onChange={(e) => {
                   setItemsPerPage(+e.target.value);
                   setCurrentPage(0);
                 }}
-                className="px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-50 text-gray-500 dark:text-black focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500 dark:text-black focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
               >
                 <option value={10}>10</option>
                 <option value={20}>20</option>
                 <option value={50}>50</option>
               </select>
-            </div>
+              </div>
+            
           </div>
         </div>
       </div>

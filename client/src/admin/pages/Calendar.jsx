@@ -1,10 +1,12 @@
-import React from 'react'
+
 import CS from '../../components/Calendar'
 function Calendar() {
   return (
-    <CS/>
-    )
-  }
-  
+    <div className="pt-16">
+      <CS />
+    </div>
+  )
+}
 
-  export default Calendar
+
+export default Calendar
