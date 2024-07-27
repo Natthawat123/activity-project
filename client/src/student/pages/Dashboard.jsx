@@ -5,7 +5,7 @@ import List_Activity from '../components/List_Activity'
 
 function Dashboard() {
   return (
-    <div className='mt-10'>
+    <div className='mt-10 pt-14'>
       {/* <Test/>
       <hr className='m-[50px]'/> */}
       <DashCountAc />

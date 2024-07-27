@@ -1,9 +1,10 @@
-import React from 'react'
-import CS from '../components/Calendar'
-import Test from '../components/Test'
+import CS from '../components/Calendar';
+
 function Calendar() {
   return (
+    <div className='pt-20'>
     <CS />
+    </div>
     // <Test />
   )
 }

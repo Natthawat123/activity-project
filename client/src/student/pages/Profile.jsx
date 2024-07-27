@@ -204,6 +204,7 @@ const StudentForm = () => {
   }
 
   return (
+    <div className="pt-16 mb-10">
     <div className="w-full lg:w-2/3 mx-auto mt-10 p-4 bg-white shadow-md rounded-md">
       <Link to='/activity/dashboard'>
         <div className="items-center mb-5"><ArrowBackIosNewIcon />ย้อนกลับ</div>
@@ -361,6 +362,7 @@ const StudentForm = () => {
           </button>
         </div>
       </form>
+    </div>
     </div>
   );
 };

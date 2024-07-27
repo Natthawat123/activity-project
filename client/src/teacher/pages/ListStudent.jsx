@@ -79,7 +79,7 @@ const ListStudents = () => {
     return <div>Loading...</div>;
   } else {
     return (
-      <div className="mb-10 container mx-auto md:px-20">
+      <div className="mb-10 container mx-auto md:px-20 pt-20">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
           <div className="text-lg font-bold mb-2 gap-2 flex">
             <h1>รายชื่อนักศึกษา</h1>

@@ -89,7 +89,7 @@ const ProductTable = () => {
     );
 
     return (
-      <div className="container mx-auto px-8 sm:px-10 md:px-10 lg:px-20 mb-5 md:grid md:grid-cols-1 lg:grid-cols-1">
+      <div className="container mx-auto px-8 sm:px-10 md:px-10 lg:px-20 mb-5 md:grid md:grid-cols-1 lg:grid-cols-1 pt-20">
       <div className="mb-10 container mx-auto">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
           <div className="flex justify-between">
