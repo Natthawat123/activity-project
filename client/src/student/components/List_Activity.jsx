@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import axios from "axios";
 import Web3 from "web3";
 import Abi from "../../components/contract/abi.json";
@@ -44,6 +44,7 @@ function Test() {
 
         setJoin(format);
       } catch (err) {
+        setError
         console.error(err);
       }
     };
@@ -161,7 +162,7 @@ function Test() {
                 <input
                   type="text"
                   id="table-search"
-                  className="block pl-10 p-2 text-sm border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="block pl-10 p-2 text-sm border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="ค้นหากิจกรรม"
                   value={searchTerm}
                   onChange={handleSearch}
@@ -175,7 +176,7 @@ function Test() {
                   <select
                     value={filter}
                     onChange={handleFilterChange}
-                    className="text-xs block p-1.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className="text-xs block p-1.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
                     <option value="default" className="text-center">ทั้งหมด</option>
                     <option value="joinEntry">เข้าร่วมกิจกรรมแล้ว</option>
@@ -187,7 +188,7 @@ function Test() {
               <div className="flex pb-4 items-center">
                 <button
                   onClick={handleSortChange}
-                  className="block p-2 text-xs border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="block p-2 text-xs border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
                   วันที่ ({sortOrder === "latest" ? "ใหม่สุด" : "เก่าสุด"})
                 </button>
@@ -234,7 +235,7 @@ function Test() {
               <button
                 onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
                 disabled={currentPage === 0}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500 dark:text-black focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
                   currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
                 }`}
               >
@@ -244,7 +245,7 @@ function Test() {
                 <button
                   key={pageNumber}
                   onClick={() => setCurrentPage(pageNumber)}
-                  className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500 dark:text-black focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                  className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
                     pageNumber === currentPage ? "bg-blue-200" : ""
                   }`}
                 >
@@ -254,7 +255,7 @@ function Test() {
               <button
                 onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))}
                 disabled={currentPage === lastPage}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500 dark:text-black focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
                   currentPage === lastPage ? "cursor-not-allowed" : "hover:bg-blue-200"
                 }`}
               >
@@ -267,7 +268,7 @@ function Test() {
                   setItemsPerPage(+e.target.value);
                   setCurrentPage(0);
                 }}
-                className="px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500 dark:text-black focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
               >
                 <option value={10}>10</option>
                 <option value={20}>20</option>
