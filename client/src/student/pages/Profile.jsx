@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import {useNavigate} from 'react-router-dom'
 import Swal from 'sweetalert2'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { Link } from "react-router-dom";
 import axios from 'axios'
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 
 const StudentForm = () => {
 
@@ -16,7 +18,8 @@ const StudentForm = () => {
     tambon_id: undefined,
     zip_code: undefined
   });
-
+  
+  const navigate = useNavigate();
   const onChangeHandle = (id, selectedValue) => {
     if (id === "province_id") {
       setValue((prev) => ({
@@ -204,13 +207,22 @@ const StudentForm = () => {
   }
 
   return (
-    <div className="pt-16 mb-10">
-    <div className="w-full lg:w-2/3 mx-auto mt-10 p-4 bg-white shadow-md rounded-md">
-      <Link to='/activity/dashboard'>
-        <div className="items-center mb-5"><ArrowBackIosNewIcon />ย้อนกลับ</div>
-      </Link>
-      <form className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:px-10">
-        <div className="mb-4">
+    <div className="container mx-auto mb-10 md:px-20 pt-24">
+    <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 pb-10">
+      <div className="flex justify-between">
+        <div className="flex gap-2">
+          <h1 className="text-lg font-bold mb-2">แก้ไขข้อมูลส่วนตัว</h1>
+          <DriveFileRenameOutlineIcon />
+        </div>
+        <div className="items-center mb-5 cursor-pointer" onClick={() => navigate(-1)}>
+          <ArrowBackIosNewIcon />
+          ย้อนกลับ
+        </div>
+      </div>
+      <hr className="mb-3" />
+      <form>
+      <div className="grid grid-cols-2 gap-4 mt-2">
+        <div>
           <label htmlFor="studentId" className="block text-sm font-medium text-gray-600">
             รหัสนักศึกษา
           </label>
@@ -223,7 +235,7 @@ const StudentForm = () => {
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
-        <div className="mb-4">
+        <div>
           <label htmlFor="classGroup" className="block text-sm font-medium text-gray-600">
             หมู่เรียน
           </label>
@@ -237,7 +249,7 @@ const StudentForm = () => {
           </select>
         </div>
 
-        <div className="mb-4">
+        <div>
           <label htmlFor="firstName" className="block text-sm font-medium text-gray-600">
             ชื่อ
           </label>
@@ -250,7 +262,7 @@ const StudentForm = () => {
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
-        <div className="mb-4">
+        <div>
           <label htmlFor="lastName" className="block text-sm font-medium text-gray-600">
             นามสกุล
           </label>
@@ -263,7 +275,7 @@ const StudentForm = () => {
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
-        <div className="mb-4">
+        <div>
           <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-600">
             เบอร์โทร
           </label>
@@ -276,7 +288,7 @@ const StudentForm = () => {
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
-        <div className="mb-4">
+        <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-600">
             อีเมลล์
           </label>
@@ -289,7 +301,7 @@ const StudentForm = () => {
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
-        <div className="mb-4">
+        <div>
           <label htmlFor="address" className="block text-sm font-medium text-gray-600">
             ที่อยู่
           </label>
@@ -301,7 +313,7 @@ const StudentForm = () => {
             className="mt-1 p-2 border w-full rounded-md" />
         </div>
 
-        <div className="mb-4">
+        <div>
           <label htmlFor="province" className="block text-sm font-medium text-gray-600">
             จังหวัด
           </label>
@@ -315,7 +327,7 @@ const StudentForm = () => {
           />
         </div>
 
-        <div className="mb-4">
+        <div>
           <label htmlFor="district" className="block text-sm font-medium text-gray-600">
             อำเภอ
           </label>
@@ -329,7 +341,7 @@ const StudentForm = () => {
           />
         </div>
 
-        <div className="mb-4">
+        <div>
           <label htmlFor="province" className="block text-sm font-medium text-gray-600">
             ตำบล
           </label>
@@ -343,7 +355,7 @@ const StudentForm = () => {
           />
         </div>
 
-        <div className="mb-4">
+        <div>
           <label htmlFor="zipcode" className="block text-sm font-medium text-gray-600">
             รหัสไปรษณีย์
           </label>
@@ -357,9 +369,10 @@ const StudentForm = () => {
         </div>
 
         <div className="flex justify-end items-center">
-          <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-1/8 h-1/2" onClick={updateClick}>
+          <button type="submit" className="mt-4 bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600" onClick={updateClick}>
             แก้ไข
           </button>
+        </div>
         </div>
       </form>
     </div>

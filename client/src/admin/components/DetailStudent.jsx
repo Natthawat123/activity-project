@@ -194,7 +194,7 @@ function DetailStudent() {
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
           <div className="flex justify-between">
             <h1 className="text-lg font-bold mb-2">ประวัติส่วนตัว</h1>
-            <div className="items-center mb-5" onClick={() => navigate(-1)}>
+            <div className="items-center mb-5 cursor-pointer" onClick={() => navigate(-1)}>
               <ArrowBackIosNewIcon />
               ย้อนกลับ
             </div>

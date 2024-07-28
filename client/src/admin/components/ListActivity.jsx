@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-// import Popup from "../components/Popup_addAc";
 import BuildIcon from "@mui/icons-material/Build";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import moment from "moment";
@@ -15,14 +14,8 @@ const ProductTable = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
   const [sortOrder, setSortOrder] = useState("latest");
-  // const [visibleStartPage, setVisibleStartPage] = useState(0);
 
   const navigate = useNavigate();
-
-  // const updateVisibleStartPage = (newCurrentPage) => {
-  //   const newVisibleStartPage = Math.floor(newCurrentPage / 4) * 4;
-  //   setVisibleStartPage(newVisibleStartPage);
-  // };
 
   useEffect(() => {
     fetch("/api/list/activity")
@@ -50,15 +43,6 @@ const ProductTable = () => {
       item.act_location.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
-  const lastPage = Math.ceil(filteredItems.length / itemsPerPage) - 1;
-  // const visibleItems = filteredItems.slice(
-  //   currentPage * itemsPerPage,
-  //   (currentPage + 1) * itemsPerPage
-  // );
-  const pageNumbers = [];
-  for (let i = 0; i <= lastPage; i++) {
-    pageNumbers.push(i);
-  }
 
   const handleSortChange = () => {
     setSortOrder((prevOrder) => (prevOrder === "latest" ? "oldest" : "latest"));
@@ -76,6 +60,13 @@ const ProductTable = () => {
     });
   };
 
+  // Helper function to format dates in Thai
+  const formatDateThai = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const date = new Date(dateString);
+    return date.toLocaleDateString('th-TH', options);
+  };
+
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {
@@ -88,21 +79,19 @@ const ProductTable = () => {
       (currentPage + 1) * itemsPerPage
     );
 
+    const pageNumbers = Array.from({ length: lastPage + 1 }, (_, index) => index);
+
     return (
       <div className="mb-10 container mx-auto">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
           <div className="flex justify-between">
             <div className="text-lg font-bold mb-2">รายชื่อกิจกรรม</div>
-
           </div>
-          {/*<hr className="m-3" /> */}
           <div className="flex justify-between">
             <div className="pb-4 items-center">
-              <label htmlFor="table-search" className="sr-only">
-                Search
-              </label>
+              <label htmlFor="table-search" className="sr-only">Search</label>
               <div className="relative mt-1">
-                <div className="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+                <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                   <svg
                     className="w-4 h-4 text-gray-500 dark:text-gray-400"
                     aria-hidden="true"
@@ -143,21 +132,11 @@ const ProductTable = () => {
           <table className="text-center w-full text-sm rtl:text-center text-gray-500 dark:text-gray-400">
             <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
               <tr className="flex w-full">
-                <th scope="col" className="px-6 py-3 w-1/12 text-center">
-                  ลำดับ
-                </th>
-                <th scope="col" className="px-6 py-3 w-4/12 text-center">
-                  ชื่อกิจกรรม
-                </th>
-                <th scope="col" className="px-6 py-3 w-3/12 text-center">
-                  วัน
-                </th>
-                <th scope="col" className="px-6 py-3 w-2/12 text-center">
-                  สถานะ
-                </th>
-                <th scope="col" className="px-6 py-3 w-2/12 text-center">
-                  เพิ่มเติม
-                </th>
+                <th scope="col" className="px-6 py-3 w-1/12 text-center">ลำดับ</th>
+                <th scope="col" className="px-6 py-3 w-4/12 text-center">ชื่อกิจกรรม</th>
+                <th scope="col" className="px-6 py-3 w-3/12 text-center">วัน</th>
+                <th scope="col" className="px-6 py-3 w-2/12 text-center">สถานะ</th>
+                <th scope="col" className="px-6 py-3 w-2/12 text-center">เพิ่มเติม</th>
               </tr>
             </thead>
             <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
@@ -167,12 +146,11 @@ const ProductTable = () => {
                     <td scope="col" className="px-6 py-3 w-1/12 text-center">
                       {currentPage * itemsPerPage + index + 1}
                     </td>
-                    <td scope="col" className="px-6 py-3 w-4/12 text-start">
+                    <td scope="col" className="px-6 py-3 w-4/12 text-center">
                       {item.act_title}
                     </td>
                     <td scope="col" className="px-6 py-3 w-3/12 text-center">
-                      {item.act_dateStart.slice(0, 10)} -{" "}
-                      {item.act_dateEnd.slice(0, 10)}
+                      {formatDateThai(item.act_dateStart)} - {formatDateThai(item.act_dateEnd)}
                     </td>
                     <td
                       scope="col"
@@ -210,7 +188,7 @@ const ProductTable = () => {
                     </td>
                     <td
                       scope="col"
-                      className="px-6 py-3 w-1/12 text-end hover:text-red-500 text-indigo-800"
+                      className="px-6 cursor-pointer py-3 w-1/12 text-end hover:text-red-500 text-indigo-800"
                     >
                       <BuildIcon
                         onClick={() => navigate(`manage/${item.act_ID}`)}
@@ -218,7 +196,7 @@ const ProductTable = () => {
                     </td>
                     <td
                       scope="col"
-                      className="px-6 py-3 w-1/12 text-start hover:text-green-500 text-teal-700"
+                      className="px-6 cursor-pointer py-3 w-1/12 text-start hover:text-green-500 text-teal-700"
                     >
                       <ListAltIcon
                         onClick={() => navigate(`detail/${item.act_ID}`)}
@@ -231,50 +209,50 @@ const ProductTable = () => {
           </table>
 
           <div className="flex justify-between mt-2">
-            <div className="flex gap-2 w-24"></div>
-            <div className="flex gap-2">
+          <div className="flex gap-2 w-24"></div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
+              disabled={currentPage === 0}
+              className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
+                }`}
+            >
+              ก่อนหน้า
+            </button>
+            {pageNumbers.map((pageNumber) => (
               <button
-                onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
-                disabled={currentPage === 0}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
+                key={pageNumber}
+                onClick={() => setCurrentPage(pageNumber)}
+                className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${pageNumber === currentPage ? "bg-blue-200" : ""
                   }`}
               >
-                ก่อนหน้า
+                {pageNumber + 1}
               </button>
-              {pageNumbers.map((pageNumber) => (
-                <button
-                  key={pageNumber}
-                  onClick={() => setCurrentPage(pageNumber)}
-                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${pageNumber === currentPage ? "bg-blue-200" : ""
-                    }`}
-                >
-                  {pageNumber + 1}
-                </button>
-              ))}
-              <button
-                onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))}
-                disabled={currentPage === lastPage}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === lastPage ? "cursor-not-allowed" : "hover:bg-blue-200"
-                  }`}
-              >
-                ถัดไป
-              </button></div>
-            <div className="flex gap-2">
-              <select
-                value={itemsPerPage}
-                onChange={(e) => {
-                  setItemsPerPage(+e.target.value);
-                  setCurrentPage(0);
-                }}
-                className="px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              >
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-              </select>
-            </div>
-
+            ))}
+            <button
+              onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))}
+              disabled={currentPage === lastPage}
+              className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === lastPage ? "cursor-not-allowed" : "hover:bg-blue-200"
+                }`}
+            >
+              ถัดไป
+            </button>
           </div>
+          <div className="flex gap-2">
+            <select
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(+e.target.value);
+                setCurrentPage(0);
+              }}
+              className="px-3 p-1.5 cursor-pointer text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+        </div>
         </div>
       </div>
     );

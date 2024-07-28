@@ -8,6 +8,13 @@ import GroupIcon from '@mui/icons-material/Group';
 
 import Abi from "../../components/contract/abi.json";
 
+// Helper function to format dates in Thai
+const formatDateThai = (dateString) => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const date = new Date(dateString);
+  return date.toLocaleDateString('th-TH', options);
+};
+
 function DetailActivity() {
   const [reserve, setReserve] = useState([]);
   const [join, setJoin] = useState([]);
@@ -103,59 +110,61 @@ function DetailActivity() {
       <div className="container m-10 mx-auto md:px-20 pt-20">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
           <div className="flex justify-between">
-          <div className="flex gap-2">
-            <h1 className="text-lg font-bold mb-2">รายละเอียดกิจกรรม</h1>
-            <ArticleIcon />
+            <div className="flex gap-2">
+              <h1 className="text-lg font-bold mb-2">รายละเอียดกิจกรรม</h1>
+              <ArticleIcon />
             </div>
-            <div className="items-center mb-5" onClick={() => navigate(-1)}>
+            <div className="items-center mb-5 cursor-pointer" onClick={() => navigate(-1)}>
               <ArrowBackIosNewIcon />
               ย้อนกลับ
             </div>
           </div>
           <hr className="mb-3" />
           <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-      
-              <tbody className="bg-white divide-y divide-gray-200 text-md">
-                  <tr>
-                      <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">ชื่อกิจกรรม</td>
-                      <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_title}</td>               
-                      <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">รายละเอียด</td>
-                      <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_desc}</td>
-                  </tr>
-                  <tr>
-                      <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">สถานที่</td>
-                      <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_location}</td>
-                  
-                      <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">เริ่มวันที่</td>
-                      <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_dateStart}</td>
-                  </tr>
-                  <tr>
-                      <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">สิ้นสุดวันที่</td>
-                      <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_dateEnd}</td>
-                  
-                      <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">Number of Students</td>
-                      <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_numStd}</td>
-                  </tr>
-                  <tr>
-                      <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">Status</td>
-                      <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_status}</td>
+            <table className="min-w-full divide-y divide-gray-200">
 
-                      <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">Staff ID</td>
-                      <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.staff_ID}</td>
-                  </tr>
+              <tbody className="bg-white divide-y divide-gray-200 text-md">
+                <tr>
+                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">ชื่อกิจกรรม</td>
+                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_title}</td>
+                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">รายละเอียด</td>
+                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_desc}</td>
+                </tr>
+                <tr>
+                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">สถานที่</td>
+                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_location}</td>
+
+                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">จำนวนที่เปิดรับ</td>
+                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_numStd}</td>
+
+
+                </tr>
+                <tr>
+                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">เริ่มวันที่</td>
+                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{formatDateThai(activity.act_dateStart)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">สิ้นสุดวันที่</td>
+                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{formatDateThai(activity.act_dateEnd)}</td>
+
+                </tr>
+                <tr>
+                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">สถานะ</td>
+                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_status}</td>
+
+                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">ผู้จัดกิจกรรม</td>
+                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.staff_ID}</td>
+                </tr>
               </tbody>
-          </table>
-      </div>
-      
+            </table>
+          </div>
+
         </div>
       </div>
 
       <div className="container m-10 mx-auto md:px-20 ">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
-        <div className="flex gap-2">
-          <h1 className="text-lg font-bold mb-2">รายชื่อนักศึกษา</h1>
-          <GroupIcon />
+          <div className="flex gap-2">
+            <h1 className="text-lg font-bold mb-2">รายชื่อนักศึกษา</h1>
+            <GroupIcon />
           </div>
           <hr className="mb-3" />
           <table className="text-center w-3/4 m-auto text-sm rtl:text-center text-gray-500 dark:text-gray-400">

@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import Web3 from "web3";
 import Abi from "../../components/contract/abi.json";
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 
 function DetailActivity() {
   const { act_ID } = useParams();
@@ -137,14 +138,12 @@ function DetailActivity() {
   const sectionName = section.find((s) => s.sec_ID === student.sec_ID);
 
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div className="bg-gray-100 min-h-screen pt-20">
       <div className="container mx-auto px-4 py-8">
-        <button
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mb-4"
-          onClick={() => navigate(-1)}
-        >
-          ย้อนกลับ
-        </button>
+      <div className="items-center mb-5 cursor-pointer" onClick={() => navigate(-1)}>
+      <ArrowBackIosNewIcon />
+      ย้อนกลับ
+    </div>
         <div className="flex justify-center">
           <div className="bg-white p-6 rounded-lg shadow-md w-full md:w-2/3">
             <h1 className="text-3xl text-center font-bold mb-4 text-gray-800">
