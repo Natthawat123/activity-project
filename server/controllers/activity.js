@@ -42,7 +42,7 @@ export const reserve = (req, res) => {
 export const update = (req, res) => {
     const {
         id
-    } = req.params // Extract act_ID from query parameters
+    } = req.params; // Extract act_ID from query parameters
     const {
         act_title,
         act_desc,
@@ -51,7 +51,8 @@ export const update = (req, res) => {
         act_numStd,
         act_location,
         staff_ID,
-        act_status
+        act_status,
+        act_transaction
     } = req.body; // Extract other fields from request body
 
     const sql = `UPDATE activity SET
@@ -62,8 +63,9 @@ export const update = (req, res) => {
         act_numStd = ?,
         act_location = ?,
         staff_ID = ?,
-        act_status = ?
-        WHERE act_ID = ?`; // SQL query with placeholders
+        act_status = ?,
+        act_transaction = ?
+        WHERE act_ID = ?`; // Correct SQL query with placeholders
 
     db.query(sql, [
         act_title,
@@ -74,6 +76,7 @@ export const update = (req, res) => {
         act_location,
         staff_ID,
         act_status,
+        act_transaction,
         id
     ], (err, result) => {
         if (err) {
@@ -87,6 +90,36 @@ export const update = (req, res) => {
         });
     });
 };
+export const transection = (req, res) => {
+    const {
+        id
+    } = req.params; // Extract act_ID from query parameters
+    const {
+        act_transaction
+    } = req.body; // Extract other fields from request body
+
+    const sql = `UPDATE activity SET
+       
+        act_transaction = ?
+        WHERE act_ID = ?`;
+
+    db.query(sql, [
+
+        act_transaction,
+        id
+    ], (err, result) => {
+        if (err) {
+            return res.status(500).json({
+                error: err.message
+            });
+        }
+        return res.json({
+            message: 'transection updated successfully',
+            result
+        });
+    });
+};
+
 
 // getAll
 export const get = (req, res) => {

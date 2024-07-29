@@ -3,16 +3,16 @@ import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import Web3 from "web3";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArticleIcon from '@mui/icons-material/Article';
-import GroupIcon from '@mui/icons-material/Group';
+import ArticleIcon from "@mui/icons-material/Article";
+import GroupIcon from "@mui/icons-material/Group";
 
 import Abi from "../../components/contract/abi.json";
 
 // Helper function to format dates in Thai
 const formatDateThai = (dateString) => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const options = { year: "numeric", month: "long", day: "numeric" };
   const date = new Date(dateString);
-  return date.toLocaleDateString('th-TH', options);
+  return date.toLocaleDateString("th-TH", options);
 };
 
 function DetailActivity() {
@@ -29,6 +29,7 @@ function DetailActivity() {
     act_numStd: "",
     act_status: "",
     staff_ID: "",
+    act_transaction: "",
   });
   const { act_ID } = useParams();
 
@@ -85,6 +86,8 @@ function DetailActivity() {
     fetchReserve();
   }, [act_ID]);
 
+  const url = `https://sepolia.etherscan.io/tx/${activity.act_transaction}/#eventlog`;
+
   const joinedStudents =
     join.find((j) => j.actID == Number(act_ID))?.stdIDs || [];
   const reservedStudents = reserve
@@ -114,7 +117,10 @@ function DetailActivity() {
               <h1 className="text-lg font-bold mb-2">รายละเอียดกิจกรรม</h1>
               <ArticleIcon />
             </div>
-            <div className="items-center mb-5 cursor-pointer" onClick={() => navigate(-1)}>
+            <div
+              className="items-center mb-5 cursor-pointer"
+              onClick={() => navigate(-1)}
+            >
               <ArrowBackIosNewIcon />
               ย้อนกลับ
             </div>
@@ -122,41 +128,76 @@ function DetailActivity() {
           <hr className="mb-3" />
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-
               <tbody className="bg-white divide-y divide-gray-200 text-md">
                 <tr>
-                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">ชื่อกิจกรรม</td>
-                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_title}</td>
-                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">รายละเอียด</td>
-                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_desc}</td>
+                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">
+                    ชื่อกิจกรรม
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">
+                    {activity.act_title}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">
+                    รายละเอียด
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">
+                    {activity.act_desc}
+                  </td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">สถานที่</td>
-                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_location}</td>
+                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">
+                    สถานที่
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">
+                    {activity.act_location}
+                  </td>
 
-                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">จำนวนที่เปิดรับ</td>
-                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_numStd}</td>
-
-
+                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">
+                    จำนวนที่เปิดรับ
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">
+                    {activity.act_numStd}
+                  </td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">เริ่มวันที่</td>
-                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{formatDateThai(activity.act_dateStart)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">สิ้นสุดวันที่</td>
-                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{formatDateThai(activity.act_dateEnd)}</td>
-
+                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">
+                    เริ่มวันที่
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">
+                    {formatDateThai(activity.act_dateStart)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">
+                    สิ้นสุดวันที่
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">
+                    {formatDateThai(activity.act_dateEnd)}
+                  </td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">สถานะ</td>
-                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.act_status}</td>
+                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">
+                    สถานะ
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">
+                    {activity.act_status}
+                  </td>
 
-                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">ผู้จัดกิจกรรม</td>
-                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">{activity.staff_ID}</td>
+                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">
+                    ผู้จัดกิจกรรม
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">
+                    {activity.staff_ID}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap  font-medium text-gray-900">
+                    transection
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap  text-gray-500">
+                    <a href={url} target="_blank" rel="noopener noreferrer">
+                      ตรวจสอบ
+                    </a>
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
-
         </div>
       </div>
 
