@@ -7,19 +7,17 @@ import Swal from "sweetalert2";
 function Upload() {
   const [data, setData] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
-
   const [selectedActID, setSelectedActID] = useState(null);
   const [selectedStdIDs, setSelectedStdIDs] = useState([]);
-
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Web3 and contract
-  const contractAddress = "0x9A00B0CB3A626c44c19f868b85A3819C8b630494";
   const [web3, setWeb3] = useState(null);
   const [contract, setContract] = useState(null);
-
-  // State to hold getAll results
   const [getAll, setGetAll] = useState([]);
+
+  // State to track check all for each activity
+  const [checkAllStates, setCheckAllStates] = useState({});
+
+  const contractAddress = "0x9A00B0CB3A626c44c19f868b85A3819C8b630494";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,54 +62,80 @@ function Upload() {
     const isSelected = selectedItems.some(
       (item) => item.stdID === stdID && item.actID === actID
     );
+
     if (isSelected) {
+      // Deselecting
       setSelectedItems((prev) =>
         prev.filter((item) => !(item.stdID === stdID && item.actID === actID))
       );
       setSelectedStdIDs((prev) => prev.filter((id) => id !== stdID));
-      setSelectedActID(null);
     } else {
+      // Selecting
       setSelectedItems((prev) => [...prev, { stdID, actID }]);
       setSelectedStdIDs((prev) => [...prev, stdID]);
-      setSelectedActID(actID);
     }
+
+    // Update selected activity ID
+    setSelectedActID(actID);
   };
 
-  // Function to handle upload button click
+  const handleCheckAll = (actID) => {
+    const isChecked = checkAllStates[actID] || false;
+    const activities = data.filter((item) => item.act_ID === actID);
+
+    if (isChecked) {
+      // Deselect all
+      setSelectedItems((prev) =>
+        prev.filter(
+          (item) => !activities.some((act) => act.std_ID === item.stdID)
+        )
+      );
+      setSelectedStdIDs((prev) =>
+        prev.filter((id) => !activities.some((act) => act.std_ID === id))
+      );
+    } else {
+      // Select all
+      const newItems = activities.map((item) => ({
+        stdID: item.std_ID,
+        actID: item.act_ID,
+      }));
+      setSelectedItems((prev) => [...prev, ...newItems]);
+      setSelectedStdIDs((prev) => [
+        ...prev,
+        ...newItems.map((item) => item.stdID),
+      ]);
+    }
+    setSelectedActID(actID);
+    setCheckAllStates((prev) => ({ ...prev, [actID]: !isChecked }));
+  };
+
   const handleUpload = async () => {
     try {
-      // Check if MetaMask is installed and connected
       if (!window.ethereum) {
         alert("Please install MetaMask");
         return;
       }
 
-      // Request accounts from MetaMask
       const accounts = await window.ethereum.request({
         method: "eth_requestAccounts",
       });
 
-      // Initialize web3 and contract
       const web3 = new Web3(window.ethereum);
       const contract = new web3.eth.Contract(contractAbi, contractAddress);
 
-      // Set states for web3 and contract
       setWeb3(web3);
       setContract(contract);
 
-      // Check if contract or web3 failed to initialize
       if (!contract || !web3) {
         console.error("Contract or web3 not initialized.");
         return;
       }
 
-      // Check if activity and students are selected
       if (!selectedActID || selectedStdIDs.length === 0) {
         console.error("No activity or students selected.");
         return;
       }
 
-      // Proceed with transaction
       try {
         const accounts = await web3.eth.getAccounts();
         const tx = await contract.methods
@@ -119,8 +143,11 @@ function Upload() {
           .send({ from: accounts[0] });
 
         console.log("Transaction successful:", tx.transactionHash);
+        await axios.put(
+          `/api/transection/${selectedActID}`,
+          { act_transaction: tx.transactionHash } // Send as JSON body
+        );
 
-        // Perform additional actions after successful transaction
         await axios.delete(`/api/reserve/${selectedActID}`);
         await axios.put(`/api/updateStatus/${selectedActID}`);
 
@@ -155,15 +182,7 @@ function Upload() {
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
-    // setCurrentPage(0); // ตั้งค่าหน้าปัจจุบันเป็น 0 เมื่อมีการค้นหา
   };
-
-  // const test = async () => {
-  //   try{
-  //     const res = await axios.put(`/api/updateStatus/${selectedActID}`);
-  //       console.log(res);
-  //   }catch(err){console.log(err)}
-  // }
 
   return (
     <div className="mb-10 container mx-auto md:px-20">
@@ -204,8 +223,16 @@ function Upload() {
         </div>
         {filteredActivities.map(({ actTitle, activities }) => (
           <div key={actTitle} className="mb-8">
-            <div className="text-lg font-bold mb-2">Activity: {actTitle}</div>
-
+            <div className="text-lg font-bold mb-2 flex items-center">
+              <span className="mr-2">Activity: {actTitle}</span>
+              <input
+                type="checkbox"
+                checked={checkAllStates[activities[0].act_ID] || false}
+                onChange={() => handleCheckAll(activities[0].act_ID)}
+                className="mr-2"
+              />
+              <label>Check All</label>
+            </div>
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
               <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
                 <tr className="flex w-full">
@@ -226,7 +253,6 @@ function Upload() {
                     <td className="px-6 py-3 w-1/6">{item.std_ID}</td>
                     <td className="px-6 py-3 w-1/6">{item.std_fname}</td>
                     <td className="px-6 py-3 w-1/6">{item.std_lname}</td>
-
                     <td className="px-6 py-3 w-1/6 ml-7">
                       <input
                         type="checkbox"
@@ -245,18 +271,15 @@ function Upload() {
             </table>
           </div>
         ))}
-
         <button
           onClick={handleUpload}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
         >
           Submit
         </button>
-        {/* <button onClick={test}>test</button> */}
       </div>
     </div>
   );
 }
-55555;
 
 export default Upload;

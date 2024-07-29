@@ -33,6 +33,31 @@ export const activity = (req, res) => {
     }
   );
 };
+export const transection = (req, res) => {
+  const {
+    act_transaction
+  } = req.body; // Get act_transaction from request body
+
+  // SQL query to insert a new record into the activity table
+  const q = `INSERT INTO activity (act_transaction) VALUES (?)`;
+
+  db.query(q, [act_transaction], (err, result) => {
+    if (err) {
+      console.error("Error inserting transaction:", err);
+      return res.status(500).json({
+        error: err.message,
+      });
+    }
+
+    // Return the ID of the newly inserted record
+    res.status(201).json({
+      status: "ok",
+      insertedId: result.insertId, // Include the ID of the new record
+    });
+  });
+};
+
+
 
 export const student = (req, res) => {
   const q =
@@ -146,7 +171,9 @@ export const studentArr = async (req, res) => {
     });
   } catch (error) {
     console.error("Error during student registration:", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      error: error.message
+    });
   }
 };
 
@@ -254,6 +281,8 @@ export const staffArr = async (req, res) => {
     });
   } catch (error) {
     console.error("Error during staff registration:", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      error: error.message
+    });
   }
 };
