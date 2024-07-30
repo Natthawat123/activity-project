@@ -1,5 +1,7 @@
 # อัปเดตล่าสุดเมื่อ 29/7/2567
  - update checkAll to upload and link to transection 
+# อัปเดตล่าสุดเมื่อ 30/7/2567
+ - update UI checkAll Sort Select Activity to upload by Pond
 *** พิมพ์อัปเดตเพิ่มเติมในไฟล์ [readme.md]() เวลาแก้ไขอะไรด้วย จะได้ง่ายว่ามีการแก้ไขอะไรหน้าไหนบ้าง ***
 
 # activity-project

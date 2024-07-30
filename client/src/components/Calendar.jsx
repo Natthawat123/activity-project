@@ -83,7 +83,7 @@ function CalendarFull() {
   };
 
   return (
-    <div className="App w-3/4 mx-auto my-10 bg-slate-50 rounded-lg shadow-xl p-10">
+    <div className="App w-3/4 mx-auto my-10 bg-slate-50 rounded-lg shadow-xl p-10 z-50">
       <h1 className="text-center text-3xl font-bold mb-5">ปฏิทินกิจกรรม</h1>
 
       <Calendar
@@ -94,9 +94,10 @@ function CalendarFull() {
         style={{ height: "70vh" }}
         eventPropGetter={eventStyleGetter}
         onSelectEvent={handleEventClick}
+        className="z-50"
       />
 
-      <div className="flex my-3 gap-5">
+      <div className="flex my-3 gap-5 z-50">
         <div className="flex items-center">
           <div className="me-1 bg-green-600 h-[18px] w-[18px] rounded-sm"></div>
           <p className="me-2">เปิดลงทะเบียน</p>
