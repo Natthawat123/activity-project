@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
-import axios from 'axios';
 
 const StudentForm = () => {
   const [provinces, setProvinces] = useState([]);
@@ -14,27 +13,29 @@ const StudentForm = () => {
     province_id: undefined,
     amphure_id: undefined,
     tambon_id: undefined,
-    zip_code: undefined,
+    zip_code: undefined
   });
 
   const [title, setTitle] = useState("");
-
+  
   const navigate = useNavigate();
+  const { std_ID } = useParams();
+
   const onChangeHandle = (id, selectedValue) => {
     if (id === "province_id") {
       setValue((prev) => ({
         ...prev,
-        province: selectedValue,
+        province: selectedValue
       }));
     } else if (id === "amphure_id") {
       setValue((prev) => ({
         ...prev,
-        district: selectedValue,
+        district: selectedValue
       }));
     } else if (id === "tambon_id") {
       setValue((prev) => ({
         ...prev,
-        subdistrict: selectedValue,
+        subdistrict: selectedValue
       }));
     }
   };
@@ -45,7 +46,7 @@ const StudentForm = () => {
     child,
     childsId = [],
     setChilds = [],
-    addressValue_PDS,
+    addressValue_PDS
   }) => {
     const onChangeHandleLocal = (event) => {
       setChilds.forEach((setChild) => setChild([]));
@@ -101,15 +102,13 @@ const StudentForm = () => {
     province: '',
     district: '',
     subdistrict: '',
-    zipcode: '',
+    zipcode: ''
   });
-
-  const stdID = localStorage.getItem('std_ID');
 
   const [section, setSection] = useState([]);
 
   useEffect(() => {
-    fetch('/api/resume/student?id=' + stdID)
+    fetch('/api/resume/student?id=' + std_ID)
       .then(response => {
         if (!response.ok) {
           throw new Error('Error fetching data');
@@ -122,7 +121,6 @@ const StudentForm = () => {
           ...data,
         }));
 
-        // Extract title from std_fname if it exists
         const titles = ["นาย", "นาง", "น.ส."];
         const title = titles.find(t => data.std_fname.match(t));
         if (title) {
@@ -137,10 +135,11 @@ const StudentForm = () => {
         console.error('Error:', error);
       });
 
-    fetch("https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json")
+    fetch(
+      "https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json"
+    )
       .then((response) => response.json())
       .then((result) => {
-        // Sort the provinces alphabetically by name_th
         const sortedProvinces = result.sort((a, b) =>
           a.name_th.localeCompare(b.name_th)
         );
@@ -150,15 +149,15 @@ const StudentForm = () => {
     fetch('/api/list/section')
       .then((respose) => respose.json())
       .then((result) => {
-        setSection(result);
-      });
+        setSection(result)
+      })
 
-  }, [stdID]);
+  }, [std_ID]);
 
   const handlechange = (e) => {
     setValue((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     }));
   };
 
@@ -177,13 +176,14 @@ const StudentForm = () => {
   const updateClick = (event) => {
     event.preventDefault();
 
+
     const updatedValue = {
       ...value,
       zipcode: zipcodeS || value.zipcode,
-      std_fname: `${title}${value.std_fname}`.trim(),
+      std_fname: `${title}${value.std_fname}`.trim()
     };
 
-    fetch('/api/update/student/' + stdID, {
+    fetch('/api/update/student/' + std_ID, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -202,7 +202,7 @@ const StudentForm = () => {
           icon: 'success',
         });
         setTimeout(() => {
-          window.location = '/activity/profile';
+          window.reload();
         }, 1500);
       })
       .catch(error => {
@@ -246,8 +246,7 @@ const StudentForm = () => {
                 name="std_ID"
                 value={value.std_ID}
                 readOnly
-                className="mt-1 p-2 border w-full rounded-md"
-              />
+                className="mt-1 p-2 border w-full rounded-md" />
             </div>
 
             <div>
@@ -301,8 +300,7 @@ const StudentForm = () => {
                 name="std_lname"
                 onChange={handlechange}
                 value={value.std_lname}
-                className="mt-1 p-2 border w-full rounded-md"
-              />
+                className="mt-1 p-2 border w-full rounded-md" />
             </div>
 
             <div>
@@ -315,8 +313,7 @@ const StudentForm = () => {
                 name="std_mobile"
                 onChange={handlechange}
                 value={value.std_mobile}
-                className="mt-1 p-2 border w-full rounded-md"
-              />
+                className="mt-1 p-2 border w-full rounded-md" />
             </div>
 
             <div>
@@ -329,8 +326,7 @@ const StudentForm = () => {
                 name="std_email"
                 onChange={handlechange}
                 value={value.std_email}
-                className="mt-1 p-2 border w-full rounded-md"
-              />
+                className="mt-1 p-2 border w-full rounded-md" />
             </div>
 
             <div>
@@ -342,8 +338,7 @@ const StudentForm = () => {
                 name="std_address"
                 onChange={handlechange}
                 value={value.std_address}
-                className="mt-1 p-2 border w-full rounded-md"
-              />
+                className="mt-1 p-2 border w-full rounded-md" />
             </div>
 
             <div>
@@ -398,8 +393,7 @@ const StudentForm = () => {
                 name="zipcode"
                 onChange={handlechange}
                 value={zipcodeS ?? value.zipcode}
-                className="mt-1 p-2 border w-full rounded-md"
-              />
+                className="mt-1 p-2 border w-full rounded-md" />
             </div>
 
             <div className="flex justify-end items-center">

@@ -28,7 +28,7 @@ function DetailStudent() {
   useEffect(() => {
     const fetchStudent = async () => {
       try {
-        const response = await axios.get(`/api/resume/student?id=${std_ID}`);
+        const response = await axios.get(`/api/resume/staff?id=${std_ID}`);
         setStudent(response.data);
       } catch (error) {
         console.error(error);
@@ -203,17 +203,17 @@ function DetailStudent() {
           </div>
           <hr className="mb-3" />
           <div className="grid grid-cols-2 gap-4">
-            <h1>รหัสนักศึกษา: {student.std_ID}</h1>
+            <h1>รหัสนักศึกษา: {student.staff_ID}</h1>
             <p>
-              ชื่อ-นามสกุล: {student.std_fname} {student.std_lname}
+              ชื่อ-นามสกุล: {student.staff_fname} {student.staff_lname}
             </p>
-            <p>
-              หมู่เรียน:
+            {/* <p>
+              ดูแลหมู่เรียน:
               {sectionName ? `${sectionName.sec_name}` : "Not found"}
-            </p>
-            <p>Email: {student.std_email}</p>
-            <p>เบอร์โทรศัพท์: {student.std_mobile}</p>
-            <p>ที่อยู่: {student.std_address}</p>
+            </p> */}
+            <p>Email: {student.staff_email}</p>
+            <p>เบอร์โทรศัพท์: {student.staff_mobile}</p>
+            <p>ที่อยู่: {student.staff_address}</p>
             <p>จังหวัด: {student.province}</p>
             <p>อำเภอ: {student.district}</p>
             <p>ตำบล: {student.subdistrict}</p>
@@ -227,7 +227,7 @@ function DetailStudent() {
               Delete
             </button>
             <button
-              className="btn btn-primary px-6 py-4 mx-3 text-white" onClick={() => navigate(`/admin/dashboard/detail/student/update/${student.std_ID}`)}
+              className="btn btn-primary px-6 py-4 mx-3 text-white" onClick={() => navigate(`/admin/dashboard/detail/teacher/update/${student.staff_ID}`)}
             >
               แก้ไขประวัติ
             </button>

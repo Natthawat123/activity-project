@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
-import {useNavigate} from "react-router-dom"
-
 import { Link } from "react-router-dom";
 
 const StudentForm = () => {
@@ -19,7 +18,9 @@ const StudentForm = () => {
   });
 
   const [title, setTitle] = useState("");
+
   const navigate = useNavigate();
+  const { staff_ID } = useParams();
 
   const onChangeHandle = (id, selectedValue) => {
     if (id === "province_id") {
@@ -100,7 +101,7 @@ const StudentForm = () => {
   const [value, setValue] = useState({
     staff_ID: "",
     staff_fname: "",
-    std_lname: "",
+    staff_lname: "",
     staff_mobile: "",
     staff_email: "",
     staff_address: "",
@@ -109,8 +110,6 @@ const StudentForm = () => {
     subdistrict: "",
     zipcode: "",
   });
-
-  const staff_ID = localStorage.getItem("staff_ID");
 
   useEffect(() => {
     fetch("/api/resume/staff?id=" + staff_ID)
@@ -192,7 +191,7 @@ const StudentForm = () => {
           icon: "success",
         });
         setTimeout(() => {
-          window.location = "/teacher/profile";
+          window.reload();
         }, 1500);
       })
       .catch((error) => {
@@ -211,7 +210,7 @@ const StudentForm = () => {
   }
 
   return (
-<div className="container mx-auto mb-10 md:px-20 pt-24">
+    <div className="container mx-auto mb-10 md:px-20 pt-24">
       <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 pb-10">
       <div className="flex justify-between">
           <div className="flex gap-2">

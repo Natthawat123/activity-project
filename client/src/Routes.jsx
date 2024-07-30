@@ -32,8 +32,11 @@ import Activity from "./admin/pages/Activity.jsx";
 import Wallet from "./admin/pages/Wallet.jsx";
 import AddUsers from "./admin/components/Add_users.jsx";
 import UpdateUser from "./admin/components/Update_user.jsx";
+import UpdateStudent from "./admin/components/UpdateStudent.jsx";
+import UpdateStaff from "./admin/components/UpdateStaff.jsx";
 import DetailActivityA from "./admin/components/DetailActivity.jsx";
 import DetailStudent from "./admin/components/DetailStudent.jsx";
+import DetailStaff from "./admin/components/DetailStaff.jsx";
 
 import ManageActivity from "./admin/components/Manage_activity.jsx";
 // import Login from './pages/Login.jsx';
@@ -57,10 +60,16 @@ export function Router() {
           <Route
             path="/admin/dashboard/detail/student/:std_ID"
             element={<DetailStudent />}
-          />{" "}
+          />
+          <Route
+            path="/admin/dashboard/detail/teacher/:std_ID"
+            element={<DetailStaff />}
+          />
           <Route path="addusers" element={<AddUsers />} />
           <Route path="update" element={<UpdateUser />} />
           <Route path="wallet" element={<Wallet />} />
+          <Route path="dashboard/detail/student/update/:std_ID" element={<UpdateStudent />} />
+          <Route path="dashboard/detail/teacher/update/:staff_ID" element={<UpdateStaff />} />
         </Route>
 
         <Route path="/activity" element={<Layout />}>
