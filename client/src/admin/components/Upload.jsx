@@ -12,9 +12,7 @@ function Upload() {
   const [searchTerm, setSearchTerm] = useState("");
   const [web3, setWeb3] = useState(null);
   const [contract, setContract] = useState(null);
-  const [getAll, setGetAll] = useState([]);
-
-  // State to track check all for each activity
+  const [selectedActivity, setSelectedActivity] = useState("all")
   const [checkAllStates, setCheckAllStates] = useState({});
 
   const contractAddress = "0x9A00B0CB3A626c44c19f868b85A3819C8b630494";
@@ -187,8 +185,8 @@ function Upload() {
   return (
     <div className="mb-10 container mx-auto md:px-20">
       <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
-        <div className="flex justify-between">
-          <div className="pb-4 items-center">
+        <div className="flex justify-between items-center pb-4">
+          <div className=" items-center">
             <label htmlFor="table-search" className="sr-only">
               Search
             </label>
@@ -220,66 +218,93 @@ function Upload() {
               />
             </div>
           </div>
+
+          <div className="relative justify-center flex ">
+            <select
+              id="filter-section"
+              value={selectedActivity}
+              onChange={(e) => setSelectedActivity(e.target.value)}
+              className="text-xs cursor-pointer block p-1 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            >
+              <option value="all">ทั้งหมด</option>
+              {Object.keys(groupedData).map((actTitle) => (
+                <option key={actTitle} value={actTitle}>
+                  {actTitle}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-        {filteredActivities.map(({ actTitle, activities }) => (
-          <div key={actTitle} className="mb-8">
-            <div className="text-lg font-bold mb-2 flex items-center">
-              <span className="mr-2">Activity: {actTitle}</span>
-              <input
-                type="checkbox"
-                checked={checkAllStates[activities[0].act_ID] || false}
-                onChange={() => handleCheckAll(activities[0].act_ID)}
-                className="mr-2"
-              />
-              <label>Check All</label>
-            </div>
-            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-              <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
-                <tr className="flex w-full">
-                  <th className="px-6 py-3 w-1/6 text-center">ลำดับ</th>
-                  <th className="px-6 py-3 w-1/6">รหัสนักศึกษา</th>
-                  <th className="px-6 py-3 w-1/6">ชื่อ</th>
-                  <th className="px-6 py-3 w-1/6">นามสกุล</th>
-                  <th className="px-6 py-3 w-1/6">เข้าร่วม</th>
-                </tr>
-              </thead>
-              <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
-                {activities.map((item, index) => (
-                  <tr
+
+        {filteredActivities
+          .filter(
+            ({ actTitle }) =>
+              selectedActivity === "all" || actTitle === selectedActivity
+          )
+          .map(({ actTitle, activities }) => (
+            <div key={actTitle} className="mb-8">
+              <div className="text-lg font-bold mb-2 flex items-center justify-between">
+                <span className="mr-2">ชื่อกิจกรรม: {actTitle}</span>
+                
+              </div>
+              <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
+                  <tr className="flex w-full">
+                    <th className="px-6 py-3 w-1/6 text-center">ลำดับ</th>
+                    <th className="px-6 py-3 w-1/6">รหัสนักศึกษา</th>
+                    <th className="px-6 py-3 w-1/6">ชื่อ</th>
+                    <th className="px-6 py-3 w-1/6">นามสกุล</th>
+                    <th className="px-6 py-3 w-1/6">
+                    <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={checkAllStates[activities[0].act_ID] || false}
+                  onChange={() => handleCheckAll(activities[0].act_ID)}
+                  className="mr-2"
+                />
+                <label>เลือกทั้งหมด</label>
+                </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
+                  {activities.map((item, index) => (
+                    <tr
                     key={item.id}
                     className="border-b-2 flex w-full items-center"
                   >
-                    <td className="px-6 py-3 w-1/6 text-center">{index + 1}</td>
-                    <td className="px-6 py-3 w-1/6">{item.std_ID}</td>
-                    <td className="px-6 py-3 w-1/6">{item.std_fname}</td>
-                    <td className="px-6 py-3 w-1/6">{item.std_lname}</td>
-                    <td className="px-6 py-3 w-1/6 ml-7">
-                      <input
-                        type="checkbox"
-                        checked={selectedItems.some(
-                          (si) =>
-                            si.stdID === item.std_ID && si.actID === item.act_ID
-                        )}
-                        onChange={() =>
-                          handleCheckboxChange(item.std_ID, item.act_ID)
-                        }
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ))}
-        <button
-          onClick={handleUpload}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
-        >
-          Submit
-        </button>
-      </div>
-    </div>
-  );
+                  <td className="px-6 py-3 w-1/6 text-center">{index + 1}</td>
+                  <td className="px-6 py-3 w-1/6">{item.std_ID}</td>
+                  <td className="px-6 py-3 w-1/6">{item.std_fname}</td>
+                  <td className="px-6 py-3 w-1/6">{item.std_lname}</td>
+                  <td className="px-6 py-3 w-1/6 ml-7">
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.some(
+                        (si) =>
+                          si.stdID === item.std_ID && si.actID === item.act_ID
+                      )}
+                      onChange={() =>
+                        handleCheckboxChange(item.std_ID, item.act_ID)
+                      }
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
+    <button
+      onClick={handleUpload}
+      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
+    >
+      Submit
+    </button>
+  </div>
+</div>
+);
 }
 
 export default Upload;
+
