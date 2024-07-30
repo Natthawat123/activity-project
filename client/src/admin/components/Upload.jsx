@@ -12,10 +12,9 @@ function Upload() {
   const [searchTerm, setSearchTerm] = useState("");
   const [web3, setWeb3] = useState(null);
   const [contract, setContract] = useState(null);
-  const [getAll, setGetAll] = useState([]);
-
-  // State to track check all for each activity
   const [checkAllStates, setCheckAllStates] = useState({});
+  const [deleteSelectedItems, setDeleteSelectedItems] = useState([]);
+  const [deleteCheckAllStates, setDeleteCheckAllStates] = useState({});
 
   const contractAddress = "0x9A00B0CB3A626c44c19f868b85A3819C8b630494";
 
@@ -64,18 +63,15 @@ function Upload() {
     );
 
     if (isSelected) {
-      // Deselecting
       setSelectedItems((prev) =>
         prev.filter((item) => !(item.stdID === stdID && item.actID === actID))
       );
       setSelectedStdIDs((prev) => prev.filter((id) => id !== stdID));
     } else {
-      // Selecting
       setSelectedItems((prev) => [...prev, { stdID, actID }]);
       setSelectedStdIDs((prev) => [...prev, stdID]);
     }
 
-    // Update selected activity ID
     setSelectedActID(actID);
   };
 
@@ -84,7 +80,6 @@ function Upload() {
     const activities = data.filter((item) => item.act_ID === actID);
 
     if (isChecked) {
-      // Deselect all
       setSelectedItems((prev) =>
         prev.filter(
           (item) => !activities.some((act) => act.std_ID === item.stdID)
@@ -94,7 +89,6 @@ function Upload() {
         prev.filter((id) => !activities.some((act) => act.std_ID === id))
       );
     } else {
-      // Select all
       const newItems = activities.map((item) => ({
         stdID: item.std_ID,
         actID: item.act_ID,
@@ -107,6 +101,26 @@ function Upload() {
     }
     setSelectedActID(actID);
     setCheckAllStates((prev) => ({ ...prev, [actID]: !isChecked }));
+  };
+
+  const handleDeleteCheckAll = (actID) => {
+    const isChecked = deleteCheckAllStates[actID] || false;
+    const activities = data.filter((item) => item.act_ID === actID);
+
+    if (isChecked) {
+      setDeleteSelectedItems((prev) =>
+        prev.filter(
+          (item) => !activities.some((act) => act.std_ID === item.stdID)
+        )
+      );
+    } else {
+      const newItems = activities.map((item) => ({
+        stdID: item.std_ID,
+        actID: item.act_ID,
+      }));
+      setDeleteSelectedItems((prev) => [...prev, ...newItems]);
+    }
+    setDeleteCheckAllStates((prev) => ({ ...prev, [actID]: !isChecked }));
   };
 
   const handleUpload = async () => {
@@ -143,10 +157,9 @@ function Upload() {
           .send({ from: accounts[0] });
 
         console.log("Transaction successful:", tx.transactionHash);
-        await axios.put(
-          `/api/transection/${selectedActID}`,
-          { act_transaction: tx.transactionHash } // Send as JSON body
-        );
+        await axios.put(`/api/transection/${selectedActID}`, {
+          act_transaction: tx.transactionHash,
+        });
 
         await axios.delete(`/api/reserve/${selectedActID}`);
         await axios.put(`/api/updateStatus/${selectedActID}`);
@@ -182,6 +195,32 @@ function Upload() {
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
+  };
+
+  const handleDeleteCheckboxChange = (std_ID, act_ID) => (event) => {
+    const isChecked = event.target.checked;
+    setDeleteSelectedItems((prev) => {
+      if (isChecked) {
+        return [...prev, { stdID: std_ID, actID: act_ID }];
+      } else {
+        return prev.filter(
+          (item) => !(item.stdID === std_ID && item.actID === act_ID)
+        );
+      }
+    });
+  };
+
+  const deleteReserve = async (stdID, actID) => {
+    console.log(stdID);
+    await axios.delete(`/api/reserve/reserve/${stdID}/${actID}`).then((res) => {
+      console.log(res);
+    });
+  };
+
+  const deleteSelectedReserves = () => {
+    for (const item of deleteSelectedItems) {
+      deleteReserve(item.stdID, item.actID);
+    }
   };
 
   return (
@@ -225,22 +264,36 @@ function Upload() {
           <div key={actTitle} className="mb-8">
             <div className="text-lg font-bold mb-2 flex items-center">
               <span className="mr-2">Activity: {actTitle}</span>
-              <input
-                type="checkbox"
-                checked={checkAllStates[activities[0].act_ID] || false}
-                onChange={() => handleCheckAll(activities[0].act_ID)}
-                className="mr-2"
-              />
-              <label>Check All</label>
             </div>
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
               <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
                 <tr className="flex w-full">
-                  <th className="px-6 py-3 w-1/6 text-center">ลำดับ</th>
-                  <th className="px-6 py-3 w-1/6">รหัสนักศึกษา</th>
-                  <th className="px-6 py-3 w-1/6">ชื่อ</th>
-                  <th className="px-6 py-3 w-1/6">นามสกุล</th>
-                  <th className="px-6 py-3 w-1/6">เข้าร่วม</th>
+                  <th className="px-6 py-3 w-1/7 text-center">ลำดับ</th>
+                  <th className="px-6 py-3 w-1/7">รหัสนักศึกษา</th>
+                  <th className="px-6 py-3 w-1/7">ชื่อ</th>
+                  <th className="px-6 py-3 w-1/7">นามสกุล</th>
+                  <th className="px-6 py-3 w-1/7">
+                    <input
+                      type="checkbox"
+                      checked={checkAllStates[activities[0].act_ID] || false}
+                      onChange={() => handleCheckAll(activities[0].act_ID)}
+                      className="mr-2"
+                    />
+                    เข้าร่วม
+                  </th>
+                  <th className="px-6 py-3 w-1/7 text-center">
+                    <input
+                      type="checkbox"
+                      checked={
+                        deleteCheckAllStates[activities[0].act_ID] || false
+                      }
+                      onChange={() =>
+                        handleDeleteCheckAll(activities[0].act_ID)
+                      }
+                      className="mr-2"
+                    />
+                    ลบ
+                  </th>
                 </tr>
               </thead>
               <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
@@ -249,11 +302,11 @@ function Upload() {
                     key={item.id}
                     className="border-b-2 flex w-full items-center"
                   >
-                    <td className="px-6 py-3 w-1/6 text-center">{index + 1}</td>
-                    <td className="px-6 py-3 w-1/6">{item.std_ID}</td>
-                    <td className="px-6 py-3 w-1/6">{item.std_fname}</td>
-                    <td className="px-6 py-3 w-1/6">{item.std_lname}</td>
-                    <td className="px-6 py-3 w-1/6 ml-7">
+                    <td className="px-6 py-3 w-1/7 text-center">{index + 1}</td>
+                    <td className="px-6 py-3 w-1/7">{item.std_ID}</td>
+                    <td className="px-6 py-3 w-1/7">{item.std_fname}</td>
+                    <td className="px-6 py-3 w-1/7">{item.std_lname}</td>
+                    <td className="px-6 py-3 w-1/7 ml-7">
                       <input
                         type="checkbox"
                         checked={selectedItems.some(
@@ -263,6 +316,19 @@ function Upload() {
                         onChange={() =>
                           handleCheckboxChange(item.std_ID, item.act_ID)
                         }
+                      />
+                    </td>
+                    <td className="px-6 py-3 w-1/7 text-center">
+                      <input
+                        type="checkbox"
+                        checked={deleteSelectedItems.some(
+                          (si) =>
+                            si.stdID === item.std_ID && si.actID === item.act_ID
+                        )}
+                        onChange={handleDeleteCheckboxChange(
+                          item.std_ID,
+                          item.act_ID
+                        )}
                       />
                     </td>
                   </tr>
@@ -276,6 +342,12 @@ function Upload() {
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
         >
           Submit
+        </button>
+        <button
+          onClick={deleteSelectedReserves}
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4 ml-4"
+        >
+          Delete Selected
         </button>
       </div>
     </div>

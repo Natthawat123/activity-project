@@ -29,3 +29,15 @@ export const numStdReserve = (req, res) => {
         return res.status(200).json('Reserved successfully');
     });
 };
+
+export const deleteReserve = (req, res) => {
+    const sql = `DELETE FROM manage WHERE std_ID = ? AND act_ID = ?`;
+    const {
+        std_ID,
+        act_ID
+    } = req.params
+    db.query(sql, [std_ID, act_ID], (err, result) => {
+        if (err) return res.status(500).json(err)
+        return res.status(200).json('Deleted Reserve successfully');
+    })
+}
