@@ -53,7 +53,8 @@ function Upload() {
         (item) =>
           item.std_ID.includes(searchTerm) ||
           item.std_fname.includes(searchTerm) ||
-          item.std_lname.includes(searchTerm)
+          item.std_lname.includes(searchTerm)||
+          item.act_title.includes(searchTerm)
       ),
     }))
     .filter((group) => group.activities.length > 0);
