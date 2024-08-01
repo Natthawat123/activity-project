@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
-import { useNavigate } from "react-router-dom";
-
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import { Link } from "react-router-dom";
 
 const StudentForm = () => {
@@ -17,38 +16,11 @@ const StudentForm = () => {
     tambon_id: undefined,
     zip_code: undefined,
   });
+
   const [title, setTitle] = useState("");
 
-  const [value, setValue] = useState({}); // Initialize with empty object
-
-  const staff_ID = localStorage.getItem("staff_ID");
-
-  useEffect(() => {
-    fetch(`/api/teachers/${staff_ID}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Error fetching data");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setValue(data[0]);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-
-    fetch(
-      "https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json"
-    )
-      .then((response) => response.json())
-      .then((result) => {
-        const sortedProvinces = result.sort((a, b) =>
-          a.name_th.localeCompare(b.name_th)
-        );
-        setProvinces(sortedProvinces);
-      });
-  }, [staff_ID]);
+  const navigate = useNavigate();
+  const { staff_ID } = useParams();
 
   const onChangeHandle = (id, selectedValue) => {
     if (id === "province_id") {
@@ -103,26 +75,82 @@ const StudentForm = () => {
     };
 
     return (
-      <select
-        value={selected[id]}
-        onChange={onChangeHandleLocal}
-        className="mt-1 p-2 border w-full rounded-md"
-      >
-        <option
-          key={selected[id]}
+      <>
+        <select
           value={selected[id]}
-          label={addressValue_PDS}
-        />
+          onChange={onChangeHandleLocal}
+          className="mt-1 p-2 border w-full rounded-md"
+        >
+          <option
+            key={selected[id]}
+            value={selected[id]}
+            label={addressValue_PDS}
+          />
 
-        {list &&
-          list.map((item) => (
-            <option key={item.id} value={item.id} label={item.name_th}>
-              {item.name_th}
-            </option>
-          ))}
-      </select>
+          {list &&
+            list.map((item) => (
+              <option key={item.id} value={item.id} label={item.name_th}>
+                {item.name_th}
+              </option>
+            ))}
+        </select>
+      </>
     );
   };
+
+  const [value, setValue] = useState({
+    staff_ID: "",
+    staff_fname: "",
+    staff_lname: "",
+    staff_mobile: "",
+    staff_email: "",
+    staff_address: "",
+    province: "",
+    district: "",
+    subdistrict: "",
+    zipcode: "",
+  });
+
+  useEffect(() => {
+    fetch("/api/resume/staff?id=" + staff_ID)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error fetching data");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setValue((prev) => ({
+          ...prev,
+          ...data,
+        }));
+
+        const titles = ["อ.", "ดร.", "รศ. ดร.", "ผศ. ดร."];
+        const title = titles.find((t) => data.staff_fname.startsWith(t));
+        if (title) {
+          setTitle(title);
+          setValue((prev) => ({
+            ...prev,
+            staff_fname: data.staff_fname.replace(title, "").trim(),
+          }));
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+
+    fetch(
+      "https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json"
+    )
+      .then((response) => response.json())
+      .then((result) => {
+        // Sort the provinces alphabetically by name_th
+        const sortedProvinces = result.sort((a, b) =>
+          a.name_th.localeCompare(b.name_th)
+        );
+        setProvinces(sortedProvinces);
+      });
+  }, [staff_ID]);
 
   const handlechange = (e) => {
     setValue((prev) => ({
@@ -144,7 +172,7 @@ const StudentForm = () => {
       staff_fname: title + value.staff_fname.trim(),
     };
 
-    fetch(`/api/update/staff/${staff_ID}`, {
+    fetch("/api/update/staff/" + staff_ID, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -163,7 +191,7 @@ const StudentForm = () => {
           icon: "success",
         });
         setTimeout(() => {
-          window.location = "/teacher/profile";
+          window.reload();
         }, 1500);
       })
       .catch((error) => {
@@ -177,29 +205,63 @@ const StudentForm = () => {
       });
   };
 
-  if (!value.login_ID) {
+  if (!value.staff_ID) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className="pt-10">
-      <div className="w-full lg:w-2/3 mx-auto mt-12 p-4 bg-white shadow-md rounded-md py-14 mb-16">
+    <div className="container mx-auto mb-10 md:px-20 pt-24">
+      <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 pb-10">
+      <div className="flex justify-between">
+          <div className="flex gap-2">
+            <h1 className="text-lg font-bold mb-2">แก้ไขข้อมูลส่วนตัว</h1>
+            <DriveFileRenameOutlineIcon />
+          </div>
+          <div className="items-center mb-5 cursor-pointer" onClick={() => navigate(-1)}>
+            <ArrowBackIosNewIcon />
+            ย้อนกลับ
+          </div>
+        </div>
+        <hr className="mb-3" />
         <form className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:px-10">
-          <div className="mb-4">
-            <label
-              htmlFor="firstName"
-              className="block text-sm font-medium text-gray-600"
-            >
-              ชื่อ
-            </label>
-            <input
-              type="text"
-              id="fname"
-              name="staff_fname"
-              onChange={handlechange}
-              value={value.staff_fname || ""}
-              className="mt-1 p-2 border w-full rounded-md"
-            />
+        <div className="flex gap-2">
+            <div className="w-1/6">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-600"
+              >
+                คำนำหน้า
+              </label>
+              <select
+                value={title}
+                onChange={handleTitleChange}
+                name="title"
+                id="title"
+                className="mt-1 p-2 border w-full rounded-md"
+              >
+                <option value="">เลือกคำนำหน้า</option>
+                <option value="อ.">อ.</option>
+                <option value="ดร.">ดร.</option>
+                <option value="รศ. ดร.">รศ. ดร.</option>
+                <option value="ผศ. ดร.">ผศ. ดร.</option>
+              </select>
+            </div>
+            <div className="w-5/6">
+              <label
+                htmlFor="firstName"
+                className="block text-sm font-medium text-gray-600"
+              >
+                ชื่อ
+              </label>
+              <input
+                type="text"
+                id="fname"
+                name="std_fname"
+                onChange={handlechange}
+                value={value.staff_fname}
+                className="mt-1 p-2 border w-full rounded-md"
+              />
+            </div>
           </div>
 
           <div className="mb-4">
@@ -214,7 +276,7 @@ const StudentForm = () => {
               id="lname"
               name="staff_lname"
               onChange={handlechange}
-              value={value.staff_lname || ""}
+              value={value.staff_lname}
               className="mt-1 p-2 border w-full rounded-md"
             />
           </div>
@@ -231,7 +293,7 @@ const StudentForm = () => {
               id="tel"
               name="staff_mobile"
               onChange={handlechange}
-              value={value.staff_mobile || ""}
+              value={value.staff_mobile}
               className="mt-1 p-2 border w-full rounded-md"
             />
           </div>
@@ -248,7 +310,7 @@ const StudentForm = () => {
               id="email"
               name="staff_email"
               onChange={handlechange}
-              value={value.staff_email || ""}
+              value={value.staff_email}
               className="mt-1 p-2 border w-full rounded-md"
             />
           </div>
@@ -264,7 +326,7 @@ const StudentForm = () => {
               id="address"
               name="staff_address"
               onChange={handlechange}
-              value={value.staff_address || ""}
+              value={value.staff_address}
               className="mt-1 p-2 border w-full rounded-md"
             />
           </div>
@@ -281,7 +343,7 @@ const StudentForm = () => {
               list={provinces}
               child="amphure"
               childsId={["amphure_id", "tambon_id"]}
-              addressValue_PDS={value.province || ""}
+              addressValue_PDS={value.province}
               setChilds={[setAmphures, setTambons]}
             />
           </div>
@@ -299,7 +361,7 @@ const StudentForm = () => {
               child="tambon"
               childsId={["tambon_id"]}
               setChilds={[setTambons]}
-              addressValue_PDS={value.district || ""}
+              addressValue_PDS={value.district}
             />
           </div>
 
@@ -316,7 +378,7 @@ const StudentForm = () => {
               child="zip_code"
               childsId={["zip_code"]}
               setChilds={[setZipcode]}
-              addressValue_PDS={value.subdistrict || ""}
+              addressValue_PDS={value.subdistrict}
             />
           </div>
 
@@ -332,7 +394,7 @@ const StudentForm = () => {
               id="zipcode"
               name="zipcode"
               onChange={handlechange}
-              value={zipcodeS ?? (value.zipcode || "")}
+              value={zipcodeS ?? value.zipcode}
               className="mt-1 p-2 border w-full rounded-md"
             />
           </div>

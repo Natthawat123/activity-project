@@ -58,109 +58,109 @@ const ListUsers = () => {
     setSortOrder(event.target.value);
   };
 
-  const filteredItems = users.filter((item) => {
-    const studentData = student.find((std) => std.std_ID === item.username);
-    const staffData = staff.find((stf) => stf.login_ID === item.login_ID);
-    const matchesSearchTerm =
-      item.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (studentData &&
-        (studentData.std_fname
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-          studentData.std_lname
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          studentData.sec_ID
-            .toString()
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()))) ||
-      (staffData &&
-        (staffData.staff_fname
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-          staffData.staff_lname
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())));
+  // const filteredItems = users.filter((item) => {
+  //   const studentData = student.find((std) => std.std_ID === item.username);
+  //   const staffData = staff.find((stf) => stf.login_ID === item.login_ID);
+  //   const matchesSearchTerm =
+  //     item.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     (studentData &&
+  //       (studentData.std_fname
+  //         .toLowerCase()
+  //         .includes(searchTerm.toLowerCase()) ||
+  //         studentData.std_lname
+  //           .toLowerCase()
+  //           .includes(searchTerm.toLowerCase()) ||
+  //         studentData.sec_ID
+  //           .toString()
+  //           .toLowerCase()
+  //           .includes(searchTerm.toLowerCase()))) ||
+  //     (staffData &&
+  //       (staffData.staff_fname
+  //         .toLowerCase()
+  //         .includes(searchTerm.toLowerCase()) ||
+  //         staffData.staff_lname
+  //           .toLowerCase()
+  //           .includes(searchTerm.toLowerCase())));
 
-    const role = studentData ? "student" : staffData ? "teacher" : "admin";
-    const matchesFilter = filter === "default" || filter === role;
-    const sectionMatches =
-      selectedSection === "all" ||
-      (studentData && studentData.sec_ID.toString() === selectedSection);
+  //   const role = studentData ? "student" : staffData ? "teacher" : "admin";
+  //   const matchesFilter = filter === "default" || filter === role;
+  //   const sectionMatches =
+  //     selectedSection === "all" ||
+  //     (studentData && studentData.sec_ID.toString() === selectedSection);
 
-    return matchesSearchTerm && matchesFilter && sectionMatches;
-  });
+  //   return matchesSearchTerm && matchesFilter && sectionMatches;
+  // });
 
-  const mappedUsers = filteredItems.map((item) => {
-    const studentData = student.find((std) => std.std_ID == item.username);
-    const staffData = staff.find((stf) => stf.login_ID == item.login_ID);
-    const sectionData = studentData
-      ? section.find((sec) => sec.sec_ID == studentData.sec_ID)
-      : null;
+  // const mappedUsers = filteredItems.map((item) => {
+  //   const studentData = student.find((std) => std.std_ID == item.username);
+  //   const staffData = staff.find((stf) => stf.login_ID == item.login_ID);
+  //   const sectionData = studentData
+  //     ? section.find((sec) => sec.sec_ID == studentData.sec_ID)
+  //     : null;
 
-    if (studentData) {
-      return {
-        ...item,
-        std_ID: studentData.std_ID,
-        std_fname: studentData.std_fname,
-        std_lname: studentData.std_lname,
-        sec_ID: studentData.sec_ID,
-        sec_name: sectionData ? sectionData.sec_name : "",
-        role: "นักศึกษา",
-      };
-    } else if (staffData) {
-      return {
-        ...item,
-        std_ID: staffData.staff_ID,
-        std_fname: staffData.staff_fname,
-        std_lname: staffData.staff_lname,
-        sec_ID: "",
-        sec_name: "",
-        role: "อาจารย์",
-      };
-    } else if (item.role == "admin") {
-      return {
-        ...item,
-        std_ID: "",
-        std_fname: "",
-        std_lname: "",
-        sec_ID: "",
-        sec_name: "",
-        role: "ผู้ดูแลระบบ",
-      };
-    } else {
-      return {
-        ...item,
-        std_ID: "",
-        std_fname: "",
-        std_lname: "",
-        sec_ID: "",
-        sec_name: "",
-        role: "unknown",
-      };
-    }
-  });
+  //   if (studentData) {
+  //     return {
+  //       ...item,
+  //       std_ID: studentData.std_ID,
+  //       std_fname: studentData.std_fname,
+  //       std_lname: studentData.std_lname,
+  //       sec_ID: studentData.sec_ID,
+  //       sec_name: sectionData ? sectionData.sec_name : "",
+  //       role: "นักศึกษา",
+  //     };
+  //   } else if (item.role == "teacher") {
+  //     return {
+  //       ...item,
+  //       std_ID: staffData.staff_ID,
+  //       std_fname: staffData.staff_fname,
+  //       std_lname: staffData.staff_lname,
+  //       sec_ID: "",
+  //       sec_name: "",
+  //       role: "อาจารย์",
+  //     };
+  //   } else if (item.role == "admin") {
+  //     return {
+  //       ...item,
+  //       std_ID: staffData.staff_ID,
+  //       std_fname: staffData.staff_fname,
+  //       std_lname: staffData.staff_lname,
+  //       sec_ID: "",
+  //       sec_name: "",
+  //       role: "ผู้ดูแลระบบ",
+  //     };
+  //   } else {
+  //     return {
+  //       ...item,
+  //       std_ID: "",
+  //       std_fname: "",
+  //       std_lname: "",
+  //       sec_ID: "",
+  //       sec_name: "",
+  //       role: "unknown",
+  //     };
+  //   }
+  // });
 
-  const sortedUsers = mappedUsers.sort((a, b) => {
-    const idA = String(a.std_ID || "");
-    const idB = String(b.std_ID || "");
+  // const sortedUsers = mappedUsers.sort((a, b) => {
+  //   const idA = String(a.std_ID || "");
+  //   const idB = String(b.std_ID || "");
 
-    if (sortOrder === "asc") {
-      return idA.localeCompare(idB);
-    } else {
-      return idB.localeCompare(idA);
-    }
-  });
+  //   if (sortOrder === "asc") {
+  //     return idA.localeCompare(idB);
+  //   } else {
+  //     return idB.localeCompare(idA);
+  //   }
+  // });
 
-  const lastPage = Math.ceil(filteredItems.length / itemsPerPage) - 1;
-  const visibleItems = sortedUsers.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
-  const pageNumbers = [];
-  for (let i = 0; i <= lastPage; i++) {
-    pageNumbers.push(i);
-  }
+  // const lastPage = Math.ceil(filteredItems.length / itemsPerPage) - 1;
+  // const visibleItems = sortedUsers.slice(
+  //   currentPage * itemsPerPage,
+  //   (currentPage + 1) * itemsPerPage
+  // );
+  // const pageNumbers = [];
+  // for (let i = 0; i <= lastPage; i++) {
+  //   pageNumbers.push(i);
+  // }
 
   if (error) {
     return <div>Error: {error.message}</div>;
@@ -332,7 +332,7 @@ const ListUsers = () => {
               >
                 ก่อนหน้า
               </button>
-              {pageNumbers.map((pageNumber) => (
+              {/* {pageNumbers.map((pageNumber) => (
                 <button
                   key={pageNumber}
                   onClick={() => setCurrentPage(pageNumber)}
@@ -342,8 +342,8 @@ const ListUsers = () => {
                 >
                   {pageNumber + 1}
                 </button>
-              ))}
-              <button
+              ))} */}
+              {/* <button
                 onClick={() =>
                   setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))
                 }
@@ -355,7 +355,7 @@ const ListUsers = () => {
                 }`}
               >
                 ถัดไป
-              </button>
+              </button> */}
             </div>
             <div className="flex gap-2">
               <select

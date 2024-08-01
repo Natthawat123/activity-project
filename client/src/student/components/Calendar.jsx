@@ -15,6 +15,8 @@ function CalendarFull() {
 
   const std_ID = localStorage.getItem("std_ID");
 
+  const [reserveValue, setReservations] = useState([]);
+
   useEffect(() => {
     fetch("/api/activitys")
       .then((response) => {
@@ -54,6 +56,15 @@ function CalendarFull() {
       })
       .catch((error) => {
         console.error("เกิดข้อผิดพลาด: ", error);
+      });
+
+    axios
+      .get("/api/manage")
+      .then((response) => {
+        setReservations(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching reservations: ", error);
       });
   }, []);
 
@@ -149,7 +160,14 @@ function CalendarFull() {
   };
 
   const eventStyleGetter = (event) => {
-    const backgroundColor = event.color;
+    const isRegistered = reserveValue.some(
+      (reservation) =>
+        reservation.std_ID.toString() === std_ID.toString() &&
+        reservation.act_ID.toString() === event.id.toString()
+    );
+
+    const backgroundColor = isRegistered ? "yellow" : event.color;
+
     const style = {
       backgroundColor,
       borderRadius: "10px",
@@ -188,6 +206,10 @@ function CalendarFull() {
       />
 
       <div className="flex my-3 gap-5">
+        <div className="flex items-center">
+          <div className="me-1 bg-yellow-400 h-[18px] w-[18px] rounded-sm"></div>
+          <p className="me-2">ลงทะเบียนแล้ว</p>
+        </div>
         <div className="flex items-center">
           <div className="me-1 bg-green-600 h-[18px] w-[18px] rounded-sm"></div>
           <p className="me-2">เปิดลงทะเบียน</p>
@@ -267,26 +289,38 @@ function CalendarFull() {
 
             <p
               style={{
-                color:
-                  selectedEvent.status == 2
-                    ? "blue"
-                    : selectedEvent.numStd == selectedEvent.numStdReserve
-                    ? "red"
-                    : now >= selectedEvent.reserveStart &&
-                      now <= selectedEvent.reserveEnd
-                    ? selectedEvent.status == 1
-                      ? "green"
-                      : "red"
-                    : "gray",
+                color: reserveValue.some(
+                  (reservation) =>
+                    reservation.std_ID.toString() === std_ID.toString() &&
+                    reservation.act_ID.toString() ===
+                      selectedEvent.id.toString()
+                )
+                  ? "yellow"
+                  : selectedEvent.status === 2
+                  ? "blue"
+                  : selectedEvent.numStd === selectedEvent.numStdReserve
+                  ? "red"
+                  : now >= selectedEvent.reserveStart &&
+                    now <= selectedEvent.reserveEnd
+                  ? selectedEvent.status === 1
+                    ? "green"
+                    : "red"
+                  : "gray",
               }}
             >
-              {selectedEvent.status == 2
+              {reserveValue.some(
+                (reservation) =>
+                  reservation.std_ID.toString() === std_ID.toString() &&
+                  reservation.act_ID.toString() === selectedEvent.id.toString()
+              )
+                ? "ลงทะเบียนแล้ว"
+                : selectedEvent.status === 2
                 ? "กิจกรรมสิ้นสุดแล้ว"
-                : selectedEvent.numStd == selectedEvent.numStdReserve
+                : selectedEvent.numStd === selectedEvent.numStdReserve
                 ? "ลงทะเบียนเต็มแล้ว"
                 : now >= selectedEvent.reserveStart &&
                   now <= selectedEvent.reserveEnd
-                ? selectedEvent.status == 1
+                ? selectedEvent.status === 1
                   ? "เปิดลงทะเบียน"
                   : "ปิดลงทะเบียน"
                 : "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"}
@@ -301,7 +335,7 @@ function CalendarFull() {
                     className="btn px-2 py-1 bg-green-600 mt-4 text-center rounded-sm text-white"
                     onClick={handleReserve}
                   >
-                    จองกิจกรรม
+                    ลงทะเบียนเข้าร่วมกิจกรรม
                   </button>
                 </div>
               )}

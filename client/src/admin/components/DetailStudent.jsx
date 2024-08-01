@@ -157,6 +157,16 @@ function DetailStudent() {
             >
               Delete
             </button>
+            <button
+              className="btn btn-primary px-6 py-4 mx-3 text-white"
+              onClick={() =>
+                navigate(
+                  `/admin/dashboard/detail/student/update/${student.std_ID}`
+                )
+              }
+            >
+              แก้ไขประวัติ
+            </button>
           </div>
         </div>
       </div>
