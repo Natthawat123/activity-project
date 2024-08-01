@@ -92,7 +92,9 @@ function DetailStudent() {
       });
 
       if (result.isConfirmed) {
-        const response = await axios.delete(`/api/student/${student.login_ID}`);
+        const response = await axios.delete(
+          `/api/students/${student.login_ID}`
+        );
 
         if (response.status === 200) {
           Swal.fire({
@@ -161,7 +163,7 @@ function DetailStudent() {
               className="btn btn-primary px-6 py-4 mx-3 text-white"
               onClick={() =>
                 navigate(
-                  `/admin/dashboard/detail/student/update/${student.std_ID}`
+                  `/admin/dashboard/detail/student/update/${student.username}`
                 )
               }
             >
