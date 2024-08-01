@@ -24,8 +24,8 @@ function DetailStudent() {
   useEffect(() => {
     const fetchStudent = async () => {
       try {
-        const response = await axios.get(`/api/students/${id}`);
-        setStudent(response.data);
+        const response = await axios.get(`/api/users/${id}`);
+        setStudent(response.data[0]);
       } catch (error) {
         console.error(error);
       }
@@ -136,21 +136,41 @@ function DetailStudent() {
           </div>
           <hr className="mb-3" />
           <div className="grid grid-cols-2 gap-4">
-            <h1>รหัสนักศึกษา: {student.username}</h1>
+            {student.role == "student" && <h1>รหัสนักศึกษา: {student.ID}</h1>}
+
             <p>
-              ชื่อ-นามสกุล: {student.std_fname} {student.std_lname}
+              ชื่อ-นามสกุล: {student.fname} {student.lname}
             </p>
-            <p>
-              หมู่เรียน:
-              {student.sec_name}
-            </p>
-            <p>Email: {student.std_email}</p>
-            <p>เบอร์โทรศัพท์: {student.std_mobile}</p>
-            <p>ที่อยู่: {student.std_address}</p>
-            <p>จังหวัด: {student.province}</p>
-            <p>อำเภอ: {student.district}</p>
-            <p>ตำบล: {student.subdistrict}</p>
-            <p>รหัสไปรษณีย์: {student.zipcode}</p>
+            {student.role == "student" && (
+              <p>
+                หมู่เรียน:
+                {student.sec_name}
+              </p>
+            )}
+            {student.role == "teacher" && (
+              <p>
+                อาจารย์ประจำหมู่เรียน:
+                {student.sec_name}
+              </p>
+            )}
+            {student.role == "student" && (
+              <p>
+                หมู่เรียน:
+                {student.sec_name}
+              </p>
+            )}
+            <p>Email: {student.email}</p>
+            <p>เบอร์โทรศัพท์: {student.mobile}</p>
+
+            {student.role != "admin" && (
+              <>
+                <p>ที่อยู่: {student.address}</p>
+                <p>จังหวัด: {student.province}</p>
+                <p>อำเภอ: {student.district}</p>
+                <p>ตำบล: {student.subdistrict}</p>
+                <p>รหัสไปรษณีย์: {student.zipcode}</p>
+              </>
+            )}
           </div>
           <div className="mt-5">
             <button

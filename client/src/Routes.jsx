@@ -51,7 +51,7 @@ export function Router() {
       <Route element={<PrivateRoutes />}>
         <Route path="/admin" element={<LayoutA />}>
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="dashboard/student/:id" element={<DetailStudent />} />
+          <Route path="dashboard/user/:id" element={<DetailStudent />} />
           <Route path="calendar" element={<CalendarA />} />
           <Route path="listusers" element={<ListUsers />} />
           <Route path="activity" element={<Activity />} />

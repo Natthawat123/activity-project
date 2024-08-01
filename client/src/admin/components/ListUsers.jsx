@@ -1,22 +1,22 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import GroupIcon from "@mui/icons-material/Group";
 
 const ListUsers = () => {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [itemsPerPage, setItemsPerPage] = useState(15);
   const [currentPage, setCurrentPage] = useState(0);
   const [users, setUsers] = useState([]);
-  const [student, setStudent] = useState([]);
-  const [staff, setStaff] = useState([]);
   const [section, setSection] = useState([]);
-  const [filter, setFilter] = useState("default");
   const [sortOrder, setSortOrder] = useState("asc");
   const [selectedSection, setSelectedSection] = useState("all");
+  const index = 1;
+
+  const [filter, setFilter] = useState("all");
+  const [test, setTest] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,6 +26,7 @@ const ListUsers = () => {
           .then((res) => {
             if (res.status === 200) {
               setUsers(res.data);
+              setTest(res.data);
             } else {
               console.error(`Error: ${res.status} ${res.statusText}`);
             }
@@ -50,117 +51,19 @@ const ListUsers = () => {
   };
 
   const handleFilterChange = (event) => {
-    setFilter(event.target.value);
-    setCurrentPage(0);
+    const value = event.target.value;
+    if (value === "all") {
+      setTest(users);
+    } else {
+      const filteredUsers = users.filter((user) => user.role === value);
+      setTest(filteredUsers);
+    }
+    setFilter(value);
   };
 
   const handleSortChange = (event) => {
     setSortOrder(event.target.value);
   };
-
-  // const filteredItems = users.filter((item) => {
-  //   const studentData = student.find((std) => std.std_ID === item.username);
-  //   const staffData = staff.find((stf) => stf.login_ID === item.login_ID);
-  //   const matchesSearchTerm =
-  //     item.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //     (studentData &&
-  //       (studentData.std_fname
-  //         .toLowerCase()
-  //         .includes(searchTerm.toLowerCase()) ||
-  //         studentData.std_lname
-  //           .toLowerCase()
-  //           .includes(searchTerm.toLowerCase()) ||
-  //         studentData.sec_ID
-  //           .toString()
-  //           .toLowerCase()
-  //           .includes(searchTerm.toLowerCase()))) ||
-  //     (staffData &&
-  //       (staffData.staff_fname
-  //         .toLowerCase()
-  //         .includes(searchTerm.toLowerCase()) ||
-  //         staffData.staff_lname
-  //           .toLowerCase()
-  //           .includes(searchTerm.toLowerCase())));
-
-  //   const role = studentData ? "student" : staffData ? "teacher" : "admin";
-  //   const matchesFilter = filter === "default" || filter === role;
-  //   const sectionMatches =
-  //     selectedSection === "all" ||
-  //     (studentData && studentData.sec_ID.toString() === selectedSection);
-
-  //   return matchesSearchTerm && matchesFilter && sectionMatches;
-  // });
-
-  // const mappedUsers = filteredItems.map((item) => {
-  //   const studentData = student.find((std) => std.std_ID == item.username);
-  //   const staffData = staff.find((stf) => stf.login_ID == item.login_ID);
-  //   const sectionData = studentData
-  //     ? section.find((sec) => sec.sec_ID == studentData.sec_ID)
-  //     : null;
-
-  //   if (studentData) {
-  //     return {
-  //       ...item,
-  //       std_ID: studentData.std_ID,
-  //       std_fname: studentData.std_fname,
-  //       std_lname: studentData.std_lname,
-  //       sec_ID: studentData.sec_ID,
-  //       sec_name: sectionData ? sectionData.sec_name : "",
-  //       role: "นักศึกษา",
-  //     };
-  //   } else if (item.role == "teacher") {
-  //     return {
-  //       ...item,
-  //       std_ID: staffData.staff_ID,
-  //       std_fname: staffData.staff_fname,
-  //       std_lname: staffData.staff_lname,
-  //       sec_ID: "",
-  //       sec_name: "",
-  //       role: "อาจารย์",
-  //     };
-  //   } else if (item.role == "admin") {
-  //     return {
-  //       ...item,
-  //       std_ID: staffData.staff_ID,
-  //       std_fname: staffData.staff_fname,
-  //       std_lname: staffData.staff_lname,
-  //       sec_ID: "",
-  //       sec_name: "",
-  //       role: "ผู้ดูแลระบบ",
-  //     };
-  //   } else {
-  //     return {
-  //       ...item,
-  //       std_ID: "",
-  //       std_fname: "",
-  //       std_lname: "",
-  //       sec_ID: "",
-  //       sec_name: "",
-  //       role: "unknown",
-  //     };
-  //   }
-  // });
-
-  // const sortedUsers = mappedUsers.sort((a, b) => {
-  //   const idA = String(a.std_ID || "");
-  //   const idB = String(b.std_ID || "");
-
-  //   if (sortOrder === "asc") {
-  //     return idA.localeCompare(idB);
-  //   } else {
-  //     return idB.localeCompare(idA);
-  //   }
-  // });
-
-  // const lastPage = Math.ceil(filteredItems.length / itemsPerPage) - 1;
-  // const visibleItems = sortedUsers.slice(
-  //   currentPage * itemsPerPage,
-  //   (currentPage + 1) * itemsPerPage
-  // );
-  // const pageNumbers = [];
-  // for (let i = 0; i <= lastPage; i++) {
-  //   pageNumbers.push(i);
-  // }
 
   if (error) {
     return <div>Error: {error.message}</div>;
@@ -219,7 +122,7 @@ const ListUsers = () => {
                     onChange={handleFilterChange}
                     className="cursor-pointer text-xs block p-1 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value="default" className="text-center">
+                    <option value="all" className="text-center">
                       ทั้งหมด
                     </option>
                     <option value="admin">ผู้ดูแลระบบ</option>
@@ -274,43 +177,60 @@ const ListUsers = () => {
                 <th scope="col" className="px-6 py-3 w-1/12 text-center">
                   ลำดับ
                 </th>
-                <th scope="col" className="px-6 py-3 w-3/12 text-center">
-                  รหัสนักศึกษา
-                </th>
+                {filter == "student" && (
+                  <th scope="col" className="px-6 py-3 w-3/12 text-center">
+                    รหัสนักศึกษา
+                  </th>
+                )}
+
                 <th scope="col" className="px-6 py-3 w-4/12 text-center">
                   ชื่อ-นามสกุล
                 </th>
                 <th scope="col" className="px-6 py-3 w-2/12 text-center">
                   บทบาท
                 </th>
-                <th scope="col" className="px-6 py-3 w-2/12 text-center">
-                  หมู่เรียน
-                </th>
+                {filter == "student" && (
+                  <th scope="col" className="px-6 py-3 w-2/12 text-center">
+                    หมู่เรียน
+                  </th>
+                )}
+                {filter == "teacher" && (
+                  <th scope="col" className="px-6 py-3 w-2/12 text-center">
+                    อาจารที่ปรึกษาหมู่เรียน
+                  </th>
+                )}
+
                 <th scope="col" className="px-6 py-3 w-2/12 text-center">
                   รายละเอียด
                 </th>
               </tr>
             </thead>
             <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
-              {users.map((item, index) => (
+              {test.map((item, index) => (
                 <tr
                   key={item.login_ID}
                   className="border-b-2 flex w-full items-center"
                 >
                   <td className="px-6 py-3 w-1/12 text-center">{index + 1}</td>
-                  <td className="px-6 py-3 w-3/12 text-center">
-                    {item.role === "student" ? item.username : item.login_ID}
-                  </td>
+                  {filter == "student" && (
+                    <td className="px-6 py-3 w-3/12 text-center">
+                      {item.role === "student" ? item.username : item.login_ID}
+                    </td>
+                  )}
+
                   <td className="px-6 py-3 w-4/12">
                     {item.fname} {item.lname}
                   </td>
                   <td className="px-6 py-3 w-2/12 text-center">{item.role}</td>
-                  <td className="px-6 py-3 w-2/12 text-center">
-                    {item.sec_name}
-                  </td>
+                  {filter != "all" && (
+                    <td className="px-6 py-3 w-2/12 text-center">
+                      {item.sec_name}
+                    </td>
+                  )}
+
                   <td className="px-6 py-3 w-2/12 text-center">
                     <button className="bg-cyan-400 hover:bg-cyan-500 px-2 py-1 text-white rounded">
-                      <Link to={`student/${item.ID}`}>เรียกดู</Link>
+                      <Link to={`user/${item.ID}`}>เรียกดู</Link>
                     </button>
                   </td>
                 </tr>

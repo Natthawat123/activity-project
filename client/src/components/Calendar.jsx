@@ -24,32 +24,43 @@ function CalendarFull() {
         return response.json();
       })
       .then((data) => {
-        const eventList = data.map((item) => ({
-          start: moment(item.act_dateStart).toDate(),
-          end: moment(item.act_dateEnd).toDate(),
-          reserveStart: moment(item.act_dateStart)
-            .subtract(2, "weeks")
-            .toDate(),
-          reserveEnd: moment(item.act_dateStart).subtract(1, "day").toDate(),
-          title: item.act_title,
-          status: item.act_status,
-          location: item.act_location,
-          numStd: item.act_numStd,
-          numStdReserve: item.act_numStdReserve,
-          id: item.act_ID,
-          color:
-            item.act_status == 2
-              ? "blue"
-              : item.act_numStd == item.act_numStdReserve
-              ? "red"
-              : now >=
-                  moment(item.act_dateStart).subtract(2, "weeks").toDate() &&
-                now <= moment(item.act_dateStart).subtract(1, "day").toDate()
-              ? item.act_status == 1
-                ? "green"
-                : "red"
-              : "gray",
-        }));
+        const seenTitles = new Set(); // Create a set to track seen titles
+        const eventList = data
+          .filter((item) => {
+            // Filter out items with duplicate titles
+            if (seenTitles.has(item.act_title)) {
+              return false;
+            } else {
+              seenTitles.add(item.act_title);
+              return true;
+            }
+          })
+          .map((item) => ({
+            start: moment(item.act_dateStart).toDate(),
+            end: moment(item.act_dateEnd).toDate(),
+            reserveStart: moment(item.act_dateStart)
+              .subtract(2, "weeks")
+              .toDate(),
+            reserveEnd: moment(item.act_dateStart).subtract(1, "day").toDate(),
+            title: item.act_title,
+            status: item.act_status,
+            location: item.act_location,
+            numStd: item.act_numStd,
+            numStdReserve: item.act_numStdReserve,
+            id: item.act_ID,
+            color:
+              item.act_status === 2
+                ? "blue"
+                : item.act_numStd === item.act_numStdReserve
+                ? "red"
+                : now >=
+                    moment(item.act_dateStart).subtract(2, "weeks").toDate() &&
+                  now <= moment(item.act_dateStart).subtract(1, "day").toDate()
+                ? item.act_status === 1
+                  ? "green"
+                  : "red"
+                : "gray",
+          }));
         setEvents(eventList);
       })
       .catch((error) => {
@@ -161,12 +172,12 @@ function CalendarFull() {
               <span
                 style={{
                   color:
-                    selectedEvent.numStd == selectedEvent.numStdReserve
+                    selectedEvent.numStd === selectedEvent.numStdReserve
                       ? "red"
                       : "green",
                 }}
               >
-                {selectedEvent.numStd == selectedEvent.numStdReserve
+                {selectedEvent.numStd === selectedEvent.numStdReserve
                   ? `${selectedEvent.numStdReserve} / ${selectedEvent.numStd}`
                   : `${selectedEvent.numStdReserve} / ${selectedEvent.numStd}`}
               </span>
@@ -176,25 +187,25 @@ function CalendarFull() {
             <p
               style={{
                 color:
-                  selectedEvent.status == 2
+                  selectedEvent.status === 2
                     ? "blue"
-                    : selectedEvent.numStd == selectedEvent.numStdReserve
+                    : selectedEvent.numStd === selectedEvent.numStdReserve
                     ? "red"
                     : now >= selectedEvent.reserveStart &&
                       now <= selectedEvent.reserveEnd
-                    ? selectedEvent.status == 1
+                    ? selectedEvent.status === 1
                       ? "green"
                       : "red"
                     : "gray",
               }}
             >
-              {selectedEvent.status == 2
+              {selectedEvent.status === 2
                 ? "กิจกรรมสิ้นสุดแล้ว"
-                : selectedEvent.numStd == selectedEvent.numStdReserve
+                : selectedEvent.numStd === selectedEvent.numStdReserve
                 ? "ลงทะเบียนเต็มแล้ว"
                 : now >= selectedEvent.reserveStart &&
                   now <= selectedEvent.reserveEnd
-                ? selectedEvent.status == 1
+                ? selectedEvent.status === 1
                   ? "เปิดลงทะเบียน"
                   : "ปิดลงทะเบียน"
                 : "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"}
