@@ -263,7 +263,9 @@ WHERE
 }
 
 export const deleteActivity = (req, res) => {
-    const id = req.params.id
+    const {
+        id
+    } = req.params
     const sql = "DELETE FROM activity WHERE act_ID = ?";
 
     db.query(sql, [id], (err, result) => {

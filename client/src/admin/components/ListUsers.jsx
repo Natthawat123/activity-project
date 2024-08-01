@@ -229,9 +229,11 @@ const ListUsers = () => {
                   )}
 
                   <td className="px-6 py-3 w-2/12 text-center">
-                    <button className="bg-cyan-400 hover:bg-cyan-500 px-2 py-1 text-white rounded">
-                      <Link to={`user/${item.ID}`}>เรียกดู</Link>
-                    </button>
+                    <Link to={`user/${item.ID}`}>
+                      <button className="bg-cyan-400 hover:bg-cyan-500 px-2 py-1 text-white rounded">
+                        เรียกดู
+                      </button>
+                    </Link>
                   </td>
                 </tr>
               ))}

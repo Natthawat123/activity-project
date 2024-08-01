@@ -15,7 +15,5 @@ router.get('/upload', upload)
 router.post('/reserve', reserveActivity)
 
 router.delete('/reserve', cancelReserve)
-
-//  
 router.put('/cancelReserve', decreaseNumStd)
 export default router

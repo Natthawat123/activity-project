@@ -18,7 +18,7 @@ Router.get('/activitys/:id', readActivityOne);
 
 Router.put('/activitys/:id', updateActivity);
 
-Router.delete('/activity/:id', deleteActivity);
+Router.delete('/activitys/:id', deleteActivity);
 
 Router.put('/transection/:id', transection); // update transection
 Router.put('/updateStatus/:id', updateStatus); // update status when upload to blockchain

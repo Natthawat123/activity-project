@@ -34,20 +34,11 @@ const Upload = () => {
   const [contract, setContract] = useState(null);
   const [selectedActivity, setSelectedActivity] = useState("all");
   const [checkAllStates, setCheckAllStates] = useState({});
-  const [deleteSelectedItems, setDeleteSelectedItems] = useState([]);
-  const [deleteCheckAllStates, setDeleteCheckAllStates] = useState({});
-  const [selectedGroups, setSelectedGroups] = useState({});
 
-  const formatDate = (date) => {
-    const options = { day: "2-digit", month: "long", year: "numeric" };
-    return new Date(date).toLocaleDateString("th-TH", options);
-  };
-
-  const calculateDateDifference = (startDate, endDate) => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const timeDiff = end - start;
-    return Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+  const formatDateThai = (dateString) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    const date = new Date(dateString);
+    return date.toLocaleDateString("th-TH", options);
   };
 
   const getDateRangeInThai = useCallback((startDate, endDate) => {
@@ -226,98 +217,6 @@ const Upload = () => {
     setSearchTerm(event.target.value);
   };
 
-  const handleDeleteCheckAll = useCallback(
-    (actID) => {
-      setDeleteCheckAllStates((prev) => {
-        const newState = { ...prev, [actID]: !prev[actID] };
-        const activities = data.filter((item) => item.act_ID === actID);
-
-        setDeleteSelectedItems((prevItems) => {
-          if (newState[actID]) {
-            const newItems = activities.map((item) => ({
-              stdID: item.std_ID,
-              actID: item.act_ID,
-              act_numStd: item.act_numStd,
-            }));
-            return [...prevItems, ...newItems];
-          } else {
-            return prevItems.filter((item) => item.actID !== actID);
-          }
-        });
-
-        return newState;
-      });
-    },
-    [data]
-  );
-
-  const handleDeleteCheckboxChange = useCallback(
-    (std_ID, act_ID, act_numStd) => {
-      setDeleteSelectedItems((prev) => {
-        const existingItem = prev.find(
-          (item) => item.stdID === std_ID && item.actID === act_ID
-        );
-        if (existingItem) {
-          return prev.filter((item) => item !== existingItem);
-        } else {
-          return [...prev, { stdID: std_ID, actID: act_ID, act_numStd }];
-        }
-      });
-    },
-    []
-  );
-
-  const deleteSelectedReserves = async () => {
-    if (deleteSelectedItems.length === 0) {
-      Swal.fire({
-        icon: "warning",
-        title: "No Items Selected",
-        text: "Please select items to delete.",
-      });
-      return;
-    }
-
-    try {
-      await Promise.all(
-        deleteSelectedItems.map((item) =>
-          axios.delete(`/api/reserve/reserve/${item.stdID}/${item.actID}`)
-        )
-      );
-
-      const groupedByActivity = deleteSelectedItems.reduce((acc, item) => {
-        if (!acc[item.actID]) {
-          acc[item.actID] = { count: 0, act_numStd: item.act_numStd };
-        }
-        acc[item.actID].count++;
-        return acc;
-      }, {});
-
-      await Promise.all(
-        Object.entries(groupedByActivity).map(
-          ([actID, { count, act_numStd }]) =>
-            axios.put(`/api/reserve/numStd/${actID}`, {
-              act_numStd: act_numStd - count,
-            })
-        )
-      );
-
-      Swal.fire({
-        icon: "success",
-        title: "Deleted Successfully",
-        text: "The selected reservations have been deleted.",
-      }).then(() => {
-        window.location.reload();
-      });
-    } catch (error) {
-      console.error("Error deleting reservations:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "An error occurred while deleting reservations.",
-      });
-    }
-  };
-
   return (
     <div className="mb-10 container mx-auto md:px-20">
       <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
@@ -382,16 +281,8 @@ const Upload = () => {
               <div className="text-lg font-bold mb-2 flex items-center justify-between">
                 <span className="mr-2">ชื่อกิจกรรม: {actTitle}</span>
                 <span className="mr-2">
-                  ระยะเวลา: {formatDate(activities[0].act_dateStart)} -{" "}
-                  {formatDate(activities[0].act_dateEnd)}
-                </span>
-                <span>
-                  รวม:{" "}
-                  {calculateDateDifference(
-                    activities[0].act_dateStart,
-                    activities[0].act_dateEnd
-                  )}{" "}
-                  วัน
+                  ระยะเวลา: {formatDateThai(activities[0].act_dateStart)} -{" "}
+                  {formatDateThai(activities[0].act_dateEnd)}
                 </span>
               </div>
               <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -422,21 +313,6 @@ const Upload = () => {
                           className="mr-2"
                         />
                         <label>เลือกทั้งหมด</label>
-                      </div>
-                    </th>
-                    <th className="px-6 py-3 w-1/7">
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={
-                            deleteCheckAllStates[activities[0].act_ID] || false
-                          }
-                          onChange={() =>
-                            handleDeleteCheckAll(activities[0].act_ID)
-                          }
-                          className="mr-2"
-                        />
-                        <label>ลบ</label>
                       </div>
                     </th>
                   </tr>
@@ -479,23 +355,6 @@ const Upload = () => {
                           />
                         </td>
                       ))}
-                      <td className="px-6 py-3 w-1/7 ml-7">
-                        <input
-                          type="checkbox"
-                          checked={deleteSelectedItems.some(
-                            (si) =>
-                              si.stdID === item.std_ID &&
-                              si.actID === item.act_ID
-                          )}
-                          onChange={() =>
-                            handleDeleteCheckboxChange(
-                              item.std_ID,
-                              item.act_ID,
-                              item.act_numStd
-                            )
-                          }
-                        />
-                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -507,12 +366,6 @@ const Upload = () => {
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
         >
           Submit
-        </button>
-        <button
-          onClick={deleteSelectedReserves}
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4 ml-4"
-        >
-          Delete Selected
         </button>
       </div>
     </div>

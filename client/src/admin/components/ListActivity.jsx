@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import BuildIcon from "@mui/icons-material/Build";
-import ListAltIcon from "@mui/icons-material/ListAlt";
+import { useNavigate } from "react-router-dom";
 import moment from "moment";
+
+//mui
+import ArticleIcon from "@mui/icons-material/Article";
+import Button from "@mui/material/Button";
 
 const ListActivity = () => {
   const now = new Date();
@@ -14,6 +16,13 @@ const ListActivity = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
   const [sortOrder, setSortOrder] = useState("latest");
+  const [filter, setFilter] = useState("default");
+
+  const [join, setJoin] = useState([]);
+  const [reserve, setReserve] = useState([]);
+  const [stdID, setStdID] = useState(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch("/api/activitys")
@@ -28,20 +37,9 @@ const ListActivity = () => {
           setError(error);
         }
       );
+
+    setStdID(localStorage.getItem("stdID"));
   }, []);
-
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-    setCurrentPage(0);
-  };
-
-  const filteredItems = activity.filter((item) => {
-    return (
-      item.act_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.act_location.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
-
   const removeDuplicates = (items) => {
     const seenTitles = new Set();
     return items.filter((item) => {
@@ -50,6 +48,57 @@ const ListActivity = () => {
       return !isDuplicate;
     });
   };
+
+  const getStatus = (activityID) => {
+    // ตรวจสอบข้อมูลการเข้าร่วม
+    const joinEntry = join.find(
+      (j) => j.actID === activityID && j.stdIDs.includes(BigInt(stdID))
+    );
+    if (joinEntry) {
+      return { message: "เข้าร่วมกิจกรรมแล้ว", color: "blue" };
+    }
+
+    // ตรวจสอบข้อมูลการลงทะเบียน
+    const reserveEntry = reserve.find(
+      (r) => r.act_ID === activityID && r.std_ID === stdID
+    );
+    if (reserveEntry) {
+      return { message: "ลงทะเบียนสำเร็จ", color: "green" };
+    }
+
+    // ตรวจสอบข้อมูลกิจกรรม
+    const activityEntry = activity.find((a) => a.act_ID === activityID);
+    if (!activityEntry) {
+      return { message: "ไม่พบข้อมูล", color: "gray" };
+    }
+
+    const now = new Date();
+    const activityStartDate = new Date(activityEntry.act_dateStart);
+    const activityEndDate = new Date(activityEntry.act_dateEnd);
+
+    // ตรวจสอบช่วงเวลาการลงทะเบียน
+    if (
+      now < moment(activityStartDate).subtract(2, "weeks").toDate() ||
+      now > moment(activityStartDate).subtract(1, "day").toDate()
+    ) {
+      return { message: "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน", color: "gray" };
+    }
+
+    // หากไม่พบข้อมูลการเข้าร่วม หรือ การลงทะเบียน
+    return { message: "ยังไม่ได้ลงทะเบียน", color: "gray" };
+  };
+
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(0); // Reset current page to 0 on search
+  };
+
+  const filteredItems = activity.filter((item) => {
+    return (
+      item.act_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.act_location.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
 
   const handleSortChange = () => {
     setSortOrder((prevOrder) => (prevOrder === "latest" ? "oldest" : "latest"));
@@ -67,12 +116,28 @@ const ListActivity = () => {
     });
   };
 
-  // Helper function to format dates in Thai
   const formatDateThai = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     const date = new Date(dateString);
     return date.toLocaleDateString("th-TH", options);
   };
+
+  const handleFilterChange = (event) => {
+    setFilter(event.target.value);
+    setCurrentPage(0);
+  };
+
+  const filteredAndFilteredItems = filteredItems.filter((item) => {
+    const status = getStatus(item.act_ID);
+    return (
+      filter === "default" ||
+      (filter === "joinEntry" && status.message === "เข้าร่วมกิจกรรมแล้ว") ||
+      (filter === "reserveEntry" && status.message === "ลงทะเบียนสำเร็จ") ||
+      (filter === "notjoin" && status.message === "ยังไม่ได้ลงทะเบียน") ||
+      (filter === "notrange" &&
+        status.message === "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน")
+    );
+  });
 
   if (error) {
     return <div>Error: {error.message}</div>;
@@ -132,13 +197,37 @@ const ListActivity = () => {
               </div>
             </div>
 
-            <div className="flex pb-4 items-center">
-              <button
-                onClick={handleSortChange}
-                className="block p-1.5 text-xs border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              >
-                วันที่ ({sortOrder === "latest" ? "ใหม่สุด" : "เก่าสุด"})
-              </button>
+            <div className="flex gap-3 items-center">
+              <div className="flex pb-4 items-center">
+                <label htmlFor="filter-activity-type" className="sr-only">
+                  Filter
+                </label>
+                <div className="relative">
+                  <select
+                    value={filter}
+                    onChange={handleFilterChange}
+                    className="text-xs block p-1.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  >
+                    <option value="default" className="text-center">
+                      ทั้งหมด
+                    </option>
+                    <option value="joinEntry">เข้าร่วมกิจกรรมแล้ว</option>
+                    <option value="reserveEntry">ลงทะเบียนสำเร็จ</option>
+                    <option value="notjoin">ยังไม่ได้ลงทะเบียน</option>
+                    <option value="notrange">
+                      ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex pb-4 items-center">
+                <button
+                  onClick={handleSortChange}
+                  className="block p-1.5 text-xs border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                >
+                  วันที่ ({sortOrder === "latest" ? "ใหม่สุด" : "เก่าสุด"})
+                </button>
+              </div>
             </div>
           </div>
 
@@ -148,31 +237,40 @@ const ListActivity = () => {
                 <th scope="col" className="px-6 py-3 w-1/12 text-center">
                   ลำดับ
                 </th>
-                <th scope="col" className="px-6 py-3 w-4/12 text-center">
+                <th scope="col" className="px-6 py-3 w-3/12 text-center">
                   ชื่อกิจกรรม
                 </th>
-                <th scope="col" className="px-6 py-3 w-3/12 text-center">
-                  วัน
+                <th scope="col" className="px-6 py-3 w-4/12 text-center">
+                  ระยะเวลา
                 </th>
                 <th scope="col" className="px-6 py-3 w-2/12 text-center">
                   สถานะ
                 </th>
                 <th scope="col" className="px-6 py-3 w-2/12 text-center">
-                  เพิ่มเติม
+                  รายละเอียด
                 </th>
               </tr>
             </thead>
             <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
-              {visibleItems.map((item, index) => {
-                return (
+              {visibleItems.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan="5"
+                    className="px-6 py-3 text-center text-gray-500"
+                  >
+                    ไม่พบข้อมูล
+                  </td>
+                </tr>
+              ) : (
+                visibleItems.map((item, index) => (
                   <tr key={item.act_ID} className="border-b-2 flex w-full">
                     <td scope="col" className="px-6 py-3 w-1/12 text-center">
                       {currentPage * itemsPerPage + index + 1}
                     </td>
-                    <td scope="col" className="px-6 py-3 w-4/12 text-center">
+                    <td scope="col" className="px-6 py-3 w-3/12 text-start">
                       {item.act_title}
                     </td>
-                    <td scope="col" className="px-6 py-3 w-3/12 text-center">
+                    <td scope="col" className="px-6 py-3 w-4/12 text-center">
                       {formatDateThai(item.act_dateStart)} -{" "}
                       {formatDateThai(item.act_dateEnd)}
                     </td>
@@ -196,7 +294,7 @@ const ListActivity = () => {
                             ? item.act_status === 1
                               ? "green"
                               : "red"
-                            : "grey",
+                            : "gray",
                       }}
                     >
                       {item.act_status === 2
@@ -212,63 +310,83 @@ const ListActivity = () => {
                               .subtract(1, "day")
                               .toDate()
                         ? item.act_status === 1
-                          ? "ลงทะเบียนได้"
-                          : "กิจกรรมจะเริ่มในอีก 1 วัน"
-                        : "กิจกรรมยังไม่เริ่ม"}
+                          ? "เปิดลงทะเบียน"
+                          : "ปิดลงทะเบียน"
+                        : "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"}
                     </td>
-                    <td scope="col" className="px-6 py-3 w-2/12 text-center">
-                      <Link
-                        to={`detail/${item.act_ID}`}
-                        className="flex items-center justify-center"
+
+                    <td
+                      scope="col"
+                      className="px-6 cursor-pointer py-3 w-2/12 text-center hover:text-green-500 text-teal-700"
+                    >
+                      <Button
+                        onClick={() => navigate(`detail/${item.act_ID}`)}
+                        variant="outlined"
+                        startIcon={<ArticleIcon />}
                       >
-                        <BuildIcon />
-                        <ListAltIcon />
-                      </Link>
+                        เพิ่มเติม
+                      </Button>
                     </td>
                   </tr>
-                );
-              })}
+                ))
+              )}
             </tbody>
           </table>
 
-          <nav className="flex justify-center mt-4">
-            <ul className="inline-flex -space-x-px">
-              <li>
+          <div className="flex justify-between mt-2">
+            <div className="flex gap-2 w-24"></div>
+            <div className="flex gap-2">
+              <button
+                onClick={() =>
+                  setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))
+                }
+                disabled={currentPage === 0}
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                  currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
+                }`}
+              >
+                ก่อนหน้า
+              </button>
+              {pageNumbers.map((pageNumber) => (
                 <button
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 0))
-                  }
-                  className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100"
+                  key={pageNumber}
+                  onClick={() => setCurrentPage(pageNumber)}
+                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                    pageNumber === currentPage ? "bg-blue-200" : ""
+                  }`}
                 >
-                  Prev
+                  {pageNumber + 1}
                 </button>
-              </li>
-              {pageNumbers.map((number) => (
-                <li key={number}>
-                  <button
-                    onClick={() => setCurrentPage(number)}
-                    className={`px-3 py-2 text-sm font-medium ${
-                      number === currentPage
-                        ? "bg-blue-500 text-white"
-                        : "bg-white text-gray-500"
-                    } border border-gray-300 hover:bg-gray-100`}
-                  >
-                    {number + 1}
-                  </button>
-                </li>
               ))}
-              <li>
-                <button
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, lastPage))
-                  }
-                  className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100"
-                >
-                  Next
-                </button>
-              </li>
-            </ul>
-          </nav>
+              <button
+                onClick={() =>
+                  setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))
+                }
+                disabled={currentPage === lastPage}
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                  currentPage === lastPage
+                    ? "cursor-not-allowed"
+                    : "hover:bg-blue-200"
+                }`}
+              >
+                ถัดไป
+              </button>
+            </div>
+            <div className="flex gap-2">
+              <select
+                value={itemsPerPage}
+                onChange={(e) => {
+                  setItemsPerPage(+e.target.value);
+                  setCurrentPage(0);
+                }}
+                className="px-3 p-1.5 cursor-pointer text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
     );
