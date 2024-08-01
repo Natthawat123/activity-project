@@ -16,7 +16,7 @@ function CalendarFull() {
   const now = new Date();
 
   useEffect(() => {
-    fetch("/api/list/activity")
+    fetch("/api/activitys")
       .then((response) => {
         if (!response.ok) {
           throw new Error("เกิดข้อผิดพลาดในการดึงข้อมูล");

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Popup from './Popup_addAc';
+import Popup from "./Popup_addAc";
 
 // import Popup from './Popup_addUser';
 
@@ -11,7 +11,7 @@ function Dash_users() {
   //   const [countVolunteer, setCountVolunteer] = useState(0);
 
   useEffect(() => {
-    fetch("/api/list/activity")
+    fetch("/api/activitys")
       .then((res) => res.json())
       .then(
         (result) => {
@@ -33,8 +33,8 @@ function Dash_users() {
       <div>
         {isLoaded ? (
           <div>
-          <div className='flex justify-between items-center'>
-              <h2 className='text-xl font-bold'>การจัดการกิจกรรม</h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold">การจัดการกิจกรรม</h2>
               <Popup />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4  pt-3">

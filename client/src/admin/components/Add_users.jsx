@@ -25,6 +25,10 @@ const Add_Users = ({ closeModal }) => {
       username: data.get("username"),
       password: data.get("password"),
       role: data.get("role"),
+      fname: data.get("firstName"),
+      lname: data.get("lastName"),
+      email: data.get("email"),
+      mobile: data.get("phoneNumber"),
     };
 
     try {
@@ -46,8 +50,9 @@ const Add_Users = ({ closeModal }) => {
           std_fname: data.get("firstName") || "กรุณาเปลี่ยนชื่อของคุณ",
           std_lname: data.get("lastName") || "กรุณาเปลี่ยนนามสกุลของคุณ",
           sec_ID: 1,
-          std_email: data.get('email') || `${data.get("username")}@webmail.npru.ac.th`,
-          std_mobile: data.get('phoneNumber') || null,
+          std_email:
+            data.get("email") || `${data.get("username")}@webmail.npru.ac.th`,
+          std_mobile: data.get("phoneNumber") || null,
           std_address: null,
           province: null,
           district: null,
@@ -69,10 +74,22 @@ const Add_Users = ({ closeModal }) => {
       } else if (jsonData.role === "teacher" || jsonData.role === "admin") {
         const additionalData = {
           login_ID: loginID,
-          staff_fname: jsonData.role === "admin" ? "admin" : (data.get("firstName") || "กรุณาเปลี่ยนชื่อของคุณ") ,
-          staff_lname: jsonData.role === "admin" ? null : (data.get("lastName") || "กรุณาเปลี่ยนนามสกุลของคุณ"),
-          staff_email: jsonData.role ===  data.get('email') || `${data.get("username")}${jsonData.role === "admin" ? "@ITinfo.npru.ac.th" : "@webmail.npru.ac.th"}`,
-          staff_mobile: data.get('phoneNumber') || null,
+          staff_fname:
+            jsonData.role === "admin"
+              ? "admin"
+              : data.get("firstName") || "กรุณาเปลี่ยนชื่อของคุณ",
+          staff_lname:
+            jsonData.role === "admin"
+              ? null
+              : data.get("lastName") || "กรุณาเปลี่ยนนามสกุลของคุณ",
+          staff_email:
+            jsonData.role === data.get("email") ||
+            `${data.get("username")}${
+              jsonData.role === "admin"
+                ? "@ITinfo.npru.ac.th"
+                : "@webmail.npru.ac.th"
+            }`,
+          staff_mobile: data.get("phoneNumber") || null,
           staff_address: null,
           province: null,
           district: null,
@@ -153,37 +170,43 @@ const Add_Users = ({ closeModal }) => {
 
     return (
       <>
-        <input type="file" onChange={handleFileChange} className="mt-1 p-1 w-full border-b-2 rounded-md" />
+        <input
+          type="file"
+          onChange={handleFileChange}
+          className="mt-1 p-1 w-full border-b-2 rounded-md"
+        />
       </>
     );
   };
 
   const handleFileLoad = async (csvData) => {
     try {
-  
       const jsonData = csvData.map((item) => ({
         username: item.username,
         password: `${item.password}`,
         role: item.role,
       }));
-  
-      const registerResponse = await axios.post("/api/auth/arrayregister", jsonData);
+
+      const registerResponse = await axios.post(
+        "/api/auth/arrayregister",
+        jsonData
+      );
       const registerData = registerResponse.data;
-  
+
       if (registerData.some((response) => response.status !== "ok")) {
         throw new Error("Failed to register some users");
       }
-  
+
       const studentsData = [];
       const staffsData = [];
-  
+
       jsonData.forEach((user, index) => {
         if (user.role === "student") {
           const registerUser = registerData[index];
           if (!registerUser || !registerUser.login_ID) {
             throw new Error(`Missing login_ID for user ${user.username}`);
           }
-  
+
           const loginID = registerUser.login_ID;
           studentsData.push({
             std_ID: user.username,
@@ -199,8 +222,7 @@ const Add_Users = ({ closeModal }) => {
             subdistrict: null,
             zipcode: null,
           });
-
-        }else {
+        } else {
           const registerUser = registerData[index];
           if (!registerUser || !registerUser.login_ID) {
             throw new Error(`Missing login_ID for user ${user.username}`);
@@ -210,7 +232,8 @@ const Add_Users = ({ closeModal }) => {
           staffsData.push({
             login_ID: loginID,
             staff_fname: csvData[index].std_fname || "กรุณาเปลี่ยนชื่อของคุณ",
-            staff_lname: csvData[index].std_lname || "กรุณาเปลี่ยนนามสกุลของคุณ",
+            staff_lname:
+              csvData[index].std_lname || "กรุณาเปลี่ยนนามสกุลของคุณ",
             staff_email: csvData[index].email,
             staff_mobile: csvData[index].phone || null,
             staff_address: null,
@@ -218,38 +241,44 @@ const Add_Users = ({ closeModal }) => {
             district: null,
             subdistrict: null,
             ipcode: null,
-          }) 
+          });
         }
       });
 
-      const createStudentResponse = await axios.post('/api/create/students', studentsData);
+      const createStudentResponse = await axios.post(
+        "/api/create/students",
+        studentsData
+      );
       const createStudentData = createStudentResponse.data;
-  
-      if (createStudentData.status !== 'ok') {
+
+      if (createStudentData.status !== "ok") {
         throw new Error("Unexpected response format from /api/create/students");
       }
 
-      const createStaffResponse = await axios.post('/api/create/staffs', staffsData);
+      const createStaffResponse = await axios.post(
+        "/api/create/staffs",
+        staffsData
+      );
       const createStaffData = createStaffResponse.data;
-  
-      if (createStaffData.status !== 'ok') {
+
+      if (createStaffData.status !== "ok") {
         throw new Error("Unexpected response format from /api/create/staffs");
       }
-  
+
       Swal.fire({
         icon: "success",
         title: "เพิ่มผู้ใช้สำเร็จ!",
         showConfirmButton: false,
         timer: 1500,
       });
-  
+
       closeModal();
       setTimeout(() => {
         window.location.reload(); // Refresh the screen
       }, 2000);
     } catch (error) {
       console.error("Error:", error);
-  
+
       Swal.fire({
         icon: "error",
         title: "เกิดข้อผิดพลาด!",
@@ -258,9 +287,6 @@ const Add_Users = ({ closeModal }) => {
       closeModal();
     }
   };
-  
-  
-
 
   return (
     <div className="flex justify-center items-center bg-gray-100 rounded-lg">
@@ -397,7 +423,7 @@ const Add_Users = ({ closeModal }) => {
                   />
                 </div>
               </>
-            ) :null}
+            ) : null}
             <div className="col-span-2 text-right">
               <button
                 type="submit"

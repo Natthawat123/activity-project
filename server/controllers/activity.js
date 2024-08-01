@@ -16,8 +16,6 @@ export const manage = (req, res) => {
         return res.json(result);
     })
 }
-
-// delete
 export const reserve = (req, res) => {
     const {
         act_ID,
@@ -38,11 +36,45 @@ export const reserve = (req, res) => {
     });
 };
 
+//create
+export const createActivity = (req, res) => {
+    const q =
+        "INSERT INTO activity(`act_title`, `act_desc`, `act_dateStart`, `act_dateEnd`, `act_numStd`, `act_location`, `staff_ID`, `act_status`, `act_createAt`) VALUES (?, ?, ?, ?, ?, ?, ?, 1 , ?)";
+    const {
+        act_title,
+        act_desc,
+        act_dateStart,
+        act_dateEnd,
+        act_numstd,
+        act_location,
+        staff_ID,
+    } = req.body;
+
+    db.query(
+        q,
+        [
+            act_title,
+            act_desc,
+            act_dateStart,
+            act_dateEnd,
+            act_numstd,
+            act_location,
+            staff_ID,
+            1,
+            new Date(),
+        ],
+        (err, result) => {
+            if (err) return res.status(500).json(err);
+            return res.json(result);
+        }
+    );
+};
+
 // update
-export const update = (req, res) => {
+export const updateActivity = (req, res) => {
     const {
         id
-    } = req.params; // Extract act_ID from query parameters
+    } = req.params;
     const {
         act_title,
         act_desc,
@@ -53,19 +85,20 @@ export const update = (req, res) => {
         staff_ID,
         act_status,
         act_transaction
-    } = req.body; // Extract other fields from request body
+    } = req.body;
 
-    const sql = `UPDATE activity SET
-        act_title = ?,
-        act_desc = ?,
-        act_dateStart = ?,
-        act_dateEnd = ?,
-        act_numStd = ?,
-        act_location = ?,
-        staff_ID = ?,
-        act_status = ?,
-        act_transaction = ?
-        WHERE act_ID = ?`; // Correct SQL query with placeholders
+    const sql = `
+        UPDATE activity SET
+            act_title = ?,
+            act_desc = ?,
+            act_dateStart = ?,
+            act_dateEnd = ?,
+            act_numStd = ?,
+            act_location = ?,
+            staff_ID = ?,
+            act_status = ?,
+            act_transaction = ?
+        WHERE act_ID = ?`
 
     db.query(sql, [
         act_title,
@@ -90,21 +123,21 @@ export const update = (req, res) => {
         });
     });
 };
+
+//transection
 export const transection = (req, res) => {
     const {
         id
-    } = req.params; // Extract act_ID from query parameters
+    } = req.params;
     const {
         act_transaction
-    } = req.body; // Extract other fields from request body
+    } = req.body;
 
     const sql = `UPDATE activity SET
-       
         act_transaction = ?
         WHERE act_ID = ?`;
 
     db.query(sql, [
-
         act_transaction,
         id
     ], (err, result) => {
@@ -120,10 +153,43 @@ export const transection = (req, res) => {
     });
 };
 
-
 // getAll
-export const get = (req, res) => {
-    const sql = "select * from activity"
+export const readActivity = (req, res) => {
+    const sql = `
+        SELECT 
+  a.act_ID,
+  a.act_title,
+  a.act_desc,
+  a.act_dateStart,
+  a.act_dateEnd,
+  a.act_numStd,
+  a.act_numStdReserve,
+  a.act_location,
+  a.staff_ID,
+  a.act_status,
+  a.act_createAt,
+  a.act_transaction,
+  t.staff_fname,
+  t.staff_lname,
+  t.staff_email,
+  t.staff_mobile,
+  t.staff_address,
+  st.login_ID,
+  st.std_fname,
+  st.std_lname,
+  st.std_email,
+  st.std_mobile,
+  st.std_address,
+  st.province,
+  st.district,
+  st.subdistrict,
+  st.zipcode
+FROM 
+  activity a
+  LEFT JOIN teacher t ON t.login_ID = a.staff_ID
+  LEFT JOIN manage m ON m.act_ID = a.act_ID
+  LEFT JOIN student st ON st.login_ID = m.std_ID
+`
     db.query(sql, (err, result) => {
         if (err) {
             return res.status(500).json({
@@ -140,9 +206,47 @@ export const get = (req, res) => {
 }
 
 // get one
-export const getOne = (req, res) => {
+export const readActivityOne = (req, res) => {
     const id = req.params.id;
-    const sql = "select * from activity where act_ID = ?"
+    const sql = `
+        SELECT 
+  a.act_ID,
+  a.act_title,
+  a.act_desc,
+  a.act_dateStart,
+  a.act_dateEnd,
+  a.act_numStd,
+  a.act_numStdReserve,
+  a.act_location,
+  a.staff_ID,
+  a.act_status,
+  a.act_createAt,
+  a.act_transaction,
+  t.staff_fname,
+  t.staff_lname,
+  t.staff_email,
+  t.staff_mobile,
+  t.staff_address,
+  st.login_ID,
+  st.std_fname,
+  st.std_lname,
+  st.std_email,
+  st.std_mobile,
+  st.std_address,
+  st.province,
+  st.district,
+  st.subdistrict,
+  st.zipcode
+FROM 
+  activity a
+  LEFT JOIN teacher t ON t.login_ID = a.staff_ID
+  LEFT JOIN manage m ON m.act_ID = a.act_ID
+  LEFT JOIN student st ON st.login_ID = m.std_ID
+WHERE 
+  a.act_ID = ?;
+
+
+`
     db.query(sql, [id], (err, result) => {
         if (err) {
             return res.status(500).json({

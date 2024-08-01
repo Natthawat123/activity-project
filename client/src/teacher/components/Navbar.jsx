@@ -2,29 +2,25 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../../images/IT_logo_Standard.png";
 import Logout from "../../components/Logout";
-import axios from 'axios';
-import PersonPinIcon from '@mui/icons-material/PersonPin';
+import axios from "axios";
+import PersonPinIcon from "@mui/icons-material/PersonPin";
 
 const NavBar = () => {
-
-  const ID = localStorage.getItem('staff_ID');
-  const [username, setUsername] = useState('');
-
+  const id = localStorage.getItem("staff_ID");
+  const [username, setUsername] = useState([]);
 
   useEffect(() => {
     const fetchUsername = async () => {
       try {
-        const response = await axios.get(`/api/resume/staff?id=${ID}`);
-        setUsername(`${response.data.staff_fname} ${response.data.staff_lname}`);
+        const response = await axios.get(`/api/teachers/${id}`);
+        setUsername(response.data[0]);
       } catch (error) {
-        console.error('Error fetching the username:', error);
+        console.error("Error fetching the username:", error);
       }
     };
 
-    if (ID) {
-      fetchUsername();
-    }
-  }, [ID]);
+    fetchUsername();
+  }, [id]);
 
   const [selectedItem, setSelectedItem] = useState("ปฏิทินกิจกรรม");
   const [isListVisible, setListVisible] = useState(false);
@@ -44,12 +40,6 @@ const NavBar = () => {
         ? "bg-indigo-600 text-white"
         : "bg-gray-50 text-gray-600 border border-white"
     }`;
-  // const getItemLogout = (itemName) =>
-  //   `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 text-grey-600 border border-white bg-grey-500 cursor-pointer px-3 py-2.5 font-normal text-xs leading-3 shadow-md rounded ${
-  //     selectedItem === itemName
-  //       ? "bg-red-600 text-white"
-  //       : "bg-gray-50 text-gray-600 border border-white"
-  //   }`;
 
   const getItemClassXs = () =>
     `px-4 py-3 text-gray-600 bg-gray-50 border border-gray-50 focus:outline-none focus:bg-gray-100 hover:bg-gray-100 duration-100 cursor-pointer text-xs leading-3 font-normal`;
@@ -109,11 +99,13 @@ const NavBar = () => {
 
             {/* Add similar li elements for other menu items */}
           </ul>
-          <div className='flex items-center gap-5'>
-            <p className='md:flex items-center'><PersonPinIcon className='mx-2 text-blue-500'/>{username}</p>
-            <Logout className='block md:hidden' />
+          <div className="flex items-center gap-5">
+            <p className="md:flex items-center">
+              <PersonPinIcon className="mx-2 text-blue-500" />
+              {username.staff_fname + " " + username.staff_lname}
+            </p>
+            <Logout className="block md:hidden" />
           </div>
-
         </nav>
 
         <div className="relative block md:hidden w-full mt-5 ">

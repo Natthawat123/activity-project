@@ -1,10 +1,9 @@
 import express from 'express'
 import {
-    manage,
-    reserve,
-    update,
-    get,
-    getOne,
+    createActivity,
+    updateActivity,
+    readActivity,
+    readActivityOne,
     deleteActivity,
     updateStatus,
     transection
@@ -12,12 +11,15 @@ import {
 
 const Router = express.Router()
 
-Router.get('/manage', manage)
-Router.delete('/reserve/:act_ID', reserve)
-Router.put('/activity/:id', update);
-Router.put('/transection/:id', transection);
-Router.get('/activity', get);
-Router.get('/activity/:id', getOne);
+Router.post('/activitys/', createActivity);
+
+Router.get('/activitys', readActivity);
+Router.get('/activitys/:id', readActivityOne);
+
+Router.put('/activitys/:id', updateActivity);
+
 Router.delete('/activity/:id', deleteActivity);
-Router.put('/updateStatus/:id', updateStatus);
+
+Router.put('/transection/:id', transection); // update transection
+Router.put('/updateStatus/:id', updateStatus); // update status when upload to blockchain
 export default Router

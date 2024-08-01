@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import GroupIcon from '@mui/icons-material/Group';
+import GroupIcon from "@mui/icons-material/Group";
 
 const ListUsers = () => {
   const [error, setError] = useState(null);
@@ -10,7 +10,7 @@ const ListUsers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [itemsPerPage, setItemsPerPage] = useState(15);
   const [currentPage, setCurrentPage] = useState(0);
-  const [login, setLogin] = useState([]);
+  const [users, setUsers] = useState([]);
   const [student, setStudent] = useState([]);
   const [staff, setStaff] = useState([]);
   const [section, setSection] = useState([]);
@@ -21,19 +21,21 @@ const ListUsers = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [loginRes, studentRes, staffRes, sectionRes] = await Promise.all([
-          axios.get("/api/list/login"),
-          axios.get("/api/list/student"),
-          axios.get("/api/list/staff"),
-          axios.get("/api/list/section"),
-        ]);
-        setLogin(loginRes.data);
-        setStudent(studentRes.data);
-        setStaff(staffRes.data);
-        setSection(sectionRes.data);
+        axios
+          .get("/api/users")
+          .then((res) => {
+            if (res.status === 200) {
+              setUsers(res.data);
+            } else {
+              console.error(`Error: ${res.status} ${res.statusText}`);
+            }
+          })
+          .catch((err) => {
+            console.error(`Error: ${err.message}`);
+          });
+
         setIsLoaded(true);
       } catch (error) {
-        console.error("Error fetching data:", error);
         setIsLoaded(false);
         setError(error);
       }
@@ -56,7 +58,7 @@ const ListUsers = () => {
     setSortOrder(event.target.value);
   };
 
-  const filteredItems = login.filter((item) => {
+  const filteredItems = users.filter((item) => {
     const studentData = student.find((std) => std.std_ID === item.username);
     const staffData = staff.find((stf) => stf.login_ID === item.login_ID);
     const matchesSearchTerm =
@@ -79,20 +81,22 @@ const ListUsers = () => {
           staffData.staff_lname
             .toLowerCase()
             .includes(searchTerm.toLowerCase())));
-  
-    const role = studentData ? "student" : (staffData ? "teacher" : "admin");
+
+    const role = studentData ? "student" : staffData ? "teacher" : "admin";
     const matchesFilter = filter === "default" || filter === role;
-    const sectionMatches = selectedSection === "all" || 
+    const sectionMatches =
+      selectedSection === "all" ||
       (studentData && studentData.sec_ID.toString() === selectedSection);
-  
+
     return matchesSearchTerm && matchesFilter && sectionMatches;
   });
-  
 
   const mappedUsers = filteredItems.map((item) => {
     const studentData = student.find((std) => std.std_ID == item.username);
     const staffData = staff.find((stf) => stf.login_ID == item.login_ID);
-    const sectionData = studentData ? section.find((sec) => sec.sec_ID == studentData.sec_ID) : null;
+    const sectionData = studentData
+      ? section.find((sec) => sec.sec_ID == studentData.sec_ID)
+      : null;
 
     if (studentData) {
       return {
@@ -137,10 +141,9 @@ const ListUsers = () => {
     }
   });
 
-  // Sorting logic
   const sortedUsers = mappedUsers.sort((a, b) => {
-    const idA = String(a.std_ID || ""); // Convert to string if std_ID is undefined or null
-    const idB = String(b.std_ID || ""); // Convert to string if std_ID is undefined or null
+    const idA = String(a.std_ID || "");
+    const idB = String(b.std_ID || "");
 
     if (sortOrder === "asc") {
       return idA.localeCompare(idB);
@@ -148,7 +151,6 @@ const ListUsers = () => {
       return idB.localeCompare(idA);
     }
   });
-
 
   const lastPage = Math.ceil(filteredItems.length / itemsPerPage) - 1;
   const visibleItems = sortedUsers.slice(
@@ -208,14 +210,18 @@ const ListUsers = () => {
 
             <div className="flex pb-4 items-center gap-2 ">
               <div className="items-center justify-center text-center">
-                <label htmlFor="filter-activity-type" className="text-xs">เรียงตามบทบาท</label>
+                <label htmlFor="filter-activity-type" className="text-xs">
+                  เรียงตามบทบาท
+                </label>
                 <div className="relative  justify-center flex">
                   <select
                     value={filter}
                     onChange={handleFilterChange}
                     className="cursor-pointer text-xs block p-1 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value="default" className="text-center">ทั้งหมด</option>
+                    <option value="default" className="text-center">
+                      ทั้งหมด
+                    </option>
                     <option value="admin">ผู้ดูแลระบบ</option>
                     <option value="teacher">อาจารย์</option>
                     <option value="student">นักศึกษา</option>
@@ -224,62 +230,87 @@ const ListUsers = () => {
               </div>
 
               <div className="items-center justify-center">
-                <label htmlFor="sort-order" className="text-xs">เรียงตามรหัสนศ.</label>
+                <label htmlFor="sort-order" className="text-xs">
+                  เรียงตามรหัสนศ.
+                </label>
                 <div className="relative justify-center flex">
                   <select
                     value={sortOrder}
                     onChange={handleSortChange}
                     className="text-xs block p-1 cursor-pointer border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value="asc" >น้อยไปมาก</option>
+                    <option value="asc">น้อยไปมาก</option>
                     <option value="desc">มากไปน้อย</option>
                   </select>
                 </div>
               </div>
 
               <div className="items-center justify-center text-center">
-              <label htmlFor="filter-section" className="text-xs">เรียงตามหมู่เรียน</label>
-              <div className="relative justify-center flex">
-                <select
-                  id="filter-section"
-                  value={selectedSection}
-                  onChange={(e) => setSelectedSection(e.target.value)}
-                  className="text-xs cursor-pointer block p-1 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                >
-                  <option value="all">ทั้งหมด</option>
-                  {section.map((sec) => (
-                    <option key={sec.sec_ID} value={sec.sec_ID}>
-                      {sec.sec_name}
-                    </option>
-                  ))}
-                </select>
+                <label htmlFor="filter-section" className="text-xs">
+                  เรียงตามหมู่เรียน
+                </label>
+                <div className="relative justify-center flex">
+                  <select
+                    id="filter-section"
+                    value={selectedSection}
+                    onChange={(e) => setSelectedSection(e.target.value)}
+                    className="text-xs cursor-pointer block p-1 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  >
+                    <option value="all">ทั้งหมด</option>
+                    {section.map((sec) => (
+                      <option key={sec.sec_ID} value={sec.sec_ID}>
+                        {sec.sec_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-            </div>
             </div>
           </div>
 
           <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
               <tr className="flex w-full">
-                <th scope="col" className="px-6 py-3 w-1/12 text-center">ลำดับ</th>
-                <th scope="col" className="px-6 py-3 w-3/12 text-center">รหัสนักศึกษา</th>
-                <th scope="col" className="px-6 py-3 w-4/12 text-center">ชื่อ-นามสกุล</th>
-                <th scope="col" className="px-6 py-3 w-2/12 text-center">บทบาท</th>
-                <th scope="col" className="px-6 py-3 w-2/12 text-center">หมู่เรียน</th> 
-                <th scope="col" className="px-6 py-3 w-2/12 text-center">รายละเอียด</th>
+                <th scope="col" className="px-6 py-3 w-1/12 text-center">
+                  ลำดับ
+                </th>
+                <th scope="col" className="px-6 py-3 w-3/12 text-center">
+                  รหัสนักศึกษา
+                </th>
+                <th scope="col" className="px-6 py-3 w-4/12 text-center">
+                  ชื่อ-นามสกุล
+                </th>
+                <th scope="col" className="px-6 py-3 w-2/12 text-center">
+                  บทบาท
+                </th>
+                <th scope="col" className="px-6 py-3 w-2/12 text-center">
+                  หมู่เรียน
+                </th>
+                <th scope="col" className="px-6 py-3 w-2/12 text-center">
+                  รายละเอียด
+                </th>
               </tr>
             </thead>
             <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
-              {visibleItems.map((item, index) => (
-                <tr key={item.std_ID} className="border-b-2 flex w-full items-center">
+              {users.map((item, index) => (
+                <tr
+                  key={item.login_ID}
+                  className="border-b-2 flex w-full items-center"
+                >
                   <td className="px-6 py-3 w-1/12 text-center">{index + 1}</td>
-                  <td className="px-6 py-3 w-3/12 text-center">{item.std_ID}</td>
-                  <td className="px-6 py-3 w-4/12">{item.std_fname} {item.std_lname}</td>
+                  <td className="px-6 py-3 w-3/12 text-center">
+                    {item.role === "student" ? item.username : item.login_ID}
+                  </td>
+                  <td className="px-6 py-3 w-4/12">
+                    {item.fname} {item.lname}
+                  </td>
                   <td className="px-6 py-3 w-2/12 text-center">{item.role}</td>
-                  <td className="px-6 py-3 w-2/12 text-center">{item.sec_name}</td> 
+                  <td className="px-6 py-3 w-2/12 text-center">
+                    {item.sec_name}
+                  </td>
                   <td className="px-6 py-3 w-2/12 text-center">
                     <button className="bg-cyan-400 hover:bg-cyan-500 px-2 py-1 text-white rounded">
-                      <a onClick={() => navigate(`detail/student/${item.std_ID}`)}>เรียกดู</a>
+                      <Link to={`student/${item.ID}`}>เรียกดู</Link>
                     </button>
                   </td>
                 </tr>
@@ -291,10 +322,13 @@ const ListUsers = () => {
             <div className="flex gap-2 w-24"></div>
             <div className="flex gap-2">
               <button
-                onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
+                onClick={() =>
+                  setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))
+                }
                 disabled={currentPage === 0}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
-                  }`}
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                  currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
+                }`}
               >
                 ก่อนหน้า
               </button>
@@ -302,17 +336,23 @@ const ListUsers = () => {
                 <button
                   key={pageNumber}
                   onClick={() => setCurrentPage(pageNumber)}
-                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${pageNumber === currentPage ? "bg-blue-200" : ""
-                    }`}
+                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                    pageNumber === currentPage ? "bg-blue-200" : ""
+                  }`}
                 >
                   {pageNumber + 1}
                 </button>
               ))}
               <button
-                onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))}
+                onClick={() =>
+                  setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))
+                }
                 disabled={currentPage === lastPage}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === lastPage ? "cursor-not-allowed" : "hover:bg-blue-200"
-                  }`}
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                  currentPage === lastPage
+                    ? "cursor-not-allowed"
+                    : "hover:bg-blue-200"
+                }`}
               >
                 ถัดไป
               </button>

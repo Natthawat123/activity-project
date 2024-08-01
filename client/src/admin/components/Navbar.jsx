@@ -1,4 +1,4 @@
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../../images/IT_logo_Standard.png";
 import Logout from "../../components/Logout";
@@ -12,10 +12,8 @@ const NavBar = () => {
   useEffect(() => {
     const fetchUsername = async () => {
       try {
-        const response = await axios.get(`/api/resume/staff?id=${ID}`);
-        setUsername(
-          `${response.data.staff_fname} ${response.data.staff_lname}`
-        );
+        const response = await axios.get(`/api/admins/${ID}`);
+        setUsername(response.data);
       } catch (error) {
         console.error("Error fetching the username:", error);
       }
@@ -103,9 +101,12 @@ const NavBar = () => {
 
             {/* Add similar li elements for other menu items */}
           </ul>
-          <div className='flex items-center gap-5'>
-            <p className='md:flex items-center'><PersonPinIcon className='mx-2 text-blue-500'/>{username}</p>
-            <Logout className='block md:hidden' />
+          <div className="flex items-center gap-5">
+            <p className="md:flex items-center">
+              <PersonPinIcon className="mx-2 text-blue-500" />
+              {username.fname}
+            </p>
+            <Logout className="block md:hidden" />
           </div>
 
           {/* <button onClick={handleLogout} className={getItemLogout}>ออกจากระบบ</button> */}
