@@ -98,7 +98,7 @@ function DetailActivity() {
 
   return (
     <div>
-      <div className="container m-10 mx-auto md:px-20">
+      <div className="container m-10 mx-auto md:px-20 pt-20">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
           <div className="flex justify-between">
             <h1 className="text-lg font-bold mb-2">รายละเอียดกิจกรรม</h1>
