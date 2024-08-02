@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import BuildIcon from "@mui/icons-material/Build";
-import ListAltIcon from "@mui/icons-material/ListAlt";
 import moment from "moment";
+
+//mui
+import ArticleIcon from "@mui/icons-material/Article";
+import Button from "@mui/material/Button";
 
 const ListActivity = () => {
   const now = new Date();
@@ -23,7 +25,7 @@ const ListActivity = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("/api/list/activity")
+    fetch("/api/activitys")
       .then((res) => res.json())
       .then(
         (result) => {
@@ -36,17 +38,55 @@ const ListActivity = () => {
         }
       );
 
-    fetch("/api/join")
-      .then((res) => res.json())
-      .then((result) => setJoin(result));
-
-    fetch("/api/reserve")
-      .then((res) => res.json())
-      .then((result) => setReserve(result));
-
     setStdID(localStorage.getItem("stdID"));
-
   }, []);
+  const removeDuplicates = (items) => {
+    const seenTitles = new Set();
+    return items.filter((item) => {
+      const isDuplicate = seenTitles.has(item.act_title);
+      seenTitles.add(item.act_title);
+      return !isDuplicate;
+    });
+  };
+
+  // const getStatus = (activityID) => {
+  //   // ตรวจสอบข้อมูลการเข้าร่วม
+  //   const joinEntry = join.find(
+  //     (j) => j.actID === activityID && j.stdIDs.includes(BigInt(stdID))
+  //   );
+  //   if (joinEntry) {
+  //     return { message: "เข้าร่วมกิจกรรมแล้ว", color: "blue" };
+  //   }
+
+  //   // ตรวจสอบข้อมูลการลงทะเบียน
+  //   const reserveEntry = reserve.find(
+  //     (r) => r.act_ID === activityID && r.std_ID === stdID
+  //   );
+  //   if (reserveEntry) {
+  //     return { message: "ลงทะเบียนสำเร็จ", color: "green" };
+  //   }
+
+  //   // ตรวจสอบข้อมูลกิจกรรม
+  //   const activityEntry = activity.find((a) => a.act_ID === activityID);
+  //   if (!activityEntry) {
+  //     return { message: "ไม่พบข้อมูล", color: "gray" };
+  //   }
+
+  //   const now = new Date();
+  //   const activityStartDate = new Date(activityEntry.act_dateStart);
+  //   const activityEndDate = new Date(activityEntry.act_dateEnd);
+
+  //   // ตรวจสอบช่วงเวลาการลงทะเบียน
+  //   if (
+  //     now < moment(activityStartDate).subtract(2, "weeks").toDate() ||
+  //     now > moment(activityStartDate).subtract(1, "day").toDate()
+  //   ) {
+  //     return { message: "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน", color: "gray" };
+  //   }
+
+  //   // หากไม่พบข้อมูลการเข้าร่วม หรือ การลงทะเบียน
+  //   return { message: "ยังไม่ได้ลงทะเบียน", color: "gray" };
+  // };
 
   const getStatus = (activityID) => {
     // ตรวจสอบข้อมูลการเข้าร่วม
@@ -73,7 +113,7 @@ const ListActivity = () => {
   
     const now = new Date();
     const activityStartDate = new Date(activityEntry.act_dateStart);
-    const activityEndDate = new Date(activityEntry.act_dateEnd);
+    // const activityEndDate = new Date(activityEntry.act_dateEnd);
     
     // ตรวจสอบช่วงเวลาการลงทะเบียน
     if (now < moment(activityStartDate).subtract(2, "weeks").toDate() || now > moment(activityStartDate).subtract(1, "day").toDate()) {
@@ -113,9 +153,9 @@ const ListActivity = () => {
   };
 
   const formatDateThai = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const options = { year: "numeric", month: "long", day: "numeric" };
     const date = new Date(dateString);
-    return date.toLocaleDateString('th-TH', options);
+    return date.toLocaleDateString("th-TH", options);
   };
 
   const handleFilterChange = (event) => {
@@ -126,11 +166,12 @@ const ListActivity = () => {
   const filteredAndFilteredItems = filteredItems.filter((item) => {
     const status = getStatus(item.act_ID);
     return (
-      (filter === "default" ||
-        (filter === "joinEntry" && status.message === "เข้าร่วมกิจกรรมแล้ว") ||
-        (filter === "reserveEntry" && status.message === "ลงทะเบียนสำเร็จ") ||
-        (filter === "notjoin" && status.message === "ยังไม่ได้ลงทะเบียน")||
-        (filter === "notrange" && status.message === "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"))
+      filter === "default" ||
+      (filter === "joinEntry" && status.message === "เข้าร่วมกิจกรรมแล้ว") ||
+      (filter === "reserveEntry" && status.message === "ลงทะเบียนสำเร็จ") ||
+      (filter === "notjoin" && status.message === "ยังไม่ได้ลงทะเบียน") ||
+      (filter === "notrange" &&
+        status.message === "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน")
     );
   });
 
@@ -139,14 +180,18 @@ const ListActivity = () => {
   } else if (!isLoaded) {
     return <div>Loading...</div>;
   } else {
-    const sortedItems = sortItems(filteredAndFilteredItems);
+    const uniqueItems = removeDuplicates(filteredItems);
+    const sortedItems = sortItems(uniqueItems);
     const lastPage = Math.ceil(sortedItems.length / itemsPerPage) - 1;
     const visibleItems = sortedItems.slice(
       currentPage * itemsPerPage,
       (currentPage + 1) * itemsPerPage
     );
 
-    const pageNumbers = Array.from({ length: lastPage + 1 }, (_, index) => index);
+    const pageNumbers = Array.from(
+      { length: lastPage + 1 },
+      (_, index) => index
+    );
 
     return (
       <div className="mb-10 container mx-auto">
@@ -156,7 +201,9 @@ const ListActivity = () => {
           </div>
           <div className="flex justify-between">
             <div className="pb-4 items-center">
-              <label htmlFor="table-search" className="sr-only">Search</label>
+              <label htmlFor="table-search" className="sr-only">
+                Search
+              </label>
               <div className="relative mt-1">
                 <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                   <svg
@@ -188,18 +235,24 @@ const ListActivity = () => {
 
             <div className="flex gap-3 items-center">
               <div className="flex pb-4 items-center">
-                <label htmlFor="filter-activity-type" className="sr-only">Filter</label>
+                <label htmlFor="filter-activity-type" className="sr-only">
+                  Filter
+                </label>
                 <div className="relative">
                   <select
                     value={filter}
                     onChange={handleFilterChange}
                     className="text-xs block p-1.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value="default" className="text-center">ทั้งหมด</option>
+                    <option value="default" className="text-center">
+                      ทั้งหมด
+                    </option>
                     <option value="joinEntry">เข้าร่วมกิจกรรมแล้ว</option>
                     <option value="reserveEntry">ลงทะเบียนสำเร็จ</option>
                     <option value="notjoin">ยังไม่ได้ลงทะเบียน</option>
-                    <option value="notrange">ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน</option>
+                    <option value="notrange">
+                      ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน
+                    </option>
                   </select>
                 </div>
               </div>
@@ -217,17 +270,30 @@ const ListActivity = () => {
           <table className="text-center w-full text-sm rtl:text-center text-gray-500 dark:text-gray-400">
             <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
               <tr className="flex w-full">
-                <th scope="col" className="px-6 py-3 w-1/12 text-center">ลำดับ</th>
-                <th scope="col" className="px-6 py-3 w-4/12 text-center">ชื่อกิจกรรม</th>
-                <th scope="col" className="px-6 py-3 w-3/12 text-center">วัน</th>
-                <th scope="col" className="px-6 py-3 w-2/12 text-center">สถานะ</th>
-                <th scope="col" className="px-6 py-3 w-2/12 text-center">เพิ่มเติม</th>
+                <th scope="col" className="px-6 py-3 w-1/12 text-center">
+                  ลำดับ
+                </th>
+                <th scope="col" className="px-6 py-3 w-3/12 text-center">
+                  ชื่อกิจกรรม
+                </th>
+                <th scope="col" className="px-6 py-3 w-4/12 text-center">
+                  ระยะเวลา
+                </th>
+                <th scope="col" className="px-6 py-3 w-2/12 text-center">
+                  สถานะ
+                </th>
+                <th scope="col" className="px-6 py-3 w-2/12 text-center">
+                  รายละเอียด
+                </th>
               </tr>
             </thead>
             <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
               {visibleItems.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-3 text-center text-gray-500">
+                  <td
+                    colSpan="5"
+                    className="px-6 py-3 text-center text-gray-500"
+                  >
                     ไม่พบข้อมูล
                   </td>
                 </tr>
@@ -237,11 +303,12 @@ const ListActivity = () => {
                     <td scope="col" className="px-6 py-3 w-1/12 text-center">
                       {currentPage * itemsPerPage + index + 1}
                     </td>
-                    <td scope="col" className="px-6 py-3 w-4/12 text-center">
+                    <td scope="col" className="px-6 py-3 w-3/12 text-start">
                       {item.act_title}
                     </td>
-                    <td scope="col" className="px-6 py-3 w-3/12 text-center">
-                      {formatDateThai(item.act_dateStart)} - {formatDateThai(item.act_dateEnd)}
+                    <td scope="col" className="px-6 py-3 w-4/12 text-center">
+                      {formatDateThai(item.act_dateStart)} -{" "}
+                      {formatDateThai(item.act_dateEnd)}
                     </td>
                     <td
                       scope="col"
@@ -251,47 +318,50 @@ const ListActivity = () => {
                           item.act_status === 2
                             ? "blue"
                             : item.act_numStd === item.act_numStdReserve
-                              ? "red"
-                              : now >= moment(item.act_dateStart)
-                                .subtract(2, "weeks")
-                                .toDate() && now <= moment(item.act_dateStart)
+                            ? "red"
+                            : now >=
+                                moment(item.act_dateStart)
+                                  .subtract(2, "weeks")
+                                  .toDate() &&
+                              now <=
+                                moment(item.act_dateStart)
                                   .subtract(1, "day")
                                   .toDate()
-                                ? item.act_status === 1
-                                  ? "green"
-                                  : "red"
-                                : "gray",
+                            ? item.act_status === 1
+                              ? "green"
+                              : "red"
+                            : "gray",
                       }}
                     >
                       {item.act_status === 2
                         ? "กิจกรรมสิ้นสุดแล้ว"
                         : item.act_numStd === item.act_numStdReserve
-                          ? "ลงทะเบียนเต็มแล้ว"
-                          : now >= moment(item.act_dateStart)
-                            .subtract(2, "weeks")
-                            .toDate() && now <= moment(item.act_dateStart)
+                        ? "ลงทะเบียนเต็มแล้ว"
+                        : now >=
+                            moment(item.act_dateStart)
+                              .subtract(2, "weeks")
+                              .toDate() &&
+                          now <=
+                            moment(item.act_dateStart)
                               .subtract(1, "day")
                               .toDate()
-                            ? item.act_status === 1
-                              ? "เปิดลงทะเบียน"
-                              : "ปิดลงทะเบียน"
-                            : "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"}
+                        ? item.act_status === 1
+                          ? "เปิดลงทะเบียน"
+                          : "ปิดลงทะเบียน"
+                        : "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"}
                     </td>
+
                     <td
                       scope="col"
-                      className="px-6 cursor-pointer py-3 w-1/12 text-end hover:text-red-500 text-indigo-800"
+                      className="px-6 cursor-pointer py-3 w-2/12 text-center hover:text-green-500 text-teal-700"
                     >
-                      <BuildIcon
-                        onClick={() => navigate(`manage/${item.act_ID}`)}
-                      />
-                    </td>
-                    <td
-                      scope="col"
-                      className="px-6 cursor-pointer py-3 w-1/12 text-start hover:text-green-500 text-teal-700"
-                    >
-                      <ListAltIcon
+                      <Button
                         onClick={() => navigate(`detail/${item.act_ID}`)}
-                      />
+                        variant="outlined"
+                        startIcon={<ArticleIcon />}
+                      >
+                        เพิ่มเติม
+                      </Button>
                     </td>
                   </tr>
                 ))
@@ -303,10 +373,13 @@ const ListActivity = () => {
             <div className="flex gap-2 w-24"></div>
             <div className="flex gap-2">
               <button
-                onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
+                onClick={() =>
+                  setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))
+                }
                 disabled={currentPage === 0}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
-                  }`}
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                  currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
+                }`}
               >
                 ก่อนหน้า
               </button>
@@ -314,17 +387,23 @@ const ListActivity = () => {
                 <button
                   key={pageNumber}
                   onClick={() => setCurrentPage(pageNumber)}
-                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${pageNumber === currentPage ? "bg-blue-200" : ""
-                    }`}
+                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                    pageNumber === currentPage ? "bg-blue-200" : ""
+                  }`}
                 >
                   {pageNumber + 1}
                 </button>
               ))}
               <button
-                onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))}
+                onClick={() =>
+                  setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))
+                }
                 disabled={currentPage === lastPage}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === lastPage ? "cursor-not-allowed" : "hover:bg-blue-200"
-                  }`}
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                  currentPage === lastPage
+                    ? "cursor-not-allowed"
+                    : "hover:bg-blue-200"
+                }`}
               >
                 ถัดไป
               </button>
@@ -344,7 +423,6 @@ const ListActivity = () => {
               </select>
             </div>
           </div>
-          
         </div>
       </div>
     );

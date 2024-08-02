@@ -11,6 +11,9 @@ function DetailStudent() {
   const [student, setStudent] = useState("");
   const [join, setJoin] = useState([]);
   const [reserve, setReserve] = useState([]);
+  const [section, setSection] = useState([]);
+  const [staff, setStaff] = useState([]);
+  // const [login, setLogin] = useState([]);
 
   const [sortOrder, setSortOrder] = useState("latest");
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,7 +28,7 @@ function DetailStudent() {
   useEffect(() => {
     const fetchStudent = async () => {
       try {
-        const response = await axios.get(`/api/students/${std_ID}`);
+        const response = await axios.get(`/api/resume/staff?id=${std_ID}`);
         setStudent(response.data);
       } catch (error) {
         console.error(error);
@@ -34,7 +37,7 @@ function DetailStudent() {
 
     const fetchActivity = async () => {
       try {
-        const response = await axios.get(`/api/activitys`); // Assuming this API endpoint is correct
+        const response = await axios.get(`/api/activity`); // Assuming this API endpoint is correct
         setActivity(response.data);
       } catch (error) {
         console.error(error);
@@ -43,7 +46,7 @@ function DetailStudent() {
 
     const fetchManage = async () => {
       try {
-        const res = await axios.get("/api/reserve");
+        const res = await axios.get("/api/manage");
         setReserve(res.data);
       } catch (err) {
         console.error(err);
@@ -67,11 +70,33 @@ function DetailStudent() {
       }
     };
 
+    const fetchSection = async () => {
+      try {
+        const response = await axios.get(`/api/list/section`);
+        setSection(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const fetchStaff = async () => {
+      try {
+        const response = await axios.get(`/api/list/staff`);
+        setStaff(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
     fetchActivity();
     fetchStudent();
     fetchSmartContract();
     fetchManage();
+    fetchSection();
+    fetchStaff();
   }, [std_ID]);
+
+
+  const sectionName = section.find((s) => s.sec_ID == student.sec_ID);
 
   const getStatus = (activityID) => {
     const joinEntry = join.find(
@@ -113,6 +138,7 @@ function DetailStudent() {
   const handleSortChange = () => {
     setSortOrder((prevOrder) => (prevOrder === "latest" ? "oldest" : "latest"));
   };
+
 
   const lastPage = Math.ceil(filteredItems.length / itemsPerPage) - 1;
   const visibleItems = filteredItems.slice(
@@ -166,28 +192,28 @@ function DetailStudent() {
   return (
     <div>
       {/* resume */}
-      <div className="container mb-10  mx-auto md:px-20">
+      <div className="container mb-10  mx-auto md:px-20 pt-20">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
           <div className="flex justify-between">
             <h1 className="text-lg font-bold mb-2">ประวัติส่วนตัว</h1>
-            <div className="items-center mb-5" onClick={() => navigate(-1)}>
+            <div className="items-center mb-5 cursor-pointer" onClick={() => navigate(-1)}>
               <ArrowBackIosNewIcon />
               ย้อนกลับ
             </div>
           </div>
           <hr className="mb-3" />
           <div className="grid grid-cols-2 gap-4">
-            <h1>รหัสนักศึกษา: {student.std_ID}</h1>
+            <h1>รหัสนักศึกษา: {student.staff_ID}</h1>
             <p>
-              ชื่อ-นามสกุล: {student.std_fname} {student.std_lname}
+              ชื่อ-นามสกุล: {student.staff_fname} {student.staff_lname}
             </p>
-            <p>
-              หมู่เรียน:
-              {student.sec_name}
-            </p>
-            <p>Email: {student.std_email}</p>
-            <p>เบอร์โทรศัพท์: {student.std_mobile}</p>
-            <p>ที่อยู่: {student.std_address}</p>
+            {/* <p>
+              ดูแลหมู่เรียน:
+              {sectionName ? `${sectionName.sec_name}` : "Not found"}
+            </p> */}
+            <p>Email: {student.staff_email}</p>
+            <p>เบอร์โทรศัพท์: {student.staff_mobile}</p>
+            <p>ที่อยู่: {student.staff_address}</p>
             <p>จังหวัด: {student.province}</p>
             <p>อำเภอ: {student.district}</p>
             <p>ตำบล: {student.subdistrict}</p>
@@ -200,6 +226,11 @@ function DetailStudent() {
             >
               Delete
             </button>
+            <button
+              className="btn btn-primary px-6 py-4 mx-3 text-white" onClick={() => navigate(`/admin/dashboard/detail/teacher/update/${student.staff_ID}`)}
+            >
+              แก้ไขประวัติ
+            </button>
           </div>
         </div>
       </div>
@@ -210,9 +241,7 @@ function DetailStudent() {
           <div className="text-lg font-bold mb-2">ประวัติการทำกิจกรรม</div>
           <div className="flex justify-between">
             <div className="pb-4 items-center">
-              <label htmlFor="table-search" className="sr-only">
-                Search
-              </label>
+              <label htmlFor="table-search" className="sr-only">Search</label>
               <div className="relative mt-1">
                 <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                   <svg
@@ -243,18 +272,14 @@ function DetailStudent() {
             </div>
             <div className="flex gap-3 items-center">
               <div className="flex pb-4 items-center">
-                <label htmlFor="filter-activity-type" className="sr-only">
-                  Filter
-                </label>
+                <label htmlFor="filter-activity-type" className="sr-only">Filter</label>
                 <div className="relative">
                   <select
                     value={filter}
                     onChange={handleFilterChange}
                     className="text-xs block p-1.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value="default" className="text-center">
-                      กิจกรรมทั้งหมด
-                    </option>
+                    <option value="default" className="text-center">กิจกรรมทั้งหมด</option>
                     <option value="joinEntry">เข้าร่วมกิจกรรมแล้ว</option>
                     <option value="reserveEntry">ลงทะเบียนสำเร็จ</option>
                     <option value="notjoin">ยังไม่ได้ลงทะเบียน</option>
@@ -332,59 +357,50 @@ function DetailStudent() {
           </table>
 
           <div className="flex justify-between mt-2">
-            <div className="flex gap-2 w-24"></div>
-            <div className="flex gap-2">
-              <button
-                onClick={() =>
-                  setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))
-                }
-                disabled={currentPage === 0}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
-                  currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
+          <div className="flex gap-2 w-24"></div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
+              disabled={currentPage === 0}
+              className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
                 }`}
-              >
-                ก่อนหน้า
-              </button>
-              {pageNumbers.map((pageNumber) => (
-                <button
-                  key={pageNumber}
-                  onClick={() => setCurrentPage(pageNumber)}
-                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
-                    pageNumber === currentPage ? "bg-blue-200" : ""
+            >
+              ก่อนหน้า
+            </button>
+            {pageNumbers.map((pageNumber) => (
+              <button
+                key={pageNumber}
+                onClick={() => setCurrentPage(pageNumber)}
+                className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${pageNumber === currentPage ? "bg-blue-200" : ""
                   }`}
-                >
-                  {pageNumber + 1}
-                </button>
-              ))}
-              <button
-                onClick={() =>
-                  setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))
-                }
-                disabled={currentPage === lastPage}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
-                  currentPage === lastPage
-                    ? "cursor-not-allowed"
-                    : "hover:bg-blue-200"
-                }`}
               >
-                ถัดไป
+                {pageNumber + 1}
               </button>
-            </div>
-            <div className="flex gap-2">
-              <select
-                value={itemsPerPage}
-                onChange={(e) => {
-                  setItemsPerPage(+e.target.value);
-                  setCurrentPage(0);
-                }}
-                className="px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              >
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-              </select>
-            </div>
+            ))}
+            <button
+              onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))}
+              disabled={currentPage === lastPage}
+              className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === lastPage ? "cursor-not-allowed" : "hover:bg-blue-200"
+                }`}
+            >
+              ถัดไป
+            </button></div>
+          <div className="flex gap-2">
+            <select
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(+e.target.value);
+                setCurrentPage(0);
+              }}
+              className="px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
           </div>
+
+        </div>
         </div>
       </div>
     </div>

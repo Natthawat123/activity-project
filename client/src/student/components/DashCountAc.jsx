@@ -16,7 +16,7 @@ function Dash_users() {
   const [notJoinedCount, setNotJoinedCount] = useState(0);
 
   useEffect(() => {
-    fetch("/api/list/activity")
+    fetch("/api/activitys")
       .then((res) => res.json())
       .then(
         (result) => {
@@ -32,15 +32,13 @@ function Dash_users() {
       );
   }, []);
 
-  const navigate = useNavigate();
-
   const contractAddress = "0x9A00B0CB3A626c44c19f868b85A3819C8b630494";
   const stdID = localStorage.getItem("std_ID");
 
   useEffect(() => {
     const fetchManage = async () => {
       try {
-        const res = await axios.get("/api/manage");
+        const res = await axios.get("/api/reserve");
         setReserve(res.data);
       } catch (err) {
         console.error(err);
@@ -64,18 +62,8 @@ function Dash_users() {
       }
     };
 
-    const fetchActivity = async () => {
-      try {
-        const res = await axios.get("/api/list/activity");
-        setActivity(res.data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
     fetchManage();
     fetchSmartContract();
-    fetchActivity();
     setIsLoaded(true);
   }, []);
 

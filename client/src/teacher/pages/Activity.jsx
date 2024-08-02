@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-// import Popup from "../components/Popup_addAc";
+import { useNavigate, Link } from "react-router-dom";
 import BuildIcon from "@mui/icons-material/Build";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import moment from "moment";
 
-const ProductTable = () => {
+const ListActivity = () => {
   const now = new Date();
 
   const [error, setError] = useState(null);
@@ -15,17 +14,9 @@ const ProductTable = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
   const [sortOrder, setSortOrder] = useState("latest");
-  // const [visibleStartPage, setVisibleStartPage] = useState(0);
-
-  const navigate = useNavigate();
-
-  // const updateVisibleStartPage = (newCurrentPage) => {
-  //   const newVisibleStartPage = Math.floor(newCurrentPage / 4) * 4;
-  //   setVisibleStartPage(newVisibleStartPage);
-  // };
 
   useEffect(() => {
-    fetch("/api/list/activity")
+    fetch("/api/activitys")
       .then((res) => res.json())
       .then(
         (result) => {
@@ -41,7 +32,7 @@ const ProductTable = () => {
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
-    setCurrentPage(0); // Reset current page to 0 on search
+    setCurrentPage(0);
   };
 
   const filteredItems = activity.filter((item) => {
@@ -50,15 +41,15 @@ const ProductTable = () => {
       item.act_location.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
-  const lastPage = Math.ceil(filteredItems.length / itemsPerPage) - 1;
-  // const visibleItems = filteredItems.slice(
-  //   currentPage * itemsPerPage,
-  //   (currentPage + 1) * itemsPerPage
-  // );
-  const pageNumbers = [];
-  for (let i = 0; i <= lastPage; i++) {
-    pageNumbers.push(i);
-  }
+
+  const removeDuplicates = (items) => {
+    const seenTitles = new Set();
+    return items.filter((item) => {
+      const isDuplicate = seenTitles.has(item.act_title);
+      seenTitles.add(item.act_title);
+      return !isDuplicate;
+    });
+  };
 
   const handleSortChange = () => {
     setSortOrder((prevOrder) => (prevOrder === "latest" ? "oldest" : "latest"));
@@ -76,34 +67,44 @@ const ProductTable = () => {
     });
   };
 
+  // Helper function to format dates in Thai
+  const formatDateThai = (dateString) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    const date = new Date(dateString);
+    return date.toLocaleDateString("th-TH", options);
+  };
+
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {
     return <div>Loading...</div>;
   } else {
-    const sortedItems = sortItems(filteredItems);
+    const uniqueItems = removeDuplicates(filteredItems);
+    const sortedItems = sortItems(uniqueItems);
     const lastPage = Math.ceil(sortedItems.length / itemsPerPage) - 1;
     const visibleItems = sortedItems.slice(
       currentPage * itemsPerPage,
       (currentPage + 1) * itemsPerPage
     );
 
+    const pageNumbers = Array.from(
+      { length: lastPage + 1 },
+      (_, index) => index
+    );
+
     return (
-      <div className="container mx-auto px-8 sm:px-10 md:px-10 lg:px-20 mb-5 md:grid md:grid-cols-1 lg:grid-cols-1 pt-20">
       <div className="mb-10 container mx-auto">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
           <div className="flex justify-between">
             <div className="text-lg font-bold mb-2">รายชื่อกิจกรรม</div>
-
           </div>
-          {/*<hr className="m-3" /> */}
           <div className="flex justify-between">
             <div className="pb-4 items-center">
               <label htmlFor="table-search" className="sr-only">
                 Search
               </label>
               <div className="relative mt-1">
-                <div className="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+                <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                   <svg
                     className="w-4 h-4 text-gray-500 dark:text-gray-400"
                     aria-hidden="true"
@@ -168,114 +169,110 @@ const ProductTable = () => {
                     <td scope="col" className="px-6 py-3 w-1/12 text-center">
                       {currentPage * itemsPerPage + index + 1}
                     </td>
-                    <td scope="col" className="px-6 py-3 w-4/12 text-start">
+                    <td scope="col" className="px-6 py-3 w-4/12 text-center">
                       {item.act_title}
                     </td>
                     <td scope="col" className="px-6 py-3 w-3/12 text-center">
-                      {item.act_dateStart.slice(0, 10)} -{" "}
-                      {item.act_dateEnd.slice(0, 10)}
+                      {formatDateThai(item.act_dateStart)} -{" "}
+                      {formatDateThai(item.act_dateEnd)}
                     </td>
                     <td
                       scope="col"
                       className="px-6 py-3 w-2/12 text-center"
                       style={{
                         color:
-                          item.act_status == 2
+                          item.act_status === 2
                             ? "blue"
-                            : item.act_numStd == item.act_numStdReserve
-                              ? "red"
-                              : now >= moment(item.act_dateStart)
-                                .subtract(2, "weeks")
-                                .toDate() && now <= moment(item.act_dateStart)
+                            : item.act_numStd === item.act_numStdReserve
+                            ? "red"
+                            : now >=
+                                moment(item.act_dateStart)
+                                  .subtract(2, "weeks")
+                                  .toDate() &&
+                              now <=
+                                moment(item.act_dateStart)
                                   .subtract(1, "day")
                                   .toDate()
-                                ? item.act_status == 1
-                                  ? "green"
-                                  : "red"
-                                : "grey",
+                            ? item.act_status === 1
+                              ? "green"
+                              : "red"
+                            : "grey",
                       }}
                     >
-                      {item.act_status == 2
+                      {item.act_status === 2
                         ? "กิจกรรมสิ้นสุดแล้ว"
-                        : item.act_numStd == item.act_numStdReserve
-                          ? "ลงทะเบียนเต็มแล้ว"
-                          : now >= moment(item.act_dateStart)
-                            .subtract(2, "weeks")
-                            .toDate() && now <= moment(item.act_dateStart)
+                        : item.act_numStd === item.act_numStdReserve
+                        ? "ลงทะเบียนเต็มแล้ว"
+                        : now >=
+                            moment(item.act_dateStart)
+                              .subtract(2, "weeks")
+                              .toDate() &&
+                          now <=
+                            moment(item.act_dateStart)
                               .subtract(1, "day")
                               .toDate()
-                            ? item.act_status == 1
-                              ? "เปิดลงทะเบียน"
-                              : "ปิดลงทะเบียน"
-                            : "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"}
+                        ? item.act_status === 1
+                          ? "ลงทะเบียนได้"
+                          : "กิจกรรมจะเริ่มในอีก 1 วัน"
+                        : "กิจกรรมยังไม่เริ่ม"}
                     </td>
-            
-                    <td
-                    scope="col"
-                    className="px-6 py-3 w-2/12 text-center hover:text-green-500 text-teal-700"
-                  >
-                    <ListAltIcon
-                      onClick={() => {
-                        navigate(`detail/${item.act_ID}`);
-                      }}
-                    />
-                  </td>
+                    <td scope="col" className="px-6 py-3 w-2/12 text-center">
+                      <Link
+                        to={`detail/${item.act_ID}`}
+                        className="flex items-center justify-center"
+                      >
+                        <BuildIcon />
+                        <ListAltIcon />
+                      </Link>
+                    </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
 
-          <div className="flex justify-between mt-2">
-            <div className="flex gap-2 w-24"></div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
-                disabled={currentPage === 0}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
-                  }`}
-              >
-                ก่อนหน้า
-              </button>
-              {pageNumbers.map((pageNumber) => (
+          <nav className="flex justify-center mt-4">
+            <ul className="inline-flex -space-x-px">
+              <li>
                 <button
-                  key={pageNumber}
-                  onClick={() => setCurrentPage(pageNumber)}
-                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${pageNumber === currentPage ? "bg-blue-200" : ""
-                    }`}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 0))
+                  }
+                  className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100"
                 >
-                  {pageNumber + 1}
+                  Prev
                 </button>
+              </li>
+              {pageNumbers.map((number) => (
+                <li key={number}>
+                  <button
+                    onClick={() => setCurrentPage(number)}
+                    className={`px-3 py-2 text-sm font-medium ${
+                      number === currentPage
+                        ? "bg-blue-500 text-white"
+                        : "bg-white text-gray-500"
+                    } border border-gray-300 hover:bg-gray-100`}
+                  >
+                    {number + 1}
+                  </button>
+                </li>
               ))}
-              <button
-                onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))}
-                disabled={currentPage === lastPage}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === lastPage ? "cursor-not-allowed" : "hover:bg-blue-200"
-                  }`}
-              >
-                ถัดไป
-              </button></div>
-            <div className="flex gap-2">
-              <select
-                value={itemsPerPage}
-                onChange={(e) => {
-                  setItemsPerPage(+e.target.value);
-                  setCurrentPage(0);
-                }}
-                className="px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              >
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-              </select>
-            </div>
-
-          </div>
+              <li>
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, lastPage))
+                  }
+                  className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100"
+                >
+                  Next
+                </button>
+              </li>
+            </ul>
+          </nav>
         </div>
-      </div>
       </div>
     );
   }
 };
 
-export default ProductTable;
+export default ListActivity;

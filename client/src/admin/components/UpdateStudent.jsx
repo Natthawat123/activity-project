@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
-import axios from "axios";
 
 const StudentForm = () => {
   const [provinces, setProvinces] = useState([]);
@@ -16,10 +15,12 @@ const StudentForm = () => {
     tambon_id: undefined,
     zip_code: undefined,
   });
+  const [section, setSection] = useState([]);
 
   const [title, setTitle] = useState("");
 
   const navigate = useNavigate();
+  const { std_ID } = useParams();
 
   const onChangeHandle = (id, selectedValue) => {
     if (id === "province_id") {
@@ -74,30 +75,31 @@ const StudentForm = () => {
     };
 
     return (
-      <select
-        value={selected[id]}
-        onChange={onChangeHandleLocal}
-        className="mt-1 p-2 border w-full rounded-md"
-      >
-        <option
-          key={selected[id]}
+      <>
+        <select
           value={selected[id]}
-          label={addressValue_PDS}
+          onChange={onChangeHandleLocal}
+          className="mt-1 p-2 border w-full rounded-md"
         >
-          {addressValue_PDS}
-        </option>
-        {list &&
-          list.map((item) => (
-            <option key={item.id} value={item.id} label={item.name_th}>
-              {item.name_th}
-            </option>
-          ))}
-      </select>
+          <option
+            key={selected[id]}
+            value={selected[id]}
+            label={addressValue_PDS}
+          />
+
+          {list &&
+            list.map((item) => (
+              <option key={item.id} value={item.id} label={item.name_th}>
+                {item.name_th}
+              </option>
+            ))}
+        </select>
+      </>
     );
   };
 
   const [value, setValue] = useState({
-    std_ID: "",
+    username: "",
     std_fname: "",
     std_lname: "",
     sec_ID: "",
@@ -109,26 +111,9 @@ const StudentForm = () => {
     subdistrict: "",
     zipcode: "",
   });
-  const [section, setSection] = useState([]);
-
-  const stdID = localStorage.getItem("std_ID");
 
   useEffect(() => {
-    fetch("/api/sections")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setSection(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching sections:", error);
-      });
-
-    fetch(`/api/students/${stdID}`)
+    fetch("/api/students/" + std_ID)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Error fetching data");
@@ -141,7 +126,29 @@ const StudentForm = () => {
           ...data,
         }));
 
-        // Extract title from std_fname if it exists
+        const titles = ["นาย", "นาง", "น.ส."];
+        const title = titles.find((t) => data.std_fname.match(t));
+        if (title) {
+          setTitle(title);
+          setValue((prev) => ({
+            ...prev,
+            std_fname: data.std_fname.replace(title, "").trim(),
+          }));
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+    fetch("/api/sections/")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error fetching data");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setSection(data);
+
         const titles = ["นาย", "นาง", "น.ส."];
         const title = titles.find((t) => data.std_fname.match(t));
         if (title) {
@@ -161,13 +168,12 @@ const StudentForm = () => {
     )
       .then((response) => response.json())
       .then((result) => {
-        // Sort the provinces alphabetically by name_th
         const sortedProvinces = result.sort((a, b) =>
           a.name_th.localeCompare(b.name_th)
         );
         setProvinces(sortedProvinces);
       });
-  }, [stdID]);
+  }, [std_ID]);
 
   const handlechange = (e) => {
     setValue((prev) => ({
@@ -197,7 +203,7 @@ const StudentForm = () => {
       std_fname: `${title}${value.std_fname}`.trim(),
     };
 
-    fetch(`/api/update/student/${stdID}`, {
+    fetch("/api/students/" + std_ID, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -216,7 +222,7 @@ const StudentForm = () => {
           icon: "success",
         });
         setTimeout(() => {
-          window.location = "/activity/profile";
+          window.location.reload();
         }, 1500);
       })
       .catch((error) => {
@@ -230,7 +236,7 @@ const StudentForm = () => {
       });
   };
 
-  if (!value.login_ID) {
+  if (!value.username) {
     return <div>Loading...</div>;
   }
 
@@ -264,7 +270,7 @@ const StudentForm = () => {
                 type="text"
                 id="username"
                 name="std_ID"
-                value={value.login_ID}
+                value={value.username}
                 readOnly
                 className="mt-1 p-2 border w-full rounded-md"
               />
@@ -292,21 +298,43 @@ const StudentForm = () => {
               </select>
             </div>
 
-            <div>
-              <label
-                htmlFor="firstName"
-                className="block text-sm font-medium text-gray-600"
-              >
-                ชื่อ
-              </label>
-              <input
-                type="text"
-                id="fname"
-                name="std_fname"
-                onChange={handlechange}
-                value={value.std_fname}
-                className="mt-1 p-2 border w-full rounded-md"
-              />
+            <div className="flex gap-2">
+              <div className="w-1/6">
+                <label
+                  htmlFor="title"
+                  className="block text-sm font-medium text-gray-600"
+                >
+                  คำนำหน้า
+                </label>
+                <select
+                  value={title}
+                  onChange={handleTitleChange}
+                  name="title"
+                  id="title"
+                  className="mt-1 p-2 border w-full rounded-md"
+                >
+                  <option value="">เลือกคำนำหน้า</option>
+                  <option value="นาย">นาย</option>
+                  <option value="นาง">นาง</option>
+                  <option value="น.ส.">น.ส.</option>
+                </select>
+              </div>
+              <div className="w-5/6">
+                <label
+                  htmlFor="firstName"
+                  className="block text-sm font-medium text-gray-600"
+                >
+                  ชื่อ
+                </label>
+                <input
+                  type="text"
+                  id="fname"
+                  name="std_fname"
+                  onChange={handlechange}
+                  value={value.std_fname}
+                  className="mt-1 p-2 border w-full rounded-md"
+                />
+              </div>
             </div>
 
             <div>
@@ -405,8 +433,8 @@ const StudentForm = () => {
                 list={amphures}
                 child="tambon"
                 childsId={["tambon_id"]}
-                addressValue_PDS={value.district}
                 setChilds={[setTambons]}
+                addressValue_PDS={value.district}
               />
             </div>
 
@@ -422,8 +450,8 @@ const StudentForm = () => {
                 list={tambons}
                 child="zip_code"
                 childsId={["zip_code"]}
-                addressValue_PDS={value.subdistrict}
                 setChilds={[setZipcode]}
+                addressValue_PDS={value.subdistrict}
               />
             </div>
 

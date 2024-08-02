@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import GroupIcon from '@mui/icons-material/Group';
+import GroupIcon from "@mui/icons-material/Group";
 
 const ListStudents = () => {
   const [error, setError] = useState(null);
@@ -18,12 +18,8 @@ const ListStudents = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [studentsRes, sectionsRes] = await Promise.all([
-          axios.get("/api/list/student"),
-          axios.get("/api/list/section"),
-        ]);
-        setStudents(studentsRes.data);
-        setSections(sectionsRes.data);
+        const res = await axios.get("/api/students");
+        setStudents(res.data);
         setIsLoaded(true);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -45,21 +41,21 @@ const ListStudents = () => {
   };
 
   const filteredStudents = students.filter((student) => {
+    const fname = student.std_fname ? student.std_fname.toLowerCase() : "";
+    const lname = student.std_lname ? student.std_lname.toLowerCase() : "";
+    const secID = student.sec_ID ? student.sec_ID.toString().toLowerCase() : "";
+
     const matchesSearchTerm =
-      student.std_ID.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.std_fname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.std_lname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.sec_ID.toString().toLowerCase().includes(searchTerm.toLowerCase());
+      fname.includes(searchTerm.toLowerCase()) ||
+      lname.includes(searchTerm.toLowerCase()) ||
+      secID.includes(searchTerm.toLowerCase());
 
-    const matchesFilter = selectedSection === "all" || student.sec_ID.toString() === selectedSection;
-
-    return matchesSearchTerm && matchesFilter;
+    return matchesSearchTerm;
   });
 
-  // Sorting logic
   const sortedStudents = filteredStudents.sort((a, b) => {
-    const idA = String(a.std_ID || ""); // Convert to string if std_ID is undefined or null
-    const idB = String(b.std_ID || ""); // Convert to string if std_ID is undefined or null
+    const idA = String(a.std_ID || "");
+    const idB = String(b.std_ID || "");
 
     return sortOrder === "asc"
       ? idA.localeCompare(idB)
@@ -121,7 +117,9 @@ const ListStudents = () => {
 
             <div className="flex pb-4 items-center gap-2">
               <div className="items-center justify-center">
-                <label htmlFor="sort-order" className="text-xs">เรียงตามรหัสนศ.</label>
+                <label htmlFor="sort-order" className="text-xs">
+                  เรียงตามรหัสนศ.
+                </label>
                 <div className="relative justify-center flex">
                   <select
                     value={sortOrder}
@@ -135,7 +133,9 @@ const ListStudents = () => {
               </div>
 
               <div className="items-center justify-center text-center">
-                <label htmlFor="filter-section" className="text-xs">หมู่เรียน</label>
+                <label htmlFor="filter-section" className="text-xs">
+                  หมู่เรียน
+                </label>
                 <div className="relative justify-center flex">
                   <select
                     id="filter-section"
@@ -158,25 +158,48 @@ const ListStudents = () => {
           <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
               <tr className="flex w-full">
-                <th scope="col" className="px-6 py-3 w-1/12 text-center">ลำดับ</th>
-                <th scope="col" className="px-6 py-3 w-3/12 text-center">รหัสนักศึกษา</th>
-                <th scope="col" className="px-6 py-3 w-4/12 text-center">ชื่อ-นามสกุล</th>
-                <th scope="col" className="px-6 py-3 w-2/12 text-center">หมู่เรียน</th>
-                <th scope="col" className="px-6 py-3 w-2/12 text-center">รายละเอียด</th>
+                <th scope="col" className="px-6 py-3 w-1/12 text-center">
+                  ลำดับ
+                </th>
+                <th scope="col" className="px-6 py-3 w-3/12 text-center">
+                  รหัสนักศึกษา
+                </th>
+                <th scope="col" className="px-6 py-3 w-4/12 text-center">
+                  ชื่อ-นามสกุล
+                </th>
+                <th scope="col" className="px-6 py-3 w-2/12 text-center">
+                  หมู่เรียน
+                </th>
+                <th scope="col" className="px-6 py-3 w-2/12 text-center">
+                  รายละเอียด
+                </th>
               </tr>
             </thead>
             <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
               {visibleStudents.map((student, index) => (
-                <tr key={student.std_ID} className="border-b-2 flex w-full items-center">
+                <tr
+                  key={student.login_ID}
+                  className="border-b-2 flex w-full items-center"
+                >
                   <td className="px-6 py-3 w-1/12 text-center">{index + 1}</td>
-                  <td className="px-6 py-3 w-3/12 text-center">{student.std_ID}</td>
-                  <td className="px-6 py-3 w-4/12">{student.std_fname} {student.std_lname}</td>
+                  <td className="px-6 py-3 w-3/12 text-center">
+                    {student.login_ID}
+                  </td>
+                  <td className="px-6 py-3 w-4/12">
+                    {student.std_fname} {student.std_lname}
+                  </td>
                   <td className="px-6 py-3 w-2/12 text-center">
-                    {sections.find(sec => sec.sec_ID === student.sec_ID)?.sec_name || "N/A"}
+                    {student.sec_name}
                   </td>
                   <td className="px-6 py-3 w-2/12 text-center">
                     <button className="bg-cyan-400 hover:bg-cyan-500 px-2 py-1 text-white rounded">
-                      <a onClick={() => navigate(`detail/student/${student.std_ID}`)}>เรียกดู</a>
+                      <a
+                        onClick={() =>
+                          navigate(`detail/student/${student.login_ID}`)
+                        }
+                      >
+                        เรียกดู
+                      </a>
                     </button>
                   </td>
                 </tr>
@@ -188,10 +211,13 @@ const ListStudents = () => {
             <div className="flex gap-2 w-24"></div>
             <div className="flex gap-2">
               <button
-                onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
+                onClick={() =>
+                  setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))
+                }
                 disabled={currentPage === 0}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
-                  }`}
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                  currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
+                }`}
               >
                 ก่อนหน้า
               </button>
@@ -199,17 +225,23 @@ const ListStudents = () => {
                 <button
                   key={pageNumber}
                   onClick={() => setCurrentPage(pageNumber)}
-                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${pageNumber === currentPage ? "bg-blue-200" : ""
-                    }`}
+                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                    pageNumber === currentPage ? "bg-blue-200" : ""
+                  }`}
                 >
                   {pageNumber + 1}
                 </button>
               ))}
               <button
-                onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))}
+                onClick={() =>
+                  setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))
+                }
                 disabled={currentPage === lastPage}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === lastPage ? "cursor-not-allowed" : "hover:bg-blue-200"
-                  }`}
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                  currentPage === lastPage
+                    ? "cursor-not-allowed"
+                    : "hover:bg-blue-200"
+                }`}
               >
                 ถัดไป
               </button>

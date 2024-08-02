@@ -1,7 +1,11 @@
-# อัปเดตล่าสุดเมื่อ 29/7/2567
- - update checkAll to upload and link to transection 
+# อัปเดตล่าสุดเมื่อ 3/8/2567
+ - UI Login page Forgot your password? by pond
+# อัปเดตล่าสุดเมื่อ 30/7/2567
+ - แก้ไขเพิ่มเติมให้มีคำนำหน้าชื่อ, ผู้ดูแลระบบสามารถแก้ไขข้อมูลของนักศึกษาและอาจารย์ได้, แก้ไขปฎิทินเพิ่มเติมให้มีการแสดงผลกิจกรรมที่ลงทะเบียนไปแล้ว
 # อัปเดตล่าสุดเมื่อ 30/7/2567
  - update UI checkAll Sort Select Activity to upload by Pond
+# อัปเดตล่าสุดเมื่อ 29/7/2567
+ - update checkAll to upload and link to transection 
 *** พิมพ์อัปเดตเพิ่มเติมในไฟล์ [readme.md]() เวลาแก้ไขอะไรด้วย จะได้ง่ายว่ามีการแก้ไขอะไรหน้าไหนบ้าง ***
 
 # activity-project

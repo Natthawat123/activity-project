@@ -3,12 +3,12 @@ import Swal from "sweetalert2";
 import PropTypes from "prop-types";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
-
 import Papa from "papaparse";
 
 const Add_Users = ({ closeModal }) => {
   const [selectedRole, setSelectedRole] = useState("");
   const [activeTab, setActiveTab] = useState("single");
+  const [title, setTitle] = useState("");
 
   const handleRoleChange = (event) => {
     setSelectedRole(event.target.value);
@@ -18,6 +18,11 @@ const Add_Users = ({ closeModal }) => {
     setActiveTab(tab);
   };
 
+  const handleTitleChange = (e) => {
+    setTitle(e.target.value);
+    console.log(title);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -25,10 +30,14 @@ const Add_Users = ({ closeModal }) => {
       username: data.get("username"),
       password: data.get("password"),
       role: data.get("role"),
+      fname: data.get("firstName"),
+      lname: data.get("lastName"),
+      email: data.get("email"),
+      mobile: data.get("phoneNumber"),
+      title: title, // Ensure title is included
     };
 
     try {
-      // Insert into login table
       const loginResponse = await axios.post("/api/auth/register", jsonData);
       const loginData = loginResponse.data;
       console.log("Login response:", loginData);
@@ -43,11 +52,13 @@ const Add_Users = ({ closeModal }) => {
         const additionalData = {
           std_ID: data.get("username"),
           login_ID: loginID,
-          std_fname: data.get("firstName") || "กรุณาเปลี่ยนชื่อของคุณ",
+          std_fname:
+            title + (data.get("firstName") || "กรุณาเปลี่ยนชื่อของคุณ"),
           std_lname: data.get("lastName") || "กรุณาเปลี่ยนนามสกุลของคุณ",
           sec_ID: 1,
-          std_email: data.get('email') || `${data.get("username")}@webmail.npru.ac.th`,
-          std_mobile: data.get('phoneNumber') || null,
+          std_email:
+            data.get("email") || `${data.get("username")}@webmail.npru.ac.th`,
+          std_mobile: data.get("phoneNumber") || null,
           std_address: null,
           province: null,
           district: null,
@@ -55,7 +66,6 @@ const Add_Users = ({ closeModal }) => {
           zipcode: null,
         };
 
-        // Insert into student or teacher table
         const additionalResponse = await axios.post(
           "/api/create/student",
           additionalData
@@ -69,10 +79,22 @@ const Add_Users = ({ closeModal }) => {
       } else if (jsonData.role === "teacher" || jsonData.role === "admin") {
         const additionalData = {
           login_ID: loginID,
-          staff_fname: jsonData.role === "admin" ? "admin" : (data.get("firstName") || "กรุณาเปลี่ยนชื่อของคุณ") ,
-          staff_lname: jsonData.role === "admin" ? null : (data.get("lastName") || "กรุณาเปลี่ยนนามสกุลของคุณ"),
-          staff_email: jsonData.role ===  data.get('email') || `${data.get("username")}${jsonData.role === "admin" ? "@ITinfo.npru.ac.th" : "@webmail.npru.ac.th"}`,
-          staff_mobile: data.get('phoneNumber') || null,
+          staff_fname:
+            jsonData.role === "admin"
+              ? "admin"
+              : title + (data.get("firstName") || "กรุณาเปลี่ยนชื่อของคุณ"),
+          staff_lname:
+            jsonData.role === "admin"
+              ? null
+              : data.get("lastName") || "กรุณาเปลี่ยนนามสกุลของคุณ",
+          staff_email:
+            data.get("email") ||
+            `${data.get("username")}${
+              jsonData.role === "admin"
+                ? "@ITinfo.npru.ac.th"
+                : "@webmail.npru.ac.th"
+            }`,
+          staff_mobile: data.get("phoneNumber") || null,
           staff_address: null,
           province: null,
           district: null,
@@ -135,6 +157,48 @@ const Add_Users = ({ closeModal }) => {
     }
   };
 
+  const renderTitleOptions = () => {
+    if (selectedRole === "student") {
+      return (
+        <>
+          <select
+            id="title"
+            name="title"
+            className="mt-1 p-1 w-full border-b-2 rounded-md"
+            onChange={handleTitleChange}
+          >
+            <option value="">เลือกคำนำหน้า</option>
+            <option value="นาย">นาย</option>
+            <option value="นาง">นาง</option>
+            <option value="น.ส.">น.ส.</option>
+          </select>
+        </>
+      );
+    } else if (selectedRole === "teacher") {
+      return (
+        <>
+          <select
+            id="title"
+            name="title"
+            className="mt-1 p-1 w-full border-b-2 rounded-md"
+            onChange={handleTitleChange}
+          >
+            <option value="">เลือกคำนำหน้า</option>
+            <option value="อ.">อ.</option>
+            <option value="ดร.">ดร.</option>
+            <option value="รศ. ดร.">รศ.ดร.</option>
+            <option value="ผศ. ดร.">ผศ.ดร.</option>
+          </select>
+        </>
+      );
+    }
+    return (
+      <option value="" disabled>
+        เลือกคำนำหน้า
+      </option>
+    );
+  };
+
   const UploadFile = ({ onFileLoad }) => {
     const handleFileChange = (e) => {
       const file = e.target.files[0];
@@ -153,37 +217,43 @@ const Add_Users = ({ closeModal }) => {
 
     return (
       <>
-        <input type="file" onChange={handleFileChange} className="mt-1 p-1 w-full border-b-2 rounded-md" />
+        <input
+          type="file"
+          onChange={handleFileChange}
+          className="mt-1 p-1 w-full border-b-2 rounded-md"
+        />
       </>
     );
   };
 
   const handleFileLoad = async (csvData) => {
     try {
-  
       const jsonData = csvData.map((item) => ({
         username: item.username,
         password: `${item.password}`,
         role: item.role,
       }));
-  
-      const registerResponse = await axios.post("/api/auth/arrayregister", jsonData);
+
+      const registerResponse = await axios.post(
+        "/api/auth/arrayregister",
+        jsonData
+      );
       const registerData = registerResponse.data;
-  
+
       if (registerData.some((response) => response.status !== "ok")) {
         throw new Error("Failed to register some users");
       }
-  
+
       const studentsData = [];
       const staffsData = [];
-  
+
       jsonData.forEach((user, index) => {
         if (user.role === "student") {
           const registerUser = registerData[index];
           if (!registerUser || !registerUser.login_ID) {
             throw new Error(`Missing login_ID for user ${user.username}`);
           }
-  
+
           const loginID = registerUser.login_ID;
           studentsData.push({
             std_ID: user.username,
@@ -199,8 +269,7 @@ const Add_Users = ({ closeModal }) => {
             subdistrict: null,
             zipcode: null,
           });
-
-        }else {
+        } else {
           const registerUser = registerData[index];
           if (!registerUser || !registerUser.login_ID) {
             throw new Error(`Missing login_ID for user ${user.username}`);
@@ -210,46 +279,53 @@ const Add_Users = ({ closeModal }) => {
           staffsData.push({
             login_ID: loginID,
             staff_fname: csvData[index].std_fname || "กรุณาเปลี่ยนชื่อของคุณ",
-            staff_lname: csvData[index].std_lname || "กรุณาเปลี่ยนนามสกุลของคุณ",
+            staff_lname:
+              csvData[index].std_lname || "กรุณาเปลี่ยนนามสกุลของคุณ",
             staff_email: csvData[index].email,
             staff_mobile: csvData[index].phone || null,
             staff_address: null,
             province: null,
             district: null,
             subdistrict: null,
-            ipcode: null,
-          }) 
+            zipcode: null,
+          });
         }
       });
 
-      const createStudentResponse = await axios.post('/api/create/students', studentsData);
+      const createStudentResponse = await axios.post(
+        "/api/create/students",
+        studentsData
+      );
       const createStudentData = createStudentResponse.data;
-  
-      if (createStudentData.status !== 'ok') {
+
+      if (createStudentData.status !== "ok") {
         throw new Error("Unexpected response format from /api/create/students");
       }
 
-      const createStaffResponse = await axios.post('/api/create/staffs', staffsData);
+      const createStaffResponse = await axios.post(
+        "/api/create/staffs",
+        staffsData
+      );
       const createStaffData = createStaffResponse.data;
-  
-      if (createStaffData.status !== 'ok') {
+
+      if (createStaffData.status !== "ok") {
         throw new Error("Unexpected response format from /api/create/staffs");
       }
-  
+
       Swal.fire({
         icon: "success",
         title: "เพิ่มผู้ใช้สำเร็จ!",
         showConfirmButton: false,
         timer: 1500,
       });
-  
+
       closeModal();
       setTimeout(() => {
         window.location.reload(); // Refresh the screen
       }, 2000);
     } catch (error) {
       console.error("Error:", error);
-  
+
       Swal.fire({
         icon: "error",
         title: "เกิดข้อผิดพลาด!",
@@ -258,13 +334,10 @@ const Add_Users = ({ closeModal }) => {
       closeModal();
     }
   };
-  
-  
-
 
   return (
     <div className="flex justify-center items-center bg-gray-100 rounded-lg">
-      <div className="p-8 rounded shadow-md w-full">
+      <div className="p-8 rounded w-full shadow-md h-full">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-semibold text-gray-800">เพิ่มผู้ใช้</h2>
           <CloseIcon className="cursor-pointer" onClick={closeModal} />
@@ -290,8 +363,8 @@ const Add_Users = ({ closeModal }) => {
           </button>
         </div>
         {activeTab === "single" ? (
-          <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-2">
-            <div className="mb-4">
+          <form onSubmit={handleSubmit} className="grid grid-cols-5 gap-2">
+            <div className="mb-4 col-span-2">
               <label
                 htmlFor="username"
                 className="block text-sm font-medium text-gray-600"
@@ -305,7 +378,7 @@ const Add_Users = ({ closeModal }) => {
                 className="mt-1 p-1 w-full border-b-2 rounded-md"
               />
             </div>
-            <div className="mb-4">
+            <div className="mb-4 col-span-2">
               <label
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-600"
@@ -319,7 +392,7 @@ const Add_Users = ({ closeModal }) => {
                 className="mt-1 p-1 w-full border-b-2 rounded-md"
               />
             </div>
-            <div className="mb-4 col-span-2">
+            <div className="mb-4">
               <label
                 htmlFor="role"
                 className="block text-sm font-medium text-gray-600"
@@ -342,6 +415,16 @@ const Add_Users = ({ closeModal }) => {
               <>
                 <div className="mb-4">
                   <label
+                    htmlFor="title"
+                    className="block text-sm font-medium text-gray-600"
+                  >
+                    คำนำหน้า
+                  </label>
+
+                  {renderTitleOptions()}
+                </div>
+                <div className="mb-4 col-span-2">
+                  <label
                     htmlFor="firstName"
                     className="block text-sm font-medium text-gray-600"
                   >
@@ -354,7 +437,7 @@ const Add_Users = ({ closeModal }) => {
                     className="mt-1 p-1 w-full border-b-2 rounded-md"
                   />
                 </div>
-                <div className="mb-4">
+                <div className="mb-4 col-span-2">
                   <label
                     htmlFor="lastName"
                     className="block text-sm font-medium text-gray-600"
@@ -368,7 +451,7 @@ const Add_Users = ({ closeModal }) => {
                     className="mt-1 p-1 w-full border-b-2 rounded-md"
                   />
                 </div>
-                <div className="mb-4">
+                <div className="mb-4 col-span-3">
                   <label
                     htmlFor="email"
                     className="block text-sm font-medium text-gray-600"
@@ -382,7 +465,7 @@ const Add_Users = ({ closeModal }) => {
                     className="mt-1 p-1 w-full border-b-2 rounded-md"
                   />
                 </div>
-                <div className="mb-4">
+                <div className="mb-4 col-span-2">
                   <label
                     htmlFor="phoneNumber"
                     className="block text-sm font-medium text-gray-600"
@@ -397,8 +480,8 @@ const Add_Users = ({ closeModal }) => {
                   />
                 </div>
               </>
-            ) :null}
-            <div className="col-span-2 text-right">
+            ) : null}
+            <div className="col-span-5 text-right">
               <button
                 type="submit"
                 className="w-fit p-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring focus:border-purple-300"
