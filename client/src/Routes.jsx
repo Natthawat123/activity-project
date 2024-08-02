@@ -36,6 +36,7 @@ import UpdateStaff from "./admin/components/UpdateStaff.jsx";
 import DetailActivityA from "./admin/components/DetailActivity.jsx";
 import DetailStudent from "./admin/components/DetailStudent.jsx";
 import DetailStaff from "./admin/components/DetailStaff.jsx";
+import Table from "./admin/components/Upload/Table.jsx";
 
 import ManageActivity from "./admin/components/Manage_activity.jsx";
 // import Login from './pages/Login.jsx';
@@ -50,6 +51,7 @@ export function Router() {
 
       <Route element={<PrivateRoutes />}>
         <Route path="/admin" element={<LayoutA />}>
+          <Route path="test" element={<Table />}></Route>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="dashboard/user/:id" element={<DetailStudent />} />
           <Route path="calendar" element={<CalendarA />} />
