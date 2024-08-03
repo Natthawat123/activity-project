@@ -69,7 +69,7 @@ const NavBar = () => {
                 onClick={() => handleItemClick("Dashboard")}
                 className={getItemClass("Dashboard")}
               >
-                Dashboard
+                จัดการข้อมูลผู้ใช้
               </li>
             </Link>
             <Link to="/admin/activity">
@@ -93,7 +93,7 @@ const NavBar = () => {
                 onClick={() => handleItemClick("Wallet")}
                 className={getItemClass("Wallet")}
               >
-                Metamask
+                บันทึกข้อมูลกิจกรรมขึ้น Blockchain
               </li>
             </Link>
 
