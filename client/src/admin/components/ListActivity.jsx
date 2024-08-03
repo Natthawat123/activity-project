@@ -7,6 +7,7 @@ import ArticleIcon from "@mui/icons-material/Article";
 import Button from "@mui/material/Button";
 
 const ListActivity = () => {
+  
   const now = new Date();
 
   const [error, setError] = useState(null);
@@ -25,6 +26,7 @@ const ListActivity = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    
     fetch("/api/activitys")
       .then((res) => res.json())
       .then(

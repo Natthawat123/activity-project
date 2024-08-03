@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import Logo from "../images/logoit.png";
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -93,29 +94,52 @@ export default function SignInSide() {
         >
           <div className="absolute bg-black opacity-60 inset-0 z-0"></div>
           <div className="w-full px-24 z-10">
-            <h1 className="text-5xl font-bold text-left tracking-wide ">
+            <motion.h1
+              initial={{ opacity: 0, y: -50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1 }}
+              className="text-5xl font-bold text-left tracking-wide "
+            >
               INFORMATION TECHNOLOGY
-            </h1>
-            <p className="text-3xl my-4">
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1 }}
+              className="text-3xl my-4"
+            >
               ยินดีต้อนรับเข้าสู่ระบบกิจกรรมของสาขาเทคโนโลยีสารสนเทศ
-            </p>
+            </motion.p>
           </div>
         </div>
-        <form
+        <motion.form
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
           onSubmit={showForgotPassword ? handleForgotPasswordSubmit : handleSubmit}
           className="w-full lg:w-1/2 bg-gray-900 flex flex-col items-center justify-center relative"
         >
           <div className="grid grid-cols-1 w-11/12 sm:w-3/4 lg:w-2/3">
-            <div className="flex flex-col items-center">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="flex flex-col items-center"
+            >
               <img src={Logo} alt="" className="w-60 -mb-14" />
               <h2 className="text-3xl font-extrabold text-white">
                 {showForgotPassword ? "RESET PASSWORD" : "LOGIN"}
               </h2>
-            </div>
+            </motion.div>
             {errorMessage && <p className="text-red-500">{errorMessage}</p>}
             {showForgotPassword ? (
               <>
-                <div className="mt-4">
+                <motion.div
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 1 }}
+                  className="mt-4"
+                >
                   <label
                     htmlFor="reset-email"
                     className="text-sm font-bold text-white"
@@ -129,25 +153,45 @@ export default function SignInSide() {
                     onChange={(e) => setResetEmail(e.target.value)}
                     className="w-full p-2 mt-1 text-white bg-gray-800 rounded-md focus:outline-none focus:ring focus:border-blue-300"
                   />
-                </div>
-                {resetMessage && <p className="text-white mt-2">{resetMessage}</p>}
-                <button
+                </motion.div>
+                {resetMessage && (
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 1 }}
+                    className="text-white mt-2"
+                  >
+                    {resetMessage}
+                  </motion.p>
+                )}
+                <motion.button
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: .5 }}
                   type="button"
                   onClick={() => setShowForgotPassword(false)}
                   className="text-sm font-semibold text-purple-600 hover:text-white mt-2"
                 >
                   Back to Login
-                </button>
-                <button
+                </motion.button>
+                <motion.button
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 1 }}
                   type="submit"
                   className="w-full p-3 text-white bg-purple-600 rounded-md hover:bg-purple-700 focus:outline-none focus:ring focus:border-purple-300 mt-4"
                 >
                   Send Reset Link
-                </button>
+                </motion.button>
               </>
             ) : (
               <>
-                <div className="mt-4">
+                <motion.div
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 1 }}
+                  className="mt-4"
+                >
                   <label
                     htmlFor="username"
                     className="text-sm font-bold text-white"
@@ -160,8 +204,13 @@ export default function SignInSide() {
                     name="username"
                     className="w-full p-2 mt-1 text-white bg-gray-800 rounded-md focus:outline-none focus:ring focus:border-blue-300"
                   />
-                </div>
-                <div className="mt-4 relative">
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 1 }}
+                  className="mt-4 relative"
+                >
                   <label
                     htmlFor="password"
                     className="text-sm font-bold text-white"
@@ -181,8 +230,13 @@ export default function SignInSide() {
                   >
                     {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                   </button>
-                </div>
-                <div className="flex items-center justify-between mt-4">
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 2 }}
+                  className="flex items-center justify-between mt-4"
+                >
                   <div>
                     <button
                       type="button"
@@ -192,16 +246,21 @@ export default function SignInSide() {
                       Forgot your password?
                     </button>
                   </div>
-                </div>
-                <div className="mt-6">
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 2.5 }}
+                  className="mt-6"
+                >
                   <button className="w-full p-3 text-white bg-purple-600 rounded-md hover:bg-purple-700 focus:outline-none focus:ring focus:border-purple-300">
                     Sign In
                   </button>
-                </div>
+                </motion.div>
               </>
             )}
           </div>
-        </form>
+        </motion.form>
       </section>
     </>
   );

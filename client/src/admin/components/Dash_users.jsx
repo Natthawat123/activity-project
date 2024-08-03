@@ -113,7 +113,7 @@ function Dash_users() {
               ]}
               width={500}
               height={300}
-            />
+            /> 
           </>
         ) : (
           <p>Loading...</p>
