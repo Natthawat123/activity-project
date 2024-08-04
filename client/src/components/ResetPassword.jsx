@@ -11,7 +11,7 @@ const ResetPassword = () => {
     e.preventDefault();
 
     try {
-      await axios.post(`/api/auth/reset-password/${token}`, { password });
+      await axios.post(`/api/reset-password/${token}`, { password });
       setMessage('Password has been reset.');
     } catch (error) {
       setMessage('Error resetting password. Please try again.');

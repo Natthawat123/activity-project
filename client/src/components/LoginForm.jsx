@@ -62,7 +62,7 @@ export default function SignInSide() {
   const handleForgotPasswordSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch("/api/auth/forgotPassword", {
+      const response = await fetch("/api/forgotPassword", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

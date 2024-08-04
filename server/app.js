@@ -14,7 +14,6 @@ const app = express()
 app.use(express.json())
 
 app.use('/auth', authRoutes)
-app.use('/auth', forgotPassword)
 
 //new
 app.use('/', user)
@@ -24,6 +23,7 @@ app.use('/', teacher)
 app.use('/', activity)
 app.use('/', manage)
 app.use('/', section)
+app.use('/', forgotPassword)
 
 app.listen(3000, () => console.log('server on port 3000'))
 
