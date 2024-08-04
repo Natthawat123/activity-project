@@ -496,7 +496,7 @@ const Add_Users = ({ closeModal }) => {
               htmlFor="csvFile"
               className="block text-sm font-medium text-gray-600 mb-4"
             >
-              อัปโหลดไฟล์ CSV เพื่อเพิ่มผู้ใช้งานแบบครั้งละหลายคน
+              อัปโหลดไฟล์ CSV เพื่อเพิ่มผู้ใช้งานจำนวนมาก
             </label>
             <UploadFile onFileLoad={handleFileLoad} />
           </div>

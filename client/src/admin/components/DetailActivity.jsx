@@ -351,15 +351,17 @@ function DetailActivity() {
                         <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
                           สถานะ
                         </td>
-                        <select
-                          value={status}
-                          onChange={handleStatusChange}
-                          disabled={isReadOnly}
-                        >
-                          <option value={1}>เปิดลงทะเบียน</option>
-                          <option value={2}>กิจกรรมจบลงแล้ว</option>
-                          <option value={0}>ปิดลงทะเบียน</option>
-                        </select>
+                        <td>
+                          <select
+                            value={status}
+                            onChange={handleStatusChange}
+                            disabled={isReadOnly}
+                          >
+                            <option value={1}>เปิดลงทะเบียน</option>
+                            <option value={2}>กิจกรรมจบลงแล้ว</option>
+                            <option value={0}>ปิดลงทะเบียน</option>
+                          </select>
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
                           ผู้จัดกิจกรรม
                         </td>
@@ -368,6 +370,7 @@ function DetailActivity() {
                             value={teacher.login_ID}
                             onChange={handleTeacherChange}
                             disabled={isReadOnly}
+
                           >
                             {teacher.map((i) => (
                               <option key={i.login_ID} value={i.login_ID}>
@@ -376,6 +379,9 @@ function DetailActivity() {
                             ))}
                           </select>
                         </td>
+                      </tr>
+
+                      <tr>
                         <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
                           transection
                         </td>

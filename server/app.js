@@ -8,11 +8,13 @@ import teacher from './routes/teacher.js'
 import activity from './routes/activity.js'
 import manage from './routes/manage.js'
 import section from './routes/section.js'
+import forgotPassword from './routes/forgotPassword.js'
 
 const app = express()
 app.use(express.json())
 
 app.use('/auth', authRoutes)
+app.use('/auth', forgotPassword)
 
 //new
 app.use('/', user)

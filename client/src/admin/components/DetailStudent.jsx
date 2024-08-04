@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import Web3 from "web3";
@@ -12,14 +12,13 @@ function DetailStudent() {
   const [updatedStudent, setUpdatedStudent] = useState({});
   const [join, setJoin] = useState([]);
   const [activity, setActivity] = useState([]);
-
   const [sortOrder, setSortOrder] = useState("latest");
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("default");
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
-  const navigate = useNavigate();
 
+  const navigate = useNavigate();
   const { id } = useParams();
   const contractAddress = "0x9A00B0CB3A626c44c19f868b85A3819C8b630494";
 
@@ -33,6 +32,7 @@ function DetailStudent() {
         console.error(error);
       }
     };
+
     const fetchActivity = async () => {
       try {
         const response = await axios.get(`/api/activitys`);
@@ -64,9 +64,9 @@ function DetailStudent() {
     fetchActivity();
   }, [id]);
 
-  const isStudentJoined = (actID) => {
-    return join.some((j) => j.actID == actID && j.stdIDs.includes(BigInt(id)));
-  };
+  const isStudentJoined = useCallback((actID) => {
+    return join.some((j) => j.actID === actID && j.stdIDs.includes(BigInt(id)));
+  }, [join, id]);
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -121,7 +121,7 @@ function DetailStudent() {
   };
 
   const handleEditToggle = () => {
-    setEditMode(!editMode);
+    setEditMode((prev) => !prev);
   };
 
   const handleInputChange = (e) => {
@@ -156,6 +156,26 @@ function DetailStudent() {
     }
   };
 
+  // Implement pagination
+  const paginatedActivities = activity
+    .filter(act => {
+      // Apply search and filter
+      return (
+        act.act_title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        (filter === "default" || (filter === "joinEntry" && isStudentJoined(act.act_ID)) ||
+         (filter === "reserveEntry" && !isStudentJoined(act.act_ID)) ||
+         (filter === "notjoin" && !isStudentJoined(act.act_ID)))
+      );
+    })
+    .sort((a, b) => {
+      if (sortOrder === "latest") {
+        return b.act_ID - a.act_ID;
+      } else {
+        return a.act_ID - b.act_ID;
+      }
+    })
+    .slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+
   return (
     <div>
       <div className="container mb-10 mx-auto md:px-20 pt-20">
@@ -171,166 +191,231 @@ function DetailStudent() {
             </div>
           </div>
           <hr className="mb-3" />
-          <div className="grid grid-cols-2 gap-4">
-            {student.role == "student" && (
-              <h1>รหัสนักศึกษา: {editMode ? (
-                <input
-                  type="text"
-                  name="ID"
-                  value={updatedStudent.ID}
-                  onChange={handleInputChange}
-                  readOnly
-                />
-              ) : (
-                student.ID
-              )}
-              </h1>
-            )}
-            <p>
-              ชื่อ-นามสกุล: {editMode ? (
+          <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-gray-200 text-md">
+              <tr>
+                <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">รหัสนักศึกษา</td>
+                <td className="px-6 py-3">
+                  {editMode ? (
+                    <input
+                      type="text"
+                      name="ID"
+                      value={updatedStudent.ID}
+                      onChange={handleInputChange}
+                      readOnly
+                    />
+                  ) : (
+                    student.ID
+                  )}
+                </td>
+             
+                <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">ชื่อ-นามสกุล</td>
+                <td className="px-6 py-3">
+                  {editMode ? (
+                    <>
+                      <input
+                        type="text"
+                        name="fname"
+                        value={updatedStudent.fname}
+                        onChange={handleInputChange}
+                      />
+                      <input
+                        type="text"
+                        name="lname"
+                        value={updatedStudent.lname}
+                        onChange={handleInputChange}
+                      />
+                    </>
+                  ) : (
+                    `${student.fname} ${student.lname}`
+                  )}
+                </td>
+              </tr>
+              {student.role === "student" && (
                 <>
-                  <input
-                    type="text"
-                    name="fname"
-                    value={updatedStudent.fname}
-                    onChange={handleInputChange}
-                  />
-                  <input
-                    type="text"
-                    name="lname"
-                    value={updatedStudent.lname}
-                    onChange={handleInputChange}
-                  />
+                  <tr>
+                    <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">หมู่เรียน</td>
+                    <td className="px-6 py-3">
+                      {editMode ? (
+                        <input
+                          type="text"
+                          name="sec_name"
+                          value={updatedStudent.sec_name}
+                          onChange={handleInputChange}
+                        />
+                      ) : (
+                        student.sec_name
+                      )}
+                    </td>
+                  </tr>
                 </>
-              ) : (
-                `${student.fname} ${student.lname}`
               )}
-            </p>
-            {student.role == "student" && (
-              <p>
-                หมู่เรียน: {editMode ? (
-                  <input
-                    type="text"
-                    name="sec_name"
-                    value={updatedStudent.sec_name}
-                    onChange={handleInputChange}
-                  />
-                ) : (
-                  student.sec_name
-                )}
-              </p>
-            )}
-            {student.role == "teacher" && (
-              <p>
-                อาจารย์ประจำหมู่เรียน: {editMode ? (
-                  <input
-                    type="text"
-                    name="sec_name"
-                    value={updatedStudent.sec_name}
-                    onChange={handleInputChange}
-                  />
-                ) : (
-                  student.sec_name
-                )}
-              </p>
-            )}
-            <p>Email: {editMode ? (
-              <input
-                type="text"
-                name="email"
-                value={updatedStudent.email}
-                onChange={handleInputChange}
-              />
-            ) : (
-              student.email
-            )}</p>
-            <p>เบอร์โทรศัพท์: {editMode ? (
-              <input
-                type="text"
-                name="mobile"
-                value={updatedStudent.mobile}
-                onChange={handleInputChange}
-              />
-            ) : (
-              student.mobile
-            )}</p>
-            {student.role != "admin" && (
-              <>
-                <p>ที่อยู่: {editMode ? (
-                  <input
-                    type="text"
-                    name="address"
-                    value={updatedStudent.address}
-                    onChange={handleInputChange}
-                  />
-                ) : (
-                  student.address
-                )}</p>
-                <p>จังหวัด: {editMode ? (
-                  <input
-                    type="text"
-                    name="province"
-                    value={updatedStudent.province}
-                    onChange={handleInputChange}
-                  />
-                ) : (
-                  student.province
-                )}</p>
-                <p>อำเภอ: {editMode ? (
-                  <input
-                    type="text"
-                    name="district"
-                    value={updatedStudent.district}
-                    onChange={handleInputChange}
-                  />
-                ) : (
-                  student.district
-                )}</p>
-                <p>ตำบล: {editMode ? (
-                  <input
-                    type="text"
-                    name="subdistrict"
-                    value={updatedStudent.subdistrict}
-                    onChange={handleInputChange}
-                  />
-                ) : (
-                  student.subdistrict
-                )}</p>
-                <p>รหัสไปรษณีย์: {editMode ? (
-                  <input
-                    type="text"
-                    name="zipcode"
-                    value={updatedStudent.zipcode}
-                    onChange={handleInputChange}
-                  />
-                ) : (
-                  student.zipcode
-                )}</p>
-              </>
-            )}
+              {student.role === "teacher" && (
+                <tr>
+                  <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">อาจารย์ประจำหมู่เรียน</td>
+                  <td className="px-6 py-3">
+                    {editMode ? (
+                      <input
+                        type="text"
+                        name="sec_name"
+                        value={updatedStudent.sec_name}
+                        onChange={handleInputChange}
+                      />
+                    ) : (
+                      student.sec_name
+                    )}
+                  </td>
+                </tr>
+              )}
+              <tr>
+                <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">อีเมล</td>
+                <td className="px-6 py-3">
+                  {editMode ? (
+                    <input
+                      type="text"
+                      name="email"
+                      value={updatedStudent.email}
+                      onChange={handleInputChange}
+                    />
+                  ) : (
+                    student.email
+                  )}
+                </td>
+        
+                <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">เบอร์โทรศัพท์</td>
+                <td className="px-6 py-3">
+                  {editMode ? (
+                    <input
+                      type="text"
+                      name="mobile"
+                      value={updatedStudent.mobile}
+                      onChange={handleInputChange}
+                    />
+                  ) : (
+                    student.mobile
+                  )}
+                </td>
+              </tr>
+              {student.role !== "admin" && (
+                <>
+                  <tr>
+                    <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">ที่อยู่</td>
+                    <td className="px-6 py-3">
+                      {editMode ? (
+                        <input
+                          type="text"
+                          name="address"
+                          value={updatedStudent.address}
+                          onChange={handleInputChange}
+                        />
+                      ) : (
+                        student.address
+                      )}
+                    </td>
+                
+                    <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">จังหวัด</td>
+                    <td className="px-6 py-3">
+                      {editMode ? (
+                        <input
+                          type="text"
+                          name="province"
+                          value={updatedStudent.province}
+                          onChange={handleInputChange}
+                        />
+                      ) : (
+                        student.province
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">อำเภอ</td>
+                    <td className="px-6 py-3">
+                      {editMode ? (
+                        <input
+                          type="text"
+                          name="district"
+                          value={updatedStudent.district}
+                          onChange={handleInputChange}
+                        />
+                      ) : (
+                        student.district
+                      )}
+                    </td>
+               
+                    <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">ตำบล</td>
+                    <td className="px-6 py-3">
+                      {editMode ? (
+                        <input
+                          type="text"
+                          name="subdistrict"
+                          value={updatedStudent.subdistrict}
+                          onChange={handleInputChange}
+                        />
+                      ) : (
+                        student.subdistrict
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">รหัสไปรษณีย์</td>
+                    <td className="px-6 py-3">
+                      {editMode ? (
+                        <input
+                          type="text"
+                          name="zipcode"
+                          value={updatedStudent.zipcode}
+                          onChange={handleInputChange}
+                        />
+                      ) : (
+                        student.zipcode
+                      )}
+                    </td>
+                  </tr>
+                </>
+              )}
+            </tbody>
+          </table>
           </div>
+
           <div className="mt-5">
+            <button
+              className="btn btn-warning px-6 py-4 text-white"
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
             {editMode ? (
               <button
-                className="btn btn-primary px-6 py-4 text-white"
+                className="btn btn-primary px-6 py-4 mx-3 text-white"
                 onClick={handleSave}
               >
                 Save
               </button>
             ) : (
               <button
-                className="btn btn-primary px-6 py-4 text-white"
+                className="btn btn-primary px-6 py-4 mx-3 text-white"
                 onClick={handleEditToggle}
               >
-                แก้ไขประวัติ
+                Edit
               </button>
             )}
             <button
-              className="btn btn-warning px-6 py-4 text-white mx-3"
-              onClick={handleDelete}
+              className="btn btn-primary px-6 py-4 mx-3 text-white"
+              onClick={() =>
+                navigate(`/admin/dashboard/detail/student/update/${student.username}`)
+              }
             >
-              Delete
+              แก้ไขประวัติ
             </button>
+            <button
+            className="btn btn-warning px-6 py-4 text-white"
+            onClick={handleDelete}
+          >
+            Delete
+          </button>
+
+
           </div>
         </div>
       </div>
@@ -407,7 +492,7 @@ function DetailStudent() {
                 </tr>
               </thead>
               <tbody>
-                {activity.map((i, index) => {
+                {paginatedActivities.map((i, index) => {
                   const isJoined = isStudentJoined(i.act_ID);
                   return (
                     <tr key={index}>
@@ -427,7 +512,7 @@ function DetailStudent() {
             >
               Previous
             </button>
-            <span className="text-sm text-gray-700 dark:text-gray-400">Page</span>
+            <span className="text-sm text-gray-700 dark:text-gray-400">Page {currentPage + 1}</span>
             <button
               onClick={() => setCurrentPage((prevPage) => prevPage + 1)}
               className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"

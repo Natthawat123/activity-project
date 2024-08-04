@@ -160,22 +160,21 @@ const ListActivity = () => {
     return date.toLocaleDateString("th-TH", options);
   };
 
-  const handleFilterChange = (event) => {
-    setFilter(event.target.value);
-    setCurrentPage(0);
-  };
 
-  const filteredAndFilteredItems = filteredItems.filter((item) => {
-    const status = getStatus(item.act_ID);
-    return (
-      filter === "default" ||
-      (filter === "joinEntry" && status.message === "เข้าร่วมกิจกรรมแล้ว") ||
-      (filter === "reserveEntry" && status.message === "ลงทะเบียนสำเร็จ") ||
-      (filter === "notjoin" && status.message === "ยังไม่ได้ลงทะเบียน") ||
-      (filter === "notrange" &&
-        status.message === "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน")
-    );
-  });
+const handleFilterChange = (event) => {
+  setFilter(event.target.value);
+  setCurrentPage(0);
+};
+
+const filteredAndFilteredItems = filteredItems.filter((item) => {
+  const status = getStatus(item.act_ID);
+  return (
+    filter === "default" ||
+    (filter === "openRegistration" && status.message === "เปิดลงทะเบียน") ||
+    (filter === "closedRegistration" && status.message === "ปิดลงทะเบียน") ||
+    (filter === "notInRegistrationPeriod" && status.message === "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน")
+  );
+});
 
   if (error) {
     return <div>Error: {error.message}</div>;
@@ -244,19 +243,18 @@ const ListActivity = () => {
                   <select
                     value={filter}
                     onChange={handleFilterChange}
-                    className="text-xs block p-1.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className="text-xs block p-1 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
                     <option value="default" className="text-center">
                       ทั้งหมด
                     </option>
-                    <option value="joinEntry">เข้าร่วมกิจกรรมแล้ว</option>
-                    <option value="reserveEntry">ลงทะเบียนสำเร็จ</option>
-                    <option value="notjoin">ยังไม่ได้ลงทะเบียน</option>
-                    <option value="notrange">
-                      ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน
-                    </option>
+                    <option value="">เปิดลงทะเบียน</option>
+                    <option value="">ปิดลงทะเบียน</option>
+                    <option value="">ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน</option>
                   </select>
                 </div>
+
+                
               </div>
               <div className="flex pb-4 items-center">
                 <button

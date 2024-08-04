@@ -61,112 +61,13 @@ function DetailActivity() {
 
   return (
     <div>
-      <div>
-        <div className="container m-10 mx-auto md:px-20 pt-20">
-          <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
-            <div className="flex justify-between">
-              <div className="flex gap-2">
-                <h1 className="text-lg font-bold mb-2">รายละเอียดกิจกรรม</h1>
-                <ArticleIcon />
-              </div>
-              <div
-                className="items-center mb-5 cursor-pointer"
-                onClick={() => navigate(-1)}
-              >
-                <ArrowBackIosNewIcon />
-                ย้อนกลับ
-              </div>
-            </div>
-            <hr className="mb-3" />
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <tbody className="bg-white divide-y divide-gray-200 text-md">
-                  {data.length > 0 ? (
-                    <>
-                      <tr>
-                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                          ชื่อกิจกรรม
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                          {data[0].act_title}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                          รายละเอียด
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                          {data[0].act_desc}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                          สถานที่
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                          {data[0].act_location}
-                        </td>
-
-                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                          จำนวนที่เปิดรับ
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                          {data[0].act_numStdReserve} {" / "}
-                          {data[0].act_numStd}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                          เริ่มวันที่
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                          {formatDateThai(data[0].act_dateStart)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                          สิ้นสุดวันที่
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                          {formatDateThai(data[0].act_dateEnd)}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                          สถานะ
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                          {data[0].act_status}
-                        </td>
-
-                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                          ผู้จัดกิจกรรม
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                          {data[0].staff_fname + " " + data[0].staff_lname}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                          transection
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                          <a
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            ตรวจสอบ
-                          </a>
-                        </td>
-                      </tr>
-                    </>
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan="6"
-                        className="text-center px-6 py-4 text-gray-500"
-                      >
-                        ไม่มีข้อมูล
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+      <div className="container m-10 mx-auto md:px-20 pt-20">
+        <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
+          <div className="flex justify-between">
+            <h1 className="text-lg font-bold mb-2">รายละเอียดกิจกรรม</h1>
+            <div className="items-center mb-5" onClick={() => navigate(-1)}>
+              <ArrowBackIosNewIcon />
+              ย้อนกลับ
             </div>
           </div>
         </div>
