@@ -7,6 +7,7 @@ import Login from "./pages/Login.jsx";
 
 import Layoutm from "./components/Layout/Layout.jsx";
 import Calen from "./components/Calendar.jsx";
+import GetReserve from "./components/Reserve_Check.jsx"
 
 import Layout from "./student/components/Layout.jsx";
 import DashUser from "./student/pages/Dashboard.jsx";
@@ -35,10 +36,11 @@ import UpdateStudent from "./admin/components/UpdateStudent.jsx";
 import UpdateStaff from "./admin/components/UpdateStaff.jsx";
 import DetailActivityA from "./admin/components/DetailActivity.jsx";
 import DetailStudent from "./admin/components/DetailStudent.jsx";
-import DetailStaff from "./admin/components/DetailStaff.jsx";
+// import DetailStaff from "./admin/components/DetailStaff.jsx";
 import Table from "./admin/components/Upload/Table.jsx";
 
 import ManageActivity from "./admin/components/Manage_activity.jsx";
+
 // import Login from './pages/Login.jsx';
 
 export function Router() {
@@ -62,8 +64,9 @@ export function Router() {
           <Route path="addusers" element={<AddUsers />} />
           <Route path="update" element={<UpdateUser />} />
           <Route path="wallet" element={<Wallet />} />
+          <Route path="reserve/:act_ID" element={<GetReserve />} />
           <Route
-            path="dashboard/detail/student/update/:std_ID"
+            path="dashboard/user/update/:id"
             element={<UpdateStudent />}
           />
           <Route

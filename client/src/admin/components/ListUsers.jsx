@@ -13,57 +13,94 @@ const ListUsers = () => {
   const [section, setSection] = useState([]);
   const [sortOrder, setSortOrder] = useState("asc");
   const [selectedSection, setSelectedSection] = useState("all");
-  const index = 1;
-
-  const [filter, setFilter] = useState("all");
+  const [selectedRole, setSelectedRole] = useState('all');
   const [test, setTest] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
      
       try {
-        axios
-          .get("/api/users")
-          .then((res) => {
-            if (res.status === 200) {
-              setUsers(res.data);
-              setTest(res.data);
-            } else {
-              console.error(`Error: ${res.status} ${res.statusText}`);
-            }
-          })
-          .catch((err) => {
-            console.error(`Error: ${err.message}`);
-          });
-
+        const res = await axios.get("/api/users");
+        if (res.status === 200) {
+          setUsers(res.data);
+          setTest(res.data);
+        } else {
+          console.error(`Error: ${res.status} ${res.statusText}`);
+        }
+      } catch (err) {
+        console.error(`Error: ${err.message}`);
+      } finally {
         setIsLoaded(true);
-      } catch (error) {
-        setIsLoaded(false);
-        setError(error);
+      }
+    };
+
+    const fetchSection = async () => {
+      try {
+        const response = await axios.get("/api/sections");
+        setSection(response.data);
+      } catch (err) {
+        console.error(`Error: ${err.message}`);
       }
     };
 
     fetchData();
+    fetchSection();
   }, []);
 
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-    setCurrentPage(0);
+  useEffect(() => {
+    applyFiltersAndSort();
+  }, [selectedRole, selectedSection, sortOrder, searchTerm]);
+
+  console.log(selectedSection)
+
+  const applyFiltersAndSort = () => {
+    let filteredUsers = users;
+
+    if (selectedRole !== 'all') {
+      filteredUsers = filteredUsers.filter(user => user.role === selectedRole);
+    }
+
+    if (selectedSection !== 'all') {
+      filteredUsers = filteredUsers.filter(user => user.sec_ID == selectedSection);
+    }
+
+    if (sortOrder === 'asc') {
+      filteredUsers = filteredUsers.sort((a, b) => a.username.localeCompare(b.username));
+    } else if (sortOrder === 'desc') {
+      filteredUsers = filteredUsers.sort((a, b) => b.username.localeCompare(a.username));
+    }
+
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filteredUsers = filteredUsers.filter(user => {
+        return (
+          (user.fname && user.fname.toLowerCase().includes(term)) ||
+          (user.lname && user.lname.toLowerCase().includes(term)) ||
+          (user.sec_name && user.sec_name.toLowerCase().includes(term)) ||
+          (user.role === 'student' && user.username && String(user.username).toLowerCase().includes(term)) ||
+          (user.role !== 'student' && user.login_ID && String(user.login_ID).toLowerCase().includes(term))
+        );
+      });
+    }
+
+    setTest(filteredUsers);
   };
 
   const handleFilterChange = (event) => {
-    const value = event.target.value;
-    if (value === "all") {
-      setTest(users);
-    } else {
-      const filteredUsers = users.filter((user) => user.role === value);
-      setTest(filteredUsers);
-    }
-    setFilter(value);
+    setSelectedRole(event.target.value);
   };
 
   const handleSortChange = (event) => {
     setSortOrder(event.target.value);
+  };
+
+  const handleSectionFilterChange = (e) => {
+    setSelectedSection(e.target.value);
+  };
+
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(0);
   };
 
   if (error) {
@@ -119,7 +156,7 @@ const ListUsers = () => {
                 </label>
                 <div className="relative  justify-center flex">
                   <select
-                    value={filter}
+                    value={selectedRole}
                     onChange={handleFilterChange}
                     className="cursor-pointer text-xs block p-1 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
@@ -151,13 +188,13 @@ const ListUsers = () => {
 
               <div className="items-center justify-center text-center">
                 <label htmlFor="filter-section" className="text-xs">
-                  เรียงตามหมู่เรียน
+                  แยกตามหมู่เรียน
                 </label>
                 <div className="relative justify-center flex">
                   <select
                     id="filter-section"
                     value={selectedSection}
-                    onChange={(e) => setSelectedSection(e.target.value)}
+                    onChange={handleSectionFilterChange}
                     className="text-xs cursor-pointer block p-1 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
                     <option value="all">ทั้งหมด</option>
@@ -178,7 +215,7 @@ const ListUsers = () => {
                 <th scope="col" className="px-6 py-3 w-1/12 text-center">
                   ลำดับ
                 </th>
-                {filter == "student" && (
+                {selectedRole == "student" && (
                   <th scope="col" className="px-6 py-3 w-3/12 text-center">
                     รหัสนักศึกษา
                   </th>
@@ -190,12 +227,12 @@ const ListUsers = () => {
                 <th scope="col" className="px-6 py-3 w-2/12 text-center">
                   บทบาท
                 </th>
-                {filter == "student" && (
+                {selectedRole == "student" && (
                   <th scope="col" className="px-6 py-3 w-2/12 text-center">
                     หมู่เรียน
                   </th>
                 )}
-                {filter == "teacher" && (
+                {selectedRole == "teacher" && (
                   <th scope="col" className="px-6 py-3 w-2/12 text-center">
                     อาจารที่ปรึกษาหมู่เรียน
                   </th>
@@ -213,7 +250,7 @@ const ListUsers = () => {
                   className="border-b-2 flex w-full items-center"
                 >
                   <td className="px-6 py-3 w-1/12 text-center">{index + 1}</td>
-                  {filter == "student" && (
+                  {selectedRole == "student" && (
                     <td className="px-6 py-3 w-3/12 text-center">
                       {item.role === "student" ? item.username : item.login_ID}
                     </td>
@@ -222,8 +259,8 @@ const ListUsers = () => {
                   <td className="px-6 py-3 w-4/12">
                     {item.fname} {item.lname}
                   </td>
-                  <td className="px-6 py-3 w-2/12 text-center">{item.role}</td>
-                  {filter != "all" && (
+                  <td className="px-6 py-3 w-2/12 text-center">{item.role == 'student' ? 'นักศึกษา' : item.role == 'teacher' ? 'อาจารย์' : 'ผู้ดูแลระบบ'}</td>
+                  {selectedRole != "all" && (
                     <td className="px-6 py-3 w-2/12 text-center">
                       {item.sec_name}
                     </td>
@@ -243,7 +280,7 @@ const ListUsers = () => {
 
           <div className="flex justify-between mt-2">
             <div className="flex gap-2 w-24"></div>
-            <div className="flex gap-2">
+            {/* <div className="flex gap-2">
               <button
                 onClick={() =>
                   setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))
@@ -255,7 +292,7 @@ const ListUsers = () => {
               >
                 ก่อนหน้า
               </button>
-              {/* {pageNumbers.map((pageNumber) => (
+              {pageNumbers.map((pageNumber) => (
                 <button
                   key={pageNumber}
                   onClick={() => setCurrentPage(pageNumber)}
@@ -265,8 +302,8 @@ const ListUsers = () => {
                 >
                   {pageNumber + 1}
                 </button>
-              ))} */}
-              {/* <button
+              ))}
+              <button
                 onClick={() =>
                   setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))
                 }
@@ -278,8 +315,8 @@ const ListUsers = () => {
                 }`}
               >
                 ถัดไป
-              </button> */}
-            </div>
+              </button>
+            </div> */}
             <div className="flex gap-2">
               <select
                 value={itemsPerPage}

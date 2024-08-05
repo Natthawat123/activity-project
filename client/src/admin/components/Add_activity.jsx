@@ -5,17 +5,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 
 function Add_Activity({ closeModal }) {
-  useEffect(() => {
-    axios
-      .get("/api/activitys")
-      .then((response) => {
-        setStaffName(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching staff list:", error);
-      });
-  }, []);
-
   const [inputTitle, setInputTitle] = useState("");
   const [inputDesc, setInputDesc] = useState("");
   const [inputNumStd, setInputNumStd] = useState(1);
@@ -24,6 +13,18 @@ function Add_Activity({ closeModal }) {
   const [inputEndDate, setEndDate] = useState("");
   const [inputStaffID, setstaffID] = useState("");
   const [staffName, setStaffName] = useState([]);
+  useEffect(() => {
+    axios
+      .get("/api/users")
+      .then((response) => {
+        setStaffName(response.data.filter((staff) => staff.role != 'student'));
+      })
+      .catch((error) => {
+        console.error("Error fetching staff list:", error);
+      });
+  }, []);
+
+
 
   const handleTitle = (event) => {
     setInputTitle(event.target.value);
@@ -173,8 +174,8 @@ function Add_Activity({ closeModal }) {
           {staffName &&
             staffName.length > 0 &&
             staffName.map((item) => (
-              <option key={item.staff_ID} value={item.staff_ID}>
-                {item.staff_fname} {item.staff_lname}
+              <option key={item.login_ID} value={item.login_ID}>
+                {item.fname} {item.lname}
               </option>
             ))}
         </select>

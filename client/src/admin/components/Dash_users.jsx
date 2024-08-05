@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Popup from "./Popup_addUser";
 import { BarChart } from "@mui/x-charts/BarChart";
+import { green } from "@mui/material/colors";
 
 function Dash_users() {
   const [items, setItems] = useState([]);
@@ -105,6 +106,7 @@ function Dash_users() {
                   scaleType: "band",
                   data: ["admin", "teacher", "student"],
                 },
+                
               ]}
               series={[
                 {
@@ -113,7 +115,13 @@ function Dash_users() {
               ]}
               width={500}
               height={300}
+<<<<<<< HEAD
             /> 
+=======
+              borderRadius={12}
+              
+            />
+>>>>>>> origin/wave
           </>
         ) : (
           <p>Loading...</p>

@@ -61,7 +61,7 @@ function CalendarFull() {
       });
 
     axios
-      .get("/api/manage")
+      .get("/api/reserve")
       .then((response) => {
         setReservations(response.data);
       })
@@ -70,11 +70,9 @@ function CalendarFull() {
       });
   }, []);
 
+
   const now = new Date();
-  const isInRegistrationPeriod =
-    selectedEvent &&
-    now >= selectedEvent.reserveStart &&
-    now <= selectedEvent.reserveEnd;
+
 
   const handleReserve = async () => {
     try {
@@ -168,7 +166,7 @@ function CalendarFull() {
         reservation.act_ID.toString() === event.id.toString()
     );
 
-    const backgroundColor = isRegistered ? "yellow" : event.color;
+    const backgroundColor = isRegistered ? "orange" : event.color;
 
     const style = {
       backgroundColor,
@@ -213,8 +211,14 @@ function CalendarFull() {
         className="flex flex-wrap my-3 gap-5 z-50"
       >
 
+<<<<<<< HEAD
         <div className="flex items-center space-x-2">
           <div className="me-1 bg-yellow-400 h-[18px] w-[18px] rounded-sm"></div>
+=======
+      <div className="flex my-3 gap-5">
+        <div className="flex items-center">
+          <div className="me-1 bg-orange-400 h-[18px] w-[18px] rounded-sm"></div>
+>>>>>>> origin/wave
           <p className="me-2">ลงทะเบียนแล้ว</p>
         </div>
         <div className="flex items-center space-x-2">
@@ -326,7 +330,11 @@ function CalendarFull() {
                     reservation.std_ID.toString() === std_ID.toString() &&
                     reservation.act_ID.toString() === selectedEvent.id.toString()
                 )
+<<<<<<< HEAD
                   ? "ลงทะเบียนแล้ว"
+=======
+                  ? "orange"
+>>>>>>> origin/wave
                   : selectedEvent.status === 2
                   ? "กิจกรรมสิ้นสุดแล้ว"
                   : selectedEvent.numStd === selectedEvent.numStdReserve

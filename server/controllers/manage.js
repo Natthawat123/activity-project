@@ -17,6 +17,37 @@ export const readManage = (req, res) => {
         return res.json(result);
     });
 }
+export const readManageOne = (req, res) => {
+    const {id} = req.params;
+    const sql = `
+    SELECT 
+        manage.*,
+        activity.*,
+        student.*,
+        teacher.staff_fname,
+        teacher.staff_lname,
+        section.sec_name
+    FROM manage 
+        LEFT JOIN activity ON activity.act_ID = manage.act_ID 
+        LEFT JOIN student ON student.login_ID = manage.std_ID
+        LEFT JOIN teacher ON teacher.login_ID = activity.staff_ID
+        LEFT JOIN section ON section.sec_ID = student.sec_ID
+    WHERE 
+        manage.act_ID = ?`
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            return res.status(500).json({
+                error: err.message
+            });
+        }
+        if (result.length === 0) {
+            return res.status(404).json({
+                message: "Data not found"
+            });
+        }
+        return res.json(result);
+    });
+}
 
 // reserve
 export const reserveActivity = (req, res) => {

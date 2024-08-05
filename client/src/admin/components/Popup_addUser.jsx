@@ -36,8 +36,13 @@ class Popup extends Component {
                         </svg>
                     </div>
                 </button>
+<<<<<<< HEAD
                 <Modal visible={this.state.visible} width="720" height="20" effect="fadeInUp" onClickAway={this.closeModal}>
                     <div className="-mt-56">
+=======
+                <Modal visible={this.state.visible} width="840" height="230" effect="fadeInUp" onClickAway={this.closeModal}>
+                    <div className="-mt-40">
+>>>>>>> origin/wave
                         <Add_Users closeModal={this.closeModal} /> {/* Pass closeModal directly */}
                     </div>
                 </Modal>

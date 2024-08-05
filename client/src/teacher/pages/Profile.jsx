@@ -17,38 +17,9 @@ const StudentForm = () => {
     tambon_id: undefined,
     zip_code: undefined,
   });
+
   const [title, setTitle] = useState("");
-
-  const [value, setValue] = useState({}); // Initialize with empty object
-
-  const staff_ID = localStorage.getItem("staff_ID");
-
-  useEffect(() => {
-    fetch(`/api/teachers/${staff_ID}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Error fetching data");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setValue(data[0]);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-
-    fetch(
-      "https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json"
-    )
-      .then((response) => response.json())
-      .then((result) => {
-        const sortedProvinces = result.sort((a, b) =>
-          a.name_th.localeCompare(b.name_th)
-        );
-        setProvinces(sortedProvinces);
-      });
-  }, [staff_ID]);
+  const navigate = useNavigate();
 
   const onChangeHandle = (id, selectedValue) => {
     if (id === "province_id") {
@@ -103,31 +74,113 @@ const StudentForm = () => {
     };
 
     return (
-      <select
-        value={selected[id]}
-        onChange={onChangeHandleLocal}
-        className="mt-1 p-2 border w-full rounded-md"
-      >
-        <option
-          key={selected[id]}
+      <>
+        <select
           value={selected[id]}
-          label={addressValue_PDS}
-        />
+          onChange={onChangeHandleLocal}
+          className="mt-1 p-2 border w-full rounded-md"
+        >
+          <option
+            key={selected[id]}
+            value={selected[id]}
+            label={addressValue_PDS}
+          />
 
-        {list &&
-          list.map((item) => (
-            <option key={item.id} value={item.id} label={item.name_th}>
-              {item.name_th}
-            </option>
-          ))}
-      </select>
+          {list &&
+            list.map((item) => (
+              <option key={item.id} value={item.id} label={item.name_th}>
+                {item.name_th}
+              </option>
+            ))}
+        </select>
+      </>
     );
   };
+
+  const [value, setValue] = useState({
+    staff_ID: "",
+    staff_fname: "",
+    std_lname: "",
+    staff_mobile: "",
+    staff_email: "",
+    staff_address: "",
+    province: "",
+    district: "",
+    subdistrict: "",
+    zipcode: "",
+  });
+
+  const [section, setSection] = useState([]);
+
+  const staff_ID = localStorage.getItem("staff_ID");
+
+  useEffect(() => {
+    fetch("/api/sections")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setSection(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching sections:", error);
+      });
+
+    fetch("/api/teachers/" + staff_ID)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error fetching data");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setValue((prev) => ({
+          ...prev,
+          ...data[0],
+        }));
+
+        const titles = ["อ.", "ดร.", "รศ. ดร.", "ผศ. ดร."];
+        const title = titles.find((t) => data[0].staff_fname.startsWith(t));
+        if (title) {
+          setTitle(title);
+          setValue((prev) => ({
+            ...prev,
+            staff_fname: data[0].staff_fname.replace(title, "").trim(),
+          }));
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+
+    fetch(
+      "https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json"
+    )
+      .then((response) => response.json())
+      .then((result) => {
+        // Sort the provinces alphabetically by name_th
+        const sortedProvinces = result.sort((a, b) =>
+          a.name_th.localeCompare(b.name_th)
+        );
+        setProvinces(sortedProvinces);
+      });
+  }, [staff_ID]);
 
   const handlechange = (e) => {
     setValue((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSectionChange = (e) => {
+    const selectedSecID = e.target.value;
+    setValue((prev) => ({
+      ...prev,
+      sec_ID: selectedSecID,
     }));
   };
 
@@ -144,7 +197,7 @@ const StudentForm = () => {
       staff_fname: title + value.staff_fname.trim(),
     };
 
-    fetch(`/api/update/staff/${staff_ID}`, {
+    fetch("/api/teachers/" + staff_ID, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -182,24 +235,61 @@ const StudentForm = () => {
   }
 
   return (
-    <div className="pt-10">
-      <div className="w-full lg:w-2/3 mx-auto mt-12 p-4 bg-white shadow-md rounded-md py-14 mb-16">
+    <div className="container mx-auto mb-10 md:px-20 pt-24">
+      <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 pb-10">
+        <div className="flex justify-between">
+          <div className="flex gap-2">
+            <h1 className="text-lg font-bold mb-2">แก้ไขข้อมูลส่วนตัว</h1>
+            <DriveFileRenameOutlineIcon />
+          </div>
+          <div
+            className="items-center mb-5 cursor-pointer"
+            onClick={() => navigate(-1)}
+          >
+            <ArrowBackIosNewIcon />
+            ย้อนกลับ
+          </div>
+        </div>
+        <hr className="mb-3" />
         <form className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:px-10">
-          <div className="mb-4">
-            <label
-              htmlFor="firstName"
-              className="block text-sm font-medium text-gray-600"
-            >
-              ชื่อ
-            </label>
-            <input
-              type="text"
-              id="fname"
-              name="staff_fname"
-              onChange={handlechange}
-              value={value.staff_fname || ""}
-              className="mt-1 p-2 border w-full rounded-md"
-            />
+          <div className="flex gap-2">
+            <div className="w-1/6">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-600"
+              >
+                คำนำหน้า
+              </label>
+              <select
+                value={title}
+                onChange={handleTitleChange}
+                name="title"
+                id="title"
+                className="mt-1 p-2 border w-full rounded-md"
+              >
+                <option value="">เลือกคำนำหน้า</option>
+                <option value="อ.">อ.</option>
+                <option value="ดร.">ดร.</option>
+                <option value="รศ. ดร.">รศ. ดร.</option>
+                <option value="ผศ. ดร.">ผศ. ดร.</option>
+              </select>
+            </div>
+            <div className="w-5/6">
+              <label
+                htmlFor="firstName"
+                className="block text-sm font-medium text-gray-600"
+              >
+                ชื่อ
+              </label>
+              <input
+                type="text"
+                id="fname"
+                name="std_fname"
+                onChange={handlechange}
+                value={value.staff_fname}
+                className="mt-1 p-2 border w-full rounded-md"
+              />
+            </div>
           </div>
 
           <div className="mb-4">
@@ -214,9 +304,31 @@ const StudentForm = () => {
               id="lname"
               name="staff_lname"
               onChange={handlechange}
-              value={value.staff_lname || ""}
+              value={value.staff_lname}
               className="mt-1 p-2 border w-full rounded-md"
             />
+          </div>
+
+          <div>
+            <label
+              htmlFor="classGroup"
+              className="block text-sm font-medium text-gray-600"
+            >
+              อาจารย์ที่ปรึกษาประจำหมู่เรียน
+            </label>
+            <select
+              value={value.sec_ID}
+              onChange={handleSectionChange}
+              name="sec_ID"
+              className="mt-1 p-2 border w-full rounded-md"
+            >
+              <option value="">{value.sec_Name || "Select a section"}</option>
+              {section.map((sec) => (
+                <option key={sec.sec_ID} value={sec.sec_ID}>
+                  {sec.sec_name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="mb-4">
@@ -231,7 +343,7 @@ const StudentForm = () => {
               id="tel"
               name="staff_mobile"
               onChange={handlechange}
-              value={value.staff_mobile || ""}
+              value={value.staff_mobile}
               className="mt-1 p-2 border w-full rounded-md"
             />
           </div>
@@ -248,7 +360,7 @@ const StudentForm = () => {
               id="email"
               name="staff_email"
               onChange={handlechange}
-              value={value.staff_email || ""}
+              value={value.staff_email}
               className="mt-1 p-2 border w-full rounded-md"
             />
           </div>
@@ -264,7 +376,7 @@ const StudentForm = () => {
               id="address"
               name="staff_address"
               onChange={handlechange}
-              value={value.staff_address || ""}
+              value={value.staff_address}
               className="mt-1 p-2 border w-full rounded-md"
             />
           </div>
@@ -281,7 +393,7 @@ const StudentForm = () => {
               list={provinces}
               child="amphure"
               childsId={["amphure_id", "tambon_id"]}
-              addressValue_PDS={value.province || ""}
+              addressValue_PDS={value.province}
               setChilds={[setAmphures, setTambons]}
             />
           </div>
@@ -299,7 +411,7 @@ const StudentForm = () => {
               child="tambon"
               childsId={["tambon_id"]}
               setChilds={[setTambons]}
-              addressValue_PDS={value.district || ""}
+              addressValue_PDS={value.district}
             />
           </div>
 
@@ -316,7 +428,7 @@ const StudentForm = () => {
               child="zip_code"
               childsId={["zip_code"]}
               setChilds={[setZipcode]}
-              addressValue_PDS={value.subdistrict || ""}
+              addressValue_PDS={value.subdistrict}
             />
           </div>
 
@@ -332,7 +444,7 @@ const StudentForm = () => {
               id="zipcode"
               name="zipcode"
               onChange={handlechange}
-              value={zipcodeS ?? (value.zipcode || "")}
+              value={zipcodeS ?? value.zipcode}
               className="mt-1 p-2 border w-full rounded-md"
             />
           </div>

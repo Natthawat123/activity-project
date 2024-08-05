@@ -95,7 +95,13 @@ function DetailStudent() {
       });
 
       if (result.isConfirmed) {
+<<<<<<< HEAD
         const response = await axios.delete(`/api/students/${student.login_ID}`);
+=======
+        const response = await axios.delete(
+          `/api/students/${id}`
+        );
+>>>>>>> origin/wave
 
         if (response.status === 200) {
           Swal.fire({
@@ -331,6 +337,27 @@ function DetailStudent() {
             >
               Delete
             </button>
+<<<<<<< HEAD
+=======
+            <button
+              className="btn btn-primary px-6 py-4 mx-3 text-white"
+              onClick={() =>
+
+                {if(student.role == 'student'){
+                  navigate(
+                    `/admin/dashboard/user/update/${student.username}`
+                  )
+                }else{
+                  navigate(
+                    `/admin/dashboard/user/update/${student.login_ID}`
+                  )
+                }
+              }
+              }
+            >
+              แก้ไขประวัติ
+            </button>
+>>>>>>> origin/wave
           </div>
         </div>
       </div>
