@@ -95,13 +95,7 @@ function DetailStudent() {
       });
 
       if (result.isConfirmed) {
-<<<<<<< HEAD
-        const response = await axios.delete(`/api/students/${student.login_ID}`);
-=======
-        const response = await axios.delete(
-          `/api/students/${id}`
-        );
->>>>>>> origin/wave
+        const response = await axios.delete(`/api/students/${id}`);
 
         if (response.status === 200) {
           Swal.fire({
@@ -140,7 +134,10 @@ function DetailStudent() {
 
   const handleSave = async () => {
     try {
-      const response = await axios.put(`/api/students/${student.login_ID}`, updatedStudent);
+      const response = await axios.put(
+        `/api/students/${student.login_ID}`,
+        updatedStudent
+      );
       if (response.status === 200) {
         Swal.fire({
           title: "Updated!",
@@ -179,21 +176,24 @@ function DetailStudent() {
           <hr className="mb-3" />
           <div className="grid grid-cols-2 gap-4">
             {student.role == "student" && (
-              <h1>รหัสนักศึกษา: {editMode ? (
-                <input
-                  type="text"
-                  name="ID"
-                  value={updatedStudent.ID}
-                  onChange={handleInputChange}
-                  readOnly
-                />
-              ) : (
-                student.ID
-              )}
+              <h1>
+                รหัสนักศึกษา:{" "}
+                {editMode ? (
+                  <input
+                    type="text"
+                    name="ID"
+                    value={updatedStudent.ID}
+                    onChange={handleInputChange}
+                    readOnly
+                  />
+                ) : (
+                  student.ID
+                )}
               </h1>
             )}
             <p>
-              ชื่อ-นามสกุล: {editMode ? (
+              ชื่อ-นามสกุล:{" "}
+              {editMode ? (
                 <>
                   <input
                     type="text"
@@ -214,7 +214,8 @@ function DetailStudent() {
             </p>
             {student.role == "student" && (
               <p>
-                หมู่เรียน: {editMode ? (
+                หมู่เรียน:{" "}
+                {editMode ? (
                   <input
                     type="text"
                     name="sec_name"
@@ -228,7 +229,8 @@ function DetailStudent() {
             )}
             {student.role == "teacher" && (
               <p>
-                อาจารย์ประจำหมู่เรียน: {editMode ? (
+                อาจารย์ประจำหมู่เรียน:{" "}
+                {editMode ? (
                   <input
                     type="text"
                     name="sec_name"
@@ -240,78 +242,99 @@ function DetailStudent() {
                 )}
               </p>
             )}
-            <p>Email: {editMode ? (
-              <input
-                type="text"
-                name="email"
-                value={updatedStudent.email}
-                onChange={handleInputChange}
-              />
-            ) : (
-              student.email
-            )}</p>
-            <p>เบอร์โทรศัพท์: {editMode ? (
-              <input
-                type="text"
-                name="mobile"
-                value={updatedStudent.mobile}
-                onChange={handleInputChange}
-              />
-            ) : (
-              student.mobile
-            )}</p>
+            <p>
+              Email:{" "}
+              {editMode ? (
+                <input
+                  type="text"
+                  name="email"
+                  value={updatedStudent.email}
+                  onChange={handleInputChange}
+                />
+              ) : (
+                student.email
+              )}
+            </p>
+            <p>
+              เบอร์โทรศัพท์:{" "}
+              {editMode ? (
+                <input
+                  type="text"
+                  name="mobile"
+                  value={updatedStudent.mobile}
+                  onChange={handleInputChange}
+                />
+              ) : (
+                student.mobile
+              )}
+            </p>
             {student.role != "admin" && (
               <>
-                <p>ที่อยู่: {editMode ? (
-                  <input
-                    type="text"
-                    name="address"
-                    value={updatedStudent.address}
-                    onChange={handleInputChange}
-                  />
-                ) : (
-                  student.address
-                )}</p>
-                <p>จังหวัด: {editMode ? (
-                  <input
-                    type="text"
-                    name="province"
-                    value={updatedStudent.province}
-                    onChange={handleInputChange}
-                  />
-                ) : (
-                  student.province
-                )}</p>
-                <p>อำเภอ: {editMode ? (
-                  <input
-                    type="text"
-                    name="district"
-                    value={updatedStudent.district}
-                    onChange={handleInputChange}
-                  />
-                ) : (
-                  student.district
-                )}</p>
-                <p>ตำบล: {editMode ? (
-                  <input
-                    type="text"
-                    name="subdistrict"
-                    value={updatedStudent.subdistrict}
-                    onChange={handleInputChange}
-                  />
-                ) : (
-                  student.subdistrict
-                )}</p>
-                <p>รหัสไปรษณีย์: {editMode ? (
-                  <input
-                    type="text"
-                    name="zipcode"
-                    value={updatedStudent.zipcode}
-                    onChange={handleInputChange}
-                  />
-                ) : (
-                  student.zipcode
-                )}</p>
+                <p>
+                  ที่อยู่:{" "}
+                  {editMode ? (
+                    <input
+                      type="text"
+                      name="address"
+                      value={updatedStudent.address}
+                      onChange={handleInputChange}
+                    />
+                  ) : (
+                    student.address
+                  )}
+                </p>
+                <p>
+                  จังหวัด:{" "}
+                  {editMode ? (
+                    <input
+                      type="text"
+                      name="province"
+                      value={updatedStudent.province}
+                      onChange={handleInputChange}
+                    />
+                  ) : (
+                    student.province
+                  )}
+                </p>
+                <p>
+                  อำเภอ:{" "}
+                  {editMode ? (
+                    <input
+                      type="text"
+                      name="district"
+                      value={updatedStudent.district}
+                      onChange={handleInputChange}
+                    />
+                  ) : (
+                    student.district
+                  )}
+                </p>
+                <p>
+                  ตำบล:{" "}
+                  {editMode ? (
+                    <input
+                      type="text"
+                      name="subdistrict"
+                      value={updatedStudent.subdistrict}
+                      onChange={handleInputChange}
+                    />
+                  ) : (
+                    student.subdistrict
+                  )}
+                </p>
+                <p>
+                  รหัสไปรษณีย์:{" "}
+                  {editMode ? (
+                    <input
+                      type="text"
+                      name="zipcode"
+                      value={updatedStudent.zipcode}
+                      onChange={handleInputChange}
+                    />
+                  ) : (
+                    student.zipcode
+                  )}
+                </p>
               </>
             )}
           </div>
@@ -337,27 +360,18 @@ function DetailStudent() {
             >
               Delete
             </button>
-<<<<<<< HEAD
-=======
             <button
               className="btn btn-primary px-6 py-4 mx-3 text-white"
-              onClick={() =>
-
-                {if(student.role == 'student'){
-                  navigate(
-                    `/admin/dashboard/user/update/${student.username}`
-                  )
-                }else{
-                  navigate(
-                    `/admin/dashboard/user/update/${student.login_ID}`
-                  )
+              onClick={() => {
+                if (student.role == "student") {
+                  navigate(`/admin/dashboard/user/update/${student.username}`);
+                } else {
+                  navigate(`/admin/dashboard/user/update/${student.login_ID}`);
                 }
-              }
-              }
+              }}
             >
               แก้ไขประวัติ
             </button>
->>>>>>> origin/wave
           </div>
         </div>
       </div>
@@ -449,12 +463,16 @@ function DetailStudent() {
           </div>
           <div className="flex justify-between items-center mt-4">
             <button
-              onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
+              onClick={() =>
+                setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))
+              }
               className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               Previous
             </button>
-            <span className="text-sm text-gray-700 dark:text-gray-400">Page</span>
+            <span className="text-sm text-gray-700 dark:text-gray-400">
+              Page
+            </span>
             <button
               onClick={() => setCurrentPage((prevPage) => prevPage + 1)}
               className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"

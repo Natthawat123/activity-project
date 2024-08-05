@@ -106,7 +106,6 @@ function Dash_users() {
                   scaleType: "band",
                   data: ["admin", "teacher", "student"],
                 },
-                
               ]}
               series={[
                 {
@@ -115,13 +114,8 @@ function Dash_users() {
               ]}
               width={500}
               height={300}
-<<<<<<< HEAD
-            /> 
-=======
               borderRadius={12}
-              
             />
->>>>>>> origin/wave
           </>
         ) : (
           <p>Loading...</p>
