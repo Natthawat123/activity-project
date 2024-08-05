@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import PropTypes from "prop-types";
 import CloseIcon from "@mui/icons-material/Close";
@@ -9,6 +9,21 @@ const Add_Users = ({ closeModal }) => {
   const [selectedRole, setSelectedRole] = useState("");
   const [activeTab, setActiveTab] = useState("single");
   const [title, setTitle] = useState("");
+  const [section, setSection] = useState([]);
+  const [selectedSection, setSelectedSection] = useState("");
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [newSection, setNewSection] = useState("");
+
+  useEffect(() => {
+    axios
+      .get("/api/sections")
+      .then((response) => {
+        setSection(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching sections:", error);
+      });
+  }, []);
 
   const handleRoleChange = (event) => {
     setSelectedRole(event.target.value);
@@ -20,17 +35,52 @@ const Add_Users = ({ closeModal }) => {
 
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
-    console.log(title)
   };
+
+  const handleSectionChange = (event) => {
+    const value = event.target.value;
+    if (value === "add-new") {
+      setIsAddingNew(true);
+    } else {
+      setIsAddingNew(false);
+      setSelectedSection(value);
+    }
+  };
+
+  const handleNewSectionChange = (event) => {
+    setNewSection(event.target.value);
+  };
+
+  // const handleAddNewSection = () => {
+  //   if (newSection.trim() === '') {
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Invalid Input",
+  //       text: "Section name cannot be empty",
+  //     });
+  //     return;
+  //   }
+
+  //   const newSectionObj = { sec_ID: Date.now().toString(), sec_name: newSection };
+  //   setSection([...section, newSectionObj]);
+  //   setSelectedSection(newSectionObj.sec_ID);
+  //   setIsAddingNew(false);
+  //   setNewSection('');
+  // };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const username = data.get("username");
     const jsonData = {
-      username: data.get("username"),
+      username: username,
       password: data.get("password"),
       role: data.get("role"),
-      title: title, // Ensure title is included
+      fname: title + data.get("firstName") || "กรุณเปลี่ยนชื่อของท่าน",
+      lname: data.get("lastName") || "กรุณาเปลี่ยนนามสกุลของท่าน",
+      email: data.get("email") || `${username}@webmail.npru.ac.th`,
+      mobile: data.get("phoneNumber"),
+      sec_id: selectedSection,
     };
 
     try {
@@ -38,62 +88,8 @@ const Add_Users = ({ closeModal }) => {
       const loginData = loginResponse.data;
       console.log("Login response:", loginData);
 
-      if (loginData.status !== "ok" || !loginData.login_ID) {
+      if (loginData.status !== "ok") {
         throw new Error("Failed to register user");
-      }
-
-      const loginID = loginData.login_ID;
-
-      if (jsonData.role === "student") {
-        const additionalData = {
-          std_ID: data.get("username"),
-          login_ID: loginID,
-          std_fname: title + (data.get("firstName") || "กรุณาเปลี่ยนชื่อของคุณ"),
-          std_lname: data.get("lastName") || "กรุณาเปลี่ยนนามสกุลของคุณ",
-          sec_ID: 1,
-          std_email: data.get('email') || `${data.get("username")}@webmail.npru.ac.th`,
-          std_mobile: data.get('phoneNumber') || null,
-          std_address: null,
-          province: null,
-          district: null,
-          subdistrict: null,
-          zipcode: null,
-        };
-
-        const additionalResponse = await axios.post(
-          "/api/create/student",
-          additionalData
-        );
-        const additionalDataResponse = additionalResponse.data;
-        console.log("Additional response:", additionalDataResponse);
-
-        if (additionalDataResponse.status !== "ok") {
-          throw new Error(`Failed to create ${jsonData.role}`);
-        }
-      } else if (jsonData.role === "teacher" || jsonData.role === "admin") {
-        const additionalData = {
-          login_ID: loginID,
-          staff_fname: jsonData.role === "admin" ? "admin" : title + (data.get("firstName") || "กรุณาเปลี่ยนชื่อของคุณ"),
-          staff_lname: jsonData.role === "admin" ? null :  (data.get("lastName") || "กรุณาเปลี่ยนนามสกุลของคุณ"),
-          staff_email: data.get('email') || `${data.get("username")}${jsonData.role === "admin" ? "@ITinfo.npru.ac.th" : "@webmail.npru.ac.th"}`,
-          staff_mobile: data.get('phoneNumber') || null,
-          staff_address: null,
-          province: null,
-          district: null,
-          subdistrict: null,
-          zipcode: null,
-        };
-
-        const additionalResponse = await axios.post(
-          "/api/create/staff",
-          additionalData
-        );
-        const additionalDataResponse = additionalResponse.data;
-        console.log("Additional response:", additionalDataResponse);
-
-        if (additionalDataResponse.status !== "ok") {
-          throw new Error(`Failed to create ${jsonData.role}`);
-        }
       }
 
       Swal.fire({
@@ -105,8 +101,8 @@ const Add_Users = ({ closeModal }) => {
 
       closeModal();
       setTimeout(() => {
-        window.location.reload(); // รีเฟรชหน้าจอ
-      }, 2000); // ล่าช้าการรีเฟรชให้เกิดชั่วโมง 2 วินาที
+        window.location.reload(); // Refresh the screen
+      }, 2000); // Delay the refresh by 2 seconds
     } catch (error) {
       console.error("Error:", error);
       if (error.response) {
@@ -142,29 +138,46 @@ const Add_Users = ({ closeModal }) => {
   const renderTitleOptions = () => {
     if (selectedRole === "student") {
       return (
-        <>
-        <select id="title" name="title" className="mt-1 p-1 w-full border-b-2 rounded-md" onChange={handleTitleChange}>
-        <option value="" >เลือกคำนำหน้า</option>
+        <select
+          id="title"
+          name="title"
+          className="mt-1 p-1 w-full border-b-2 rounded-md"
+          onChange={handleTitleChange}
+        >
+          <option value="">เลือกคำนำหน้า</option>
           <option value="นาย">นาย</option>
           <option value="นาง">นาง</option>
           <option value="น.ส.">น.ส.</option>
         </select>
-        </>
       );
     } else if (selectedRole === "teacher") {
       return (
-        <>
-        <select id="title" name="title" className="mt-1 p-1 w-full border-b-2 rounded-md" onChange={handleTitleChange}>
-        <option value="" >เลือกคำนำหน้า</option>
+        <select
+          id="title"
+          name="title"
+          className="mt-1 p-1 w-full border-b-2 rounded-md"
+          onChange={handleTitleChange}
+        >
+          <option value="">เลือกคำนำหน้า</option>
           <option value="อ.">อ.</option>
           <option value="ดร.">ดร.</option>
           <option value="รศ. ดร.">รศ.ดร.</option>
           <option value="ผศ. ดร.">ผศ.ดร.</option>
-          </select>
-        </>
+        </select>
       );
     }
-    return <option value="" disabled>เลือกคำนำหน้า</option>;
+    return (
+      <select
+        id="title"
+        name="title"
+        className="mt-1 p-1 w-full border-b-2 rounded-md"
+        disabled
+      >
+        <option value="" disabled>
+          เลือกคำนำหน้า
+        </option>
+      </select>
+    );
   };
 
   const UploadFile = ({ onFileLoad }) => {
@@ -184,9 +197,12 @@ const Add_Users = ({ closeModal }) => {
     };
 
     return (
-      <>
-        <input type="file" onChange={handleFileChange} className="mt-1 p-1 w-full border-b-2 rounded-md" />
-      </>
+      <input
+        type="file"
+        onChange={handleFileChange}
+        className="mt-1 p-1 w-full border-b-2 rounded-md"
+        accept=".csv"
+      />
     );
   };
 
@@ -196,75 +212,21 @@ const Add_Users = ({ closeModal }) => {
         username: item.username,
         password: `${item.password}`,
         role: item.role,
+        fname: item.fname,
+        lname: item.lname,
+        email: item.email || `${item.username}@webmail.npru.ac.th`,
+        mobile: item.mobile,
+        sec_ID: item.section,
       }));
 
-      const registerResponse = await axios.post("/api/auth/arrayregister", jsonData);
+      const registerResponse = await axios.post(
+        "/api/auth/arrayregister",
+        jsonData
+      );
       const registerData = registerResponse.data;
 
       if (registerData.some((response) => response.status !== "ok")) {
         throw new Error("Failed to register some users");
-      }
-
-      const studentsData = [];
-      const staffsData = [];
-
-      jsonData.forEach((user, index) => {
-        if (user.role === "student") {
-          const registerUser = registerData[index];
-          if (!registerUser || !registerUser.login_ID) {
-            throw new Error(`Missing login_ID for user ${user.username}`);
-          }
-
-          const loginID = registerUser.login_ID;
-          studentsData.push({
-            std_ID: user.username,
-            login_ID: loginID,
-            std_fname: csvData[index].std_fname || "กรุณาเปลี่ยนชื่อของคุณ",
-            std_lname: csvData[index].std_lname || "กรุณาเปลี่ยนนามสกุลของคุณ",
-            sec_ID: 1,
-            std_email: csvData[index].email,
-            std_mobile: csvData[index].phone || null,
-            std_address: null,
-            province: null,
-            district: null,
-            subdistrict: null,
-            zipcode: null,
-          });
-
-        } else {
-          const registerUser = registerData[index];
-          if (!registerUser || !registerUser.login_ID) {
-            throw new Error(`Missing login_ID for user ${user.username}`);
-          }
-
-          const loginID = registerUser.login_ID;
-          staffsData.push({
-            login_ID: loginID,
-            staff_fname: csvData[index].std_fname || "กรุณาเปลี่ยนชื่อของคุณ",
-            staff_lname: csvData[index].std_lname || "กรุณาเปลี่ยนนามสกุลของคุณ",
-            staff_email: csvData[index].email,
-            staff_mobile: csvData[index].phone || null,
-            staff_address: null,
-            province: null,
-            district: null,
-            subdistrict: null,
-            zipcode: null,
-          });
-        }
-      });
-
-      const createStudentResponse = await axios.post('/api/create/students', studentsData);
-      const createStudentData = createStudentResponse.data;
-
-      if (createStudentData.status !== 'ok') {
-        throw new Error("Unexpected response format from /api/create/students");
-      }
-
-      const createStaffResponse = await axios.post('/api/create/staffs', staffsData);
-      const createStaffData = createStaffResponse.data;
-
-      if (createStaffData.status !== 'ok') {
-        throw new Error("Unexpected response format from /api/create/staffs");
       }
 
       Swal.fire({
@@ -299,31 +261,67 @@ const Add_Users = ({ closeModal }) => {
         </div>
         <div className="flex mb-6">
           <button
-            className={`p-2 w-1/2 ${activeTab === "single" ? "bg-purple-600 text-white" : "bg-gray-200"}`}
+            className={`p-2 w-1/2 ${
+              activeTab === "single"
+                ? "bg-purple-600 text-white"
+                : "bg-gray-200"
+            }`}
             onClick={() => handleTabChange("single")}
           >
-            เพิ่มผู้ใช้คนเดียว
+            เพิ่มผู้ใช้งานคนเดียว
           </button>
           <button
-            className={`p-2 w-1/2 ${activeTab === "bulk" ? "bg-purple-600 text-white" : "bg-gray-200"}`}
+            className={`p-2 w-1/2 ${
+              activeTab === "bulk" ? "bg-purple-600 text-white" : "bg-gray-200"
+            }`}
             onClick={() => handleTabChange("bulk")}
           >
-            อัปโหลด CSV
+            เพิ่มผู้ใช้งานหลายคน โดยอัปโหลด CSV
           </button>
         </div>
         {activeTab === "single" ? (
           <form onSubmit={handleSubmit} className="grid grid-cols-5 gap-2">
             <div className="mb-4 col-span-2">
-              <label htmlFor="username" className="block text-sm font-medium text-gray-600">Username</label>
-              <input type="text" id="username" name="username" className="mt-1 p-1 w-full border-b-2 rounded-md" />
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-gray-600"
+              >
+                Username
+              </label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                className="mt-1 p-1 w-full border-b-2 rounded-md"
+              />
             </div>
             <div className="mb-4 col-span-2">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-600">Password</label>
-              <input type="password" id="password" name="password" className="mt-1 p-1 w-full border-b-2 rounded-md" />
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-600"
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                className="mt-1 p-1 w-full border-b-2 rounded-md"
+              />
             </div>
             <div className="mb-4">
-              <label htmlFor="role" className="block text-sm font-medium text-gray-600">Role</label>
-              <select id="role" name="role" className="mt-1 p-1 w-full border-b-2 rounded-md" onChange={handleRoleChange}>
+              <label
+                htmlFor="role"
+                className="block text-sm font-medium text-gray-600"
+              >
+                Role
+              </label>
+              <select
+                id="role"
+                name="role"
+                className="mt-1 p-1 w-full border-b-2 rounded-md"
+                onChange={handleRoleChange}
+              >
                 <option value="">Select a Role</option>
                 <option value="student">student</option>
                 <option value="teacher">teacher</option>
@@ -333,35 +331,123 @@ const Add_Users = ({ closeModal }) => {
             {selectedRole === "student" || selectedRole === "teacher" ? (
               <>
                 <div className="mb-4">
-                  <label htmlFor="title" className="block text-sm font-medium text-gray-600">คำนำหน้า</label>
-
-                    {renderTitleOptions()}
+                  <label
+                    htmlFor="title"
+                    className="block text-sm font-medium text-gray-600"
+                  >
+                    คำนำหน้า
+                  </label>
+                  {renderTitleOptions()}
                 </div>
                 <div className="mb-4 col-span-2">
-                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-600">First Name</label>
-                  <input type="text" id="firstName" name="firstName" className="mt-1 p-1 w-full border-b-2 rounded-md" />
+                  <label
+                    htmlFor="firstName"
+                    className="block text-sm font-medium text-gray-600"
+                  >
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    className="mt-1 p-1 w-full border-b-2 rounded-md"
+                  />
                 </div>
                 <div className="mb-4 col-span-2">
-                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-600">Last Name</label>
-                  <input type="text" id="lastName" name="lastName" className="mt-1 p-1 w-full border-b-2 rounded-md" />
+                  <label
+                    htmlFor="lastName"
+                    className="block text-sm font-medium text-gray-600"
+                  >
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    className="mt-1 p-1 w-full border-b-2 rounded-md"
+                  />
                 </div>
                 <div className="mb-4 col-span-3">
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-600">Email</label>
-                  <input type="text" id="email" name="email" className="mt-1 p-1 w-full border-b-2 rounded-md" />
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-600"
+                  >
+                    Email
+                  </label>
+                  <input
+                    type="text"
+                    id="email"
+                    name="email"
+                    className="mt-1 p-1 w-full border-b-2 rounded-md"
+                  />
                 </div>
-                <div className="mb-4 col-span-2">
-                  <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-600">Phone</label>
-                  <input type="text" id="phoneNumber" name="phoneNumber" className="mt-1 p-1 w-full border-b-2 rounded-md" />
+                <div className="mb-4">
+                  <label
+                    htmlFor="phoneNumber"
+                    className="block text-sm font-medium text-gray-600"
+                  >
+                    Phone
+                  </label>
+                  <input
+                    type="text"
+                    id="phoneNumber"
+                    name="phoneNumber"
+                    className="mt-1 p-1 w-full border-b-2 rounded-md"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label
+                    htmlFor="section"
+                    className="block text-sm font-medium text-gray-600"
+                  >
+                    Section
+                  </label>
+                  {isAddingNew ? (
+                    <div>
+                      <input
+                        id="newSection"
+                        name="newSection"
+                        type="text"
+                        value={newSection}
+                        onChange={handleNewSectionChange}
+                        placeholder="New Section Name"
+                        className="mt-1 p-1 w-full border-b-2 rounded-md"
+                      />
+                    </div>
+                  ) : (
+                    <select
+                      className="mt-1 p-1 w-full border-b-2 rounded-md"
+                      onChange={handleSectionChange}
+                      value={selectedSection}
+                    >
+                      {section.map((s) => (
+                        <option key={s.sec_ID} value={s.sec_ID}>
+                          {s.sec_name}
+                        </option>
+                      ))}
+                      <option value="add-new">Add New Section</option>
+                    </select>
+                  )}
                 </div>
               </>
             ) : null}
             <div className="col-span-5 text-right">
-              <button type="submit" className="w-fit p-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring focus:border-purple-300">เพิ่มข้อมูล</button>
+              <button
+                type="submit"
+                className="w-fit p-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring focus:border-purple-300"
+              >
+                เพิ่มข้อมูล
+              </button>
             </div>
           </form>
         ) : (
           <div className="flex flex-col items-center">
-            <label htmlFor="csvFile" className="block text-sm font-medium text-gray-600 mb-4">อัปโหลดไฟล์ CSV เพื่อเพิ่มผู้ใช้งานแบบครั้งละหลายคน</label>
+            <label
+              htmlFor="csvFile"
+              className="block text-sm font-medium text-gray-600 mb-4"
+            >
+              อัปโหลดไฟล์ CSV เพื่อเพิ่มผู้ใช้งานแบบครั้งละหลายคน
+            </label>
             <UploadFile onFileLoad={handleFileLoad} />
           </div>
         )}

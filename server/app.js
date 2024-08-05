@@ -1,27 +1,27 @@
 import express from 'express'
-//import cors from 'cors'
 
 import authRoutes from './routes/auth.js'
-import listRoutes from './routes/list.js'
-import createRoutes from './routes/create.js'
-import resumeRoutes from './routes/resume.js'
-import updateRoutes from './routes/update.js'
-import reserveRoutes from './routes/reserve.js'
-import activityRoutes from './routes/activity.js'
-import studentRoutes from './routes/student.js'
+import user from './routes/user.js'
+import student from './routes/student.js'
+import admin from './routes/admin.js'
+import teacher from './routes/teacher.js'
+import activity from './routes/activity.js'
+import manage from './routes/manage.js'
+import section from './routes/section.js'
 
 const app = express()
 app.use(express.json())
-// app.use(cors())
 
 app.use('/auth', authRoutes)
-app.use('/list', listRoutes)
-app.use('/create', createRoutes)
-app.use('/resume', resumeRoutes)
-app.use('/update', updateRoutes)
-app.use('/reserve', reserveRoutes)
-app.use('/', activityRoutes)
-app.use('/', studentRoutes)
+
+//new
+app.use('/', user)
+app.use('/', student)
+app.use('/', admin)
+app.use('/', teacher)
+app.use('/', activity)
+app.use('/', manage)
+app.use('/', section)
 
 app.listen(3000, () => console.log('server on port 3000'))
 

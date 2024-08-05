@@ -1,165 +1,106 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import GroupIcon from "@mui/icons-material/Group";
 
 const ListUsers = () => {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [itemsPerPage, setItemsPerPage] = useState(15);
   const [currentPage, setCurrentPage] = useState(0);
-  const [login, setLogin] = useState([]);
-  const [student, setStudent] = useState([]);
-  const [staff, setStaff] = useState([]);
+  const [users, setUsers] = useState([]);
   const [section, setSection] = useState([]);
-  const [filter, setFilter] = useState("default");
   const [sortOrder, setSortOrder] = useState("asc");
   const [selectedSection, setSelectedSection] = useState("all");
+  const [selectedRole, setSelectedRole] = useState('all');
+  const [test, setTest] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [loginRes, studentRes, staffRes, sectionRes] = await Promise.all([
-          axios.get("/api/list/login"),
-          axios.get("/api/list/student"),
-          axios.get("/api/list/staff"),
-          axios.get("/api/list/section"),
-        ]);
-        setLogin(loginRes.data);
-        setStudent(studentRes.data);
-        setStaff(staffRes.data);
-        setSection(sectionRes.data);
+        const res = await axios.get("/api/users");
+        if (res.status === 200) {
+          setUsers(res.data);
+          setTest(res.data);
+        } else {
+          console.error(`Error: ${res.status} ${res.statusText}`);
+        }
+      } catch (err) {
+        console.error(`Error: ${err.message}`);
+      } finally {
         setIsLoaded(true);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setIsLoaded(false);
-        setError(error);
+      }
+    };
+
+    const fetchSection = async () => {
+      try {
+        const response = await axios.get("/api/sections");
+        setSection(response.data);
+      } catch (err) {
+        console.error(`Error: ${err.message}`);
       }
     };
 
     fetchData();
+    fetchSection();
   }, []);
 
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-    setCurrentPage(0);
+  useEffect(() => {
+    applyFiltersAndSort();
+  }, [selectedRole, selectedSection, sortOrder, searchTerm]);
+
+  console.log(selectedSection)
+
+  const applyFiltersAndSort = () => {
+    let filteredUsers = users;
+
+    if (selectedRole !== 'all') {
+      filteredUsers = filteredUsers.filter(user => user.role === selectedRole);
+    }
+
+    if (selectedSection !== 'all') {
+      filteredUsers = filteredUsers.filter(user => user.sec_ID == selectedSection);
+    }
+
+    if (sortOrder === 'asc') {
+      filteredUsers = filteredUsers.sort((a, b) => a.username.localeCompare(b.username));
+    } else if (sortOrder === 'desc') {
+      filteredUsers = filteredUsers.sort((a, b) => b.username.localeCompare(a.username));
+    }
+
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filteredUsers = filteredUsers.filter(user => {
+        return (
+          (user.fname && user.fname.toLowerCase().includes(term)) ||
+          (user.lname && user.lname.toLowerCase().includes(term)) ||
+          (user.sec_name && user.sec_name.toLowerCase().includes(term)) ||
+          (user.role === 'student' && user.username && String(user.username).toLowerCase().includes(term)) ||
+          (user.role !== 'student' && user.login_ID && String(user.login_ID).toLowerCase().includes(term))
+        );
+      });
+    }
+
+    setTest(filteredUsers);
   };
 
   const handleFilterChange = (event) => {
-    setFilter(event.target.value);
-    setCurrentPage(0);
+    setSelectedRole(event.target.value);
   };
 
   const handleSortChange = (event) => {
     setSortOrder(event.target.value);
   };
 
-  const filteredItems = login.filter((item) => {
-    const studentData = student.find((std) => std.std_ID === item.username);
-    const staffData = staff.find((stf) => stf.login_ID === item.login_ID);
-    const matchesSearchTerm =
-      item.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (studentData &&
-        (studentData.std_fname
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-          studentData.std_lname
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          studentData.sec_ID
-            .toString()
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()))) ||
-      (staffData &&
-        (staffData.staff_fname
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-          staffData.staff_lname
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())));
+  const handleSectionFilterChange = (e) => {
+    setSelectedSection(e.target.value);
+  };
 
-    const role = studentData ? "student" : staffData ? "teacher" : "admin";
-    const matchesFilter = filter === "default" || filter === role;
-    const sectionMatches =
-      selectedSection === "all" ||
-      (studentData && studentData.sec_ID.toString() === selectedSection);
-
-    return matchesSearchTerm && matchesFilter && sectionMatches;
-  });
-
-  const mappedUsers = filteredItems.map((item) => {
-    const studentData = student.find((std) => std.std_ID == item.username);
-    const staffData = staff.find((stf) => stf.login_ID == item.login_ID);
-    const sectionData = studentData
-      ? section.find((sec) => sec.sec_ID == studentData.sec_ID)
-      : null;
-
-    if (studentData) {
-      return {
-        ...item,
-        std_ID: studentData.std_ID,
-        std_fname: studentData.std_fname,
-        std_lname: studentData.std_lname,
-        sec_ID: studentData.sec_ID,
-        sec_name: sectionData ? sectionData.sec_name : "",
-        role: "นักศึกษา",
-      };
-    } else if (item.role == "teacher") {
-      return {
-        ...item,
-        std_ID: staffData.staff_ID,
-        std_fname: staffData.staff_fname,
-        std_lname: staffData.staff_lname,
-        sec_ID: "",
-        sec_name: "",
-        role: "อาจารย์",
-      };
-    } else if (item.role == "admin") {
-      return {
-        ...item,
-        std_ID: staffData.staff_ID,
-        std_fname: staffData.staff_fname,
-        std_lname: staffData.staff_lname,
-        sec_ID: "",
-        sec_name: "",
-        role: "ผู้ดูแลระบบ",
-      };
-    } else {
-      return {
-        ...item,
-        std_ID: "",
-        std_fname: "",
-        std_lname: "",
-        sec_ID: "",
-        sec_name: "",
-        role: "unknown",
-      };
-    }
-  });
-
-  // Sorting logic
-  const sortedUsers = mappedUsers.sort((a, b) => {
-    const idA = String(a.std_ID || ""); // Convert to string if std_ID is undefined or null
-    const idB = String(b.std_ID || ""); // Convert to string if std_ID is undefined or null
-
-    if (sortOrder === "asc") {
-      return idA.localeCompare(idB);
-    } else {
-      return idB.localeCompare(idA);
-    }
-  });
-
-  const lastPage = Math.ceil(filteredItems.length / itemsPerPage) - 1;
-  const visibleItems = sortedUsers.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
-  const pageNumbers = [];
-  for (let i = 0; i <= lastPage; i++) {
-    pageNumbers.push(i);
-  }
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(0);
+  };
 
   if (error) {
     return <div>Error: {error.message}</div>;
@@ -214,11 +155,11 @@ const ListUsers = () => {
                 </label>
                 <div className="relative  justify-center flex">
                   <select
-                    value={filter}
+                    value={selectedRole}
                     onChange={handleFilterChange}
                     className="cursor-pointer text-xs block p-1 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value="default" className="text-center">
+                    <option value="all" className="text-center">
                       ทั้งหมด
                     </option>
                     <option value="admin">ผู้ดูแลระบบ</option>
@@ -246,13 +187,13 @@ const ListUsers = () => {
 
               <div className="items-center justify-center text-center">
                 <label htmlFor="filter-section" className="text-xs">
-                  เรียงตามหมู่เรียน
+                  แยกตามหมู่เรียน
                 </label>
                 <div className="relative justify-center flex">
                   <select
                     id="filter-section"
                     value={selectedSection}
-                    onChange={(e) => setSelectedSection(e.target.value)}
+                    onChange={handleSectionFilterChange}
                     className="text-xs cursor-pointer block p-1 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
                     <option value="all">ทั้งหมด</option>
@@ -273,54 +214,63 @@ const ListUsers = () => {
                 <th scope="col" className="px-6 py-3 w-1/12 text-center">
                   ลำดับ
                 </th>
-                <th scope="col" className="px-6 py-3 w-3/12 text-center">
-                  รหัสนักศึกษา
-                </th>
+                {selectedRole == "student" && (
+                  <th scope="col" className="px-6 py-3 w-3/12 text-center">
+                    รหัสนักศึกษา
+                  </th>
+                )}
+
                 <th scope="col" className="px-6 py-3 w-4/12 text-center">
                   ชื่อ-นามสกุล
                 </th>
                 <th scope="col" className="px-6 py-3 w-2/12 text-center">
                   บทบาท
                 </th>
-                <th scope="col" className="px-6 py-3 w-2/12 text-center">
-                  หมู่เรียน
-                </th>
+                {selectedRole == "student" && (
+                  <th scope="col" className="px-6 py-3 w-2/12 text-center">
+                    หมู่เรียน
+                  </th>
+                )}
+                {selectedRole == "teacher" && (
+                  <th scope="col" className="px-6 py-3 w-2/12 text-center">
+                    อาจารที่ปรึกษาหมู่เรียน
+                  </th>
+                )}
+
                 <th scope="col" className="px-6 py-3 w-2/12 text-center">
                   รายละเอียด
                 </th>
               </tr>
             </thead>
             <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
-              {visibleItems.map((item, index) => (
+              {test.map((item, index) => (
                 <tr
-                  key={item.std_ID}
+                  key={item.login_ID}
                   className="border-b-2 flex w-full items-center"
                 >
                   <td className="px-6 py-3 w-1/12 text-center">{index + 1}</td>
-                  <td className="px-6 py-3 w-3/12 text-center">
-                    {item.std_ID}
-                  </td>
+                  {selectedRole == "student" && (
+                    <td className="px-6 py-3 w-3/12 text-center">
+                      {item.role === "student" ? item.username : item.login_ID}
+                    </td>
+                  )}
+
                   <td className="px-6 py-3 w-4/12">
-                    {item.std_fname} {item.std_lname}
+                    {item.fname} {item.lname}
                   </td>
-                  <td className="px-6 py-3 w-2/12 text-center">{item.role}</td>
+                  <td className="px-6 py-3 w-2/12 text-center">{item.role == 'student' ? 'นักศึกษา' : item.role == 'teacher' ? 'อาจารย์' : 'ผู้ดูแลระบบ'}</td>
+                  {selectedRole != "all" && (
+                    <td className="px-6 py-3 w-2/12 text-center">
+                      {item.sec_name}
+                    </td>
+                  )}
+
                   <td className="px-6 py-3 w-2/12 text-center">
-                    {item.sec_name}
-                  </td>
-                  <td className="px-6 py-3 w-2/12 text-center">
-                    <button className="bg-cyan-400 hover:bg-cyan-500 px-2 py-1 text-white rounded">
-                      <a
-                        onClick={() => {
-                          if (item.role == "นักศึกษา") {
-                            navigate(`detail/student/${item.std_ID}`);
-                          }else{
-                            navigate(`detail/teacher/${item.std_ID}`)
-                          }
-                        }}
-                      >
+                    <Link to={`user/${item.ID}`}>
+                      <button className="bg-cyan-400 hover:bg-cyan-500 px-2 py-1 text-white rounded">
                         เรียกดู
-                      </a>
-                    </button>
+                      </button>
+                    </Link>
                   </td>
                 </tr>
               ))}
@@ -329,7 +279,7 @@ const ListUsers = () => {
 
           <div className="flex justify-between mt-2">
             <div className="flex gap-2 w-24"></div>
-            <div className="flex gap-2">
+            {/* <div className="flex gap-2">
               <button
                 onClick={() =>
                   setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))
@@ -365,7 +315,7 @@ const ListUsers = () => {
               >
                 ถัดไป
               </button>
-            </div>
+            </div> */}
             <div className="flex gap-2">
               <select
                 value={itemsPerPage}

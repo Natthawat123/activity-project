@@ -1,19 +1,14 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import { format } from "date-fns";
 import Web3 from "web3";
 import Abi from "../../components/contract/abi.json";
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 
 function DetailActivity() {
   const { act_ID } = useParams();
   const [activity, setActivity] = useState(null);
-  const [student, setStudent] = useState(null);
   const [join, setJoin] = useState([]);
-  const [reserve, setReserve] = useState([]);
-  const [section, setSection] = useState([]);
-  const [staff, setStaff] = useState([]);
   const navigate = useNavigate();
 
   const contractAddress = "0x9A00B0CB3A626c44c19f868b85A3819C8b630494";
@@ -22,26 +17,8 @@ function DetailActivity() {
   useEffect(() => {
     const fetchActivity = async () => {
       try {
-        const response = await axios.get(`/api/activity/${act_ID}`);
+        const response = await axios.get(`/api/activitys/${act_ID}`);
         setActivity(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    const fetchManage = async () => {
-      try {
-        const res = await axios.get("/api/manage");
-        setReserve(res.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    const fetchStudent = async () => {
-      try {
-        const response = await axios.get(`/api/resume/student?id=${stdID}`);
-        setStudent(response.data);
       } catch (error) {
         console.error(error);
       }
@@ -64,39 +41,9 @@ function DetailActivity() {
       }
     };
 
-    const fetchSection = async () => {
-      try {
-        const response = await axios.get(`/api/list/section`);
-        setSection(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    const fetchStaff = async () => {
-      try {
-        const response = await axios.get(`/api/list/staff`);
-        setStaff(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
     fetchActivity();
-    fetchStudent();
     fetchSmartContract();
-    fetchManage();
-    fetchSection();
-    fetchStaff();
   }, [act_ID, stdID]);
-
-  if (!activity || !student) {
-    return <div>Loading...</div>;
-  }
-
-  // const formatDate = (dateString) => {
-  //     return format(new Date(dateString), 'dd MMMM yyyy');
-  // };
 
   const formatDateToThai = (dateString) => {
     const date = new Date(dateString);
@@ -105,6 +52,8 @@ function DetailActivity() {
   };
 
   const Status = () => {
+    if (!activity) return null;
+
     const joinEntry = join.find(
       (j) => j.actID === activity[0].act_ID && j.stdIDs.includes(BigInt(stdID))
     );
@@ -116,17 +65,6 @@ function DetailActivity() {
       );
     }
 
-    const reserveEntry = reserve.find(
-      (r) => r.act_ID === activity[0].act_ID && r.std_ID === stdID
-    );
-    if (reserveEntry) {
-      return (
-        <span className="inline-block bg-blue-500 text-white px-3 py-1 rounded-full text-sm">
-          ลงทะเบียนแล้ว
-        </span>
-      );
-    }
-
     return (
       <span className="inline-block bg-yellow-500 text-white px-3 py-1 rounded-full text-sm">
         ยังไม่ได้เข้าร่วม
@@ -134,16 +72,20 @@ function DetailActivity() {
     );
   };
 
-  const staffMember = staff.find((s) => s.staff_ID === activity[0].staff_ID);
-  const sectionName = section.find((s) => s.sec_ID === student.sec_ID);
+  if (!activity) {
+    return <div>Loading...</div>; // Show a loading indicator while fetching data
+  }
 
   return (
     <div className="bg-gray-100 min-h-screen pt-20">
       <div className="container mx-auto px-4 py-8">
-      <div className="items-center mb-5 cursor-pointer" onClick={() => navigate(-1)}>
-      <ArrowBackIosNewIcon />
-      ย้อนกลับ
-    </div>
+        <div
+          className="items-center mb-5 cursor-pointer"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowBackIosNewIcon />
+          ย้อนกลับ
+        </div>
         <div className="flex justify-center">
           <div className="bg-white p-6 rounded-lg shadow-md w-full md:w-2/3">
             <h1 className="text-3xl text-center font-bold mb-4 text-gray-800">
@@ -223,11 +165,7 @@ function DetailActivity() {
                       <td className="font-semibold text-gray-700">
                         ชื่อเจ้าหน้าที่:
                       </td>
-                      <td className="text-gray-700">
-                        {staffMember
-                          ? `${staffMember.staff_fname} ${staffMember.staff_lname}`
-                          : "ไม่พบข้อมูล"}
-                      </td>
+                      <td className="text-gray-700">fgh</td>
                     </tr>
 
                     <h2 className="text-xl font-bold mb-2 text-gray-800 mt-5">
@@ -238,25 +176,19 @@ function DetailActivity() {
                       <td className="font-semibold text-gray-700">
                         รหัสนักศึกษา:
                       </td>
-                      <td className="text-gray-700">{student.std_ID}</td>
+                      <td className="text-gray-700">fg</td>
                     </tr>
                     <tr>
                       <td className="font-semibold text-gray-700">
                         ชื่อนักศึกษา:
                       </td>
-                      <td className="text-gray-700">
-                        {`${student.std_fname} ${student.std_lname}`}
-                      </td>
+                      <td className="text-gray-700">dfg</td>
                     </tr>
                     <tr>
                       <td className="font-semibold text-gray-700">
                         หมู่เรียน:
                       </td>
-                      <td className="text-gray-700">
-                        {sectionName
-                          ? `${sectionName.sec_name}`
-                          : "ไม่พบข้อมูล"}
-                      </td>
+                      <td className="text-gray-700">fg</td>
                     </tr>
                   </tbody>
                 </table>

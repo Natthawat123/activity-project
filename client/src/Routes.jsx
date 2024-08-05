@@ -19,7 +19,6 @@ import LayoutT from "./teacher/components/Layout.jsx";
 import CalendarT from "./teacher/pages/Calendar.jsx";
 import ListStudent from "./teacher/pages/ListStudent.jsx";
 import ProfileT from "./teacher/pages/Profile.jsx";
-import Pro from "./teacher/pages/Pro.jsx";
 import ActivityT from "./teacher/pages/Activity.jsx";
 import DetailS from "./teacher/components/DetailStudent.jsx";
 import DetailActivityT from "./teacher/components/DetailActivity.jsx";
@@ -52,24 +51,23 @@ export function Router() {
       <Route element={<PrivateRoutes />}>
         <Route path="/admin" element={<LayoutA />}>
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="dashboard/user/:id" element={<DetailStudent />} />
           <Route path="calendar" element={<CalendarA />} />
           <Route path="listusers" element={<ListUsers />} />
           <Route path="activity" element={<Activity />} />
-          <Route path="activity/manage/:act_ID" element={<ManageActivity />} />
+          <Route path="activity/edit/:act_ID" element={<ManageActivity />} />
           <Route path="activity/detail/:act_ID" element={<DetailActivityA />} />
-          <Route
-            path="/admin/dashboard/detail/student/:std_ID"
-            element={<DetailStudent />}
-          />
-          <Route
-            path="/admin/dashboard/detail/teacher/:std_ID"
-            element={<DetailStaff />}
-          />
           <Route path="addusers" element={<AddUsers />} />
           <Route path="update" element={<UpdateUser />} />
           <Route path="wallet" element={<Wallet />} />
-          <Route path="dashboard/detail/student/update/:std_ID" element={<UpdateStudent />} />
-          <Route path="dashboard/detail/teacher/update/:staff_ID" element={<UpdateStaff />} />
+          <Route
+            path="dashboard/user/update/:id"
+            element={<UpdateStudent />}
+          />
+          <Route
+            path="dashboard/detail/teacher/update/:staff_ID"
+            element={<UpdateStaff />}
+          />
         </Route>
 
         <Route path="/activity" element={<Layout />}>
@@ -84,7 +82,6 @@ export function Router() {
           <Route path="calendar" element={<CalendarT />} />
           <Route path="liststudent" element={<ListStudent />} />
           <Route path="profile" element={<ProfileT />} />
-          <Route path="pro" element={<Pro />} />
           <Route path="activity" element={<ActivityT />} />
           <Route path="activity/detail/:act_ID" element={<DetailActivityT />} />
 

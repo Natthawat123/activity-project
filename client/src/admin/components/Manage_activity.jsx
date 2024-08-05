@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 
 const UpdateActivity = () => {
   const { act_ID } = useParams();
@@ -24,7 +24,7 @@ const UpdateActivity = () => {
   useEffect(() => {
     const getActivity = async () => {
       try {
-        const res = await axios.get(`/api/activity/${act_ID}`);
+        const res = await axios.get(`/api/activitys/${act_ID}`);
         setActivity(res.data[0]);
         setLoading(false);
       } catch (err) {
@@ -32,16 +32,6 @@ const UpdateActivity = () => {
       }
     };
 
-    const fetchStaff = async () => {
-      try {
-        const res = await axios.get("/api/list/staff");
-        setStaff(res.data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    fetchStaff();
     getActivity();
   }, [act_ID]);
 
@@ -56,7 +46,7 @@ const UpdateActivity = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`/api/activity/${act_ID}`, activity);
+      await axios.put(`/api/activitys/${act_ID}`, activity);
       Swal.fire({
         position: "top-end",
         icon: "success",
@@ -103,14 +93,16 @@ const UpdateActivity = () => {
             <h1 className="text-lg font-bold mb-2">แก้ไขกิจกรรม</h1>
             <DriveFileRenameOutlineIcon />
           </div>
-          <div className="items-center mb-5 cursor-pointer" onClick={() => navigate(-1)}>
+          <div
+            className="items-center mb-5 cursor-pointer"
+            onClick={() => navigate(-1)}
+          >
             <ArrowBackIosNewIcon />
             ย้อนกลับ
           </div>
         </div>
         <hr className="mb-3" />
         <form onSubmit={handleSubmit}>
-
           <div className="grid grid-cols-2 gap-4 mt-2">
             <div>
               <label>ชื่อกิจกรรม:</label>

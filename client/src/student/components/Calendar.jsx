@@ -18,7 +18,7 @@ function CalendarFull() {
   const [reserveValue, setReservations] = useState([]);
 
   useEffect(() => {
-    fetch("/api/list/activity")
+    fetch("/api/activitys")
       .then((response) => {
         if (!response.ok) {
           throw new Error("เกิดข้อผิดพลาดในการดึงข้อมูล");
@@ -26,7 +26,7 @@ function CalendarFull() {
         return response.json();
       })
       .then((data) => {
-        const eventList = data.map((item, index) => ({
+        const eventList = data.map((item) => ({
           start: moment(item.act_dateStart).toDate(),
           end: moment(item.act_dateEnd).toDate(),
           reserveStart: moment(item.act_dateStart)
@@ -59,7 +59,7 @@ function CalendarFull() {
       });
 
     axios
-      .get("/api/manage")
+      .get("/api/reserve")
       .then((response) => {
         setReservations(response.data);
       })
@@ -68,11 +68,9 @@ function CalendarFull() {
       });
   }, []);
 
+
   const now = new Date();
-  const isInRegistrationPeriod =
-    selectedEvent &&
-    now >= selectedEvent.reserveStart &&
-    now <= selectedEvent.reserveEnd;
+
 
   const handleReserve = async () => {
     try {
@@ -105,8 +103,15 @@ function CalendarFull() {
 
         let reservations = [];
         try {
-          const checkResponse = await axios.get("/api/manage");
+          const checkResponse = await axios.get("/api/reserve");
           reservations = checkResponse.data;
+          Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: "ลงทะเบียนสำเร็จ",
+            showConfirmButton: false,
+            timer: 1500,
+          });
         } catch (error) {
           console.log(error);
         }
@@ -129,25 +134,12 @@ function CalendarFull() {
           }
         }
 
-        const reserveResponse = await axios.post(
-          "/api/reserve/activity",
-          reserve
-        );
+        const reserveResponse = await axios.post("/api/reserve", reserve);
 
         if (
           reserveResponse.data &&
           (reserveResponse.data.success || reserveResponse.status === 200)
         ) {
-          const updatedNumStdReserve = selectedEvent.numStdReserve + 1;
-          const setActNumStdReserve = await axios.put(
-            `/api/reserve/numStdReserve`,
-            {
-              act_ID: selectedEvent.id,
-              numStdReserve: updatedNumStdReserve,
-            }
-          );
-          console.log(setActNumStdReserve);
-
           Swal.fire({
             position: "top-end",
             icon: "success",
@@ -155,9 +147,7 @@ function CalendarFull() {
             showConfirmButton: false,
             timer: 1500,
           });
-          // setTimeout(() => {
-          //         window.location.reload();
-          //     }, 1500);
+          closePopup();
         }
       } else {
         alert("ไม่ได้อยู่ในช่วงละเทียน");
@@ -174,7 +164,7 @@ function CalendarFull() {
         reservation.act_ID.toString() === event.id.toString()
     );
 
-    const backgroundColor = isRegistered ? "yellow" : event.color;
+    const backgroundColor = isRegistered ? "orange" : event.color;
 
     const style = {
       backgroundColor,
@@ -215,7 +205,7 @@ function CalendarFull() {
 
       <div className="flex my-3 gap-5">
         <div className="flex items-center">
-          <div className="me-1 bg-yellow-400 h-[18px] w-[18px] rounded-sm"></div>
+          <div className="me-1 bg-orange-400 h-[18px] w-[18px] rounded-sm"></div>
           <p className="me-2">ลงทะเบียนแล้ว</p>
         </div>
         <div className="flex items-center">
@@ -297,23 +287,23 @@ function CalendarFull() {
 
             <p
               style={{
-                color:
-                reserveValue.some(
+                color: reserveValue.some(
                   (reservation) =>
                     reservation.std_ID.toString() === std_ID.toString() &&
-                    reservation.act_ID.toString() === selectedEvent.id.toString()
+                    reservation.act_ID.toString() ===
+                      selectedEvent.id.toString()
                 )
-                ? "yellow"
-                :selectedEvent.status === 2
-                    ? "blue"
-                    : selectedEvent.numStd === selectedEvent.numStdReserve
-                    ? "red"
-                    : now >= selectedEvent.reserveStart &&
-                      now <= selectedEvent.reserveEnd
-                    ? selectedEvent.status === 1
-                      ? "green"
-                      : "red"
-                    : "gray",
+                  ? "orange"
+                  : selectedEvent.status === 2
+                  ? "blue"
+                  : selectedEvent.numStd === selectedEvent.numStdReserve
+                  ? "red"
+                  : now >= selectedEvent.reserveStart &&
+                    now <= selectedEvent.reserveEnd
+                  ? selectedEvent.status === 1
+                    ? "green"
+                    : "red"
+                  : "gray",
               }}
             >
               {reserveValue.some(
@@ -337,9 +327,7 @@ function CalendarFull() {
             {selectedEvent.numStd != selectedEvent.numStdReserve &&
               now >= selectedEvent.reserveStart &&
               now <= selectedEvent.reserveEnd &&
-              selectedEvent.status == 1 && 
-
-              (
+              selectedEvent.status == 1 && (
                 <div className="text-end">
                   <button
                     className="btn px-2 py-1 bg-green-600 mt-4 text-center rounded-sm text-white"

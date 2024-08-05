@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
-import axios from 'axios';
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
+import axios from "axios";
 
 const StudentForm = () => {
   const [provinces, setProvinces] = useState([]);
@@ -20,6 +20,7 @@ const StudentForm = () => {
   const [title, setTitle] = useState("");
 
   const navigate = useNavigate();
+
   const onChangeHandle = (id, selectedValue) => {
     if (id === "province_id") {
       setValue((prev) => ({
@@ -67,56 +68,74 @@ const StudentForm = () => {
         }
       }
 
-      const selectedValue = list.find((item) => item.id === dependId)?.name_th || '';
+      const selectedValue =
+        list.find((item) => item.id === dependId)?.name_th || "";
       onChangeHandle(id, selectedValue);
     };
 
     return (
-      <>
-        <select value={selected[id]} onChange={onChangeHandleLocal} className="mt-1 p-2 border w-full rounded-md">
-          <option key={selected[id]} value={selected[id]} label={addressValue_PDS} />
-
-          {list && list.map((item) => (
-            <option
-              key={item.id}
-              value={item.id}
-              label={item.name_th}
-            >
+      <select
+        value={selected[id]}
+        onChange={onChangeHandleLocal}
+        className="mt-1 p-2 border w-full rounded-md"
+      >
+        <option
+          key={selected[id]}
+          value={selected[id]}
+          label={addressValue_PDS}
+        >
+          {addressValue_PDS}
+        </option>
+        {list &&
+          list.map((item) => (
+            <option key={item.id} value={item.id} label={item.name_th}>
               {item.name_th}
             </option>
           ))}
-        </select>
-      </>
+      </select>
     );
   };
 
   const [value, setValue] = useState({
-    std_ID: '',
-    std_fname: '',
-    std_lname: '',
-    sec_ID: '',
-    std_mobile: '',
-    std_email: '',
-    std_address: '',
-    province: '',
-    district: '',
-    subdistrict: '',
-    zipcode: '',
+    login_ID: "",
+    std_fname: "",
+    std_lname: "",
+    sec_ID: "",
+    std_mobile: "",
+    std_email: "",
+    std_address: "",
+    province: "",
+    district: "",
+    subdistrict: "",
+    zipcode: "",
   });
-
-  const stdID = localStorage.getItem('std_ID');
-
   const [section, setSection] = useState([]);
 
+  const stdID = localStorage.getItem("std_ID");
+
   useEffect(() => {
-    fetch('/api/resume/student?id=' + stdID)
-      .then(response => {
+    fetch("/api/sections")
+      .then((response) => {
         if (!response.ok) {
-          throw new Error('Error fetching data');
+          throw new Error("Network response was not ok");
         }
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
+        setSection(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching sections:", error);
+      });
+
+    fetch(`/api/students/${stdID}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error fetching data");
+        }
+        return response.json();
+      })
+      .then((data) => {
         setValue((prev) => ({
           ...prev,
           ...data,
@@ -124,20 +143,22 @@ const StudentForm = () => {
 
         // Extract title from std_fname if it exists
         const titles = ["นาย", "นาง", "น.ส."];
-        const title = titles.find(t => data.std_fname.match(t));
+        const title = titles.find((t) => data.std_fname.match(t));
         if (title) {
           setTitle(title);
           setValue((prev) => ({
             ...prev,
-            std_fname: data.std_fname.replace(title, '').trim()
+            std_fname: data.std_fname.replace(title, "").trim(),
           }));
         }
       })
-      .catch(error => {
-        console.error('Error:', error);
+      .catch((error) => {
+        console.error("Error:", error);
       });
 
-    fetch("https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json")
+    fetch(
+      "https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json"
+    )
       .then((response) => response.json())
       .then((result) => {
         // Sort the provinces alphabetically by name_th
@@ -146,13 +167,6 @@ const StudentForm = () => {
         );
         setProvinces(sortedProvinces);
       });
-
-    fetch('/api/list/section')
-      .then((respose) => respose.json())
-      .then((result) => {
-        setSection(result);
-      });
-
   }, [stdID]);
 
   const handlechange = (e) => {
@@ -183,40 +197,40 @@ const StudentForm = () => {
       std_fname: `${title}${value.std_fname}`.trim(),
     };
 
-    fetch('/api/update/student/' + stdID, {
-      method: 'PUT',
+    fetch(`/api/students/${stdID}`, {
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(updatedValue),
     })
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
-          throw new Error('Error updating data');
+          throw new Error("Error updating data");
         }
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
         Swal.fire({
-          title: 'แก้ไขประวัติส่วนตัวเสร็จสิ้น',
-          icon: 'success',
+          title: "แก้ไขประวัติส่วนตัวเสร็จสิ้น",
+          icon: "success",
         });
         setTimeout(() => {
-          window.location = '/activity/profile';
+          window.location = "/activity/profile";
         }, 1500);
       })
-      .catch(error => {
-        console.error('Error:', error);
+      .catch((error) => {
+        console.error("Error:", error);
         Swal.fire({
-          title: 'Oops...something went wrong!',
-          icon: 'error',
+          title: "Oops...something went wrong!",
+          icon: "error",
           text: `Error occurred! ${error.message}`,
-          confirmButtonText: 'OK',
+          confirmButtonText: "OK",
         });
       });
   };
 
-  if (!value.std_ID) {
+  if (!value.login_ID) {
     return <div>Loading...</div>;
   }
 
@@ -228,7 +242,10 @@ const StudentForm = () => {
             <h1 className="text-lg font-bold mb-2">แก้ไขข้อมูลส่วนตัว</h1>
             <DriveFileRenameOutlineIcon />
           </div>
-          <div className="items-center mb-5 cursor-pointer" onClick={() => navigate(-1)}>
+          <div
+            className="items-center mb-5 cursor-pointer"
+            onClick={() => navigate(-1)}
+          >
             <ArrowBackIosNewIcon />
             ย้อนกลับ
           </div>
@@ -237,26 +254,37 @@ const StudentForm = () => {
         <form>
           <div className="grid grid-cols-2 gap-4 mt-2">
             <div>
-              <label htmlFor="studentId" className="block text-sm font-medium text-gray-600">
+              <label
+                htmlFor="studentId"
+                className="block text-sm font-medium text-gray-600"
+              >
                 รหัสนักศึกษา
               </label>
               <input
                 type="text"
                 id="username"
-                name="std_ID"
-                value={value.std_ID}
+                name="login_ID"
+                value={value.username}
                 readOnly
                 className="mt-1 p-2 border w-full rounded-md"
               />
             </div>
 
             <div>
-              <label htmlFor="classGroup" className="block text-sm font-medium text-gray-600">
+              <label
+                htmlFor="classGroup"
+                className="block text-sm font-medium text-gray-600"
+              >
                 หมู่เรียน
               </label>
-              <select value={value.sec_ID} onChange={handleSectionChange} name="sec_ID" className="mt-1 p-2 border w-full rounded-md">
+              <select
+                value={value.sec_ID}
+                onChange={handleSectionChange}
+                name="sec_ID"
+                className="mt-1 p-2 border w-full rounded-md"
+              >
                 <option value="">{value.sec_Name || "Select a section"}</option>
-                {section.map(sec => (
+                {section.map((sec) => (
                   <option key={sec.sec_ID} value={sec.sec_ID}>
                     {sec.sec_name}
                   </option>
@@ -291,8 +319,12 @@ const StudentForm = () => {
               </div>
             </div>
 
+
             <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-600">
+              <label
+                htmlFor="lastName"
+                className="block text-sm font-medium text-gray-600"
+              >
                 นามสกุล
               </label>
               <input
@@ -306,7 +338,10 @@ const StudentForm = () => {
             </div>
 
             <div>
-              <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-600">
+              <label
+                htmlFor="phoneNumber"
+                className="block text-sm font-medium text-gray-600"
+              >
                 เบอร์โทร
               </label>
               <input
@@ -320,7 +355,10 @@ const StudentForm = () => {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-600">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-600"
+              >
                 อีเมลล์
               </label>
               <input
@@ -334,7 +372,10 @@ const StudentForm = () => {
             </div>
 
             <div>
-              <label htmlFor="address" className="block text-sm font-medium text-gray-600">
+              <label
+                htmlFor="address"
+                className="block text-sm font-medium text-gray-600"
+              >
                 ที่อยู่
               </label>
               <input
@@ -347,7 +388,10 @@ const StudentForm = () => {
             </div>
 
             <div>
-              <label htmlFor="province" className="block text-sm font-medium text-gray-600">
+              <label
+                htmlFor="province"
+                className="block text-sm font-medium text-gray-600"
+              >
                 จังหวัด
               </label>
               <DropdownList
@@ -361,7 +405,10 @@ const StudentForm = () => {
             </div>
 
             <div>
-              <label htmlFor="district" className="block text-sm font-medium text-gray-600">
+              <label
+                htmlFor="district"
+                className="block text-sm font-medium text-gray-600"
+              >
                 อำเภอ
               </label>
               <DropdownList
@@ -369,13 +416,16 @@ const StudentForm = () => {
                 list={amphures}
                 child="tambon"
                 childsId={["tambon_id"]}
-                setChilds={[setTambons]}
                 addressValue_PDS={value.district}
+                setChilds={[setTambons]}
               />
             </div>
 
             <div>
-              <label htmlFor="province" className="block text-sm font-medium text-gray-600">
+              <label
+                htmlFor="province"
+                className="block text-sm font-medium text-gray-600"
+              >
                 ตำบล
               </label>
               <DropdownList
@@ -383,13 +433,16 @@ const StudentForm = () => {
                 list={tambons}
                 child="zip_code"
                 childsId={["zip_code"]}
-                setChilds={[setZipcode]}
                 addressValue_PDS={value.subdistrict}
+                setChilds={[setZipcode]}
               />
             </div>
 
             <div>
-              <label htmlFor="zipcode" className="block text-sm font-medium text-gray-600">
+              <label
+                htmlFor="zipcode"
+                className="block text-sm font-medium text-gray-600"
+              >
                 รหัสไปรษณีย์
               </label>
               <input
@@ -403,7 +456,11 @@ const StudentForm = () => {
             </div>
 
             <div className="flex justify-end items-center">
-              <button type="submit" className="mt-4 bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600" onClick={updateClick}>
+              <button
+                type="submit"
+                className="mt-4 bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+                onClick={updateClick}
+              >
                 แก้ไข
               </button>
             </div>
