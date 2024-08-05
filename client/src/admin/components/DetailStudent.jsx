@@ -7,7 +7,9 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import Swal from "sweetalert2";
 
 function DetailStudent() {
-  const [student, setStudent] = useState([]); // Initialize as an empty array
+  const [student, setStudent] = useState({});
+  const [editMode, setEditMode] = useState(false);
+  const [updatedStudent, setUpdatedStudent] = useState({});
   const [join, setJoin] = useState([]);
   const [activity, setActivity] = useState([]);
 
@@ -26,6 +28,7 @@ function DetailStudent() {
       try {
         const response = await axios.get(`/api/users/${id}`);
         setStudent(response.data[0]);
+        setUpdatedStudent(response.data[0]);
       } catch (error) {
         console.error(error);
       }
@@ -92,9 +95,7 @@ function DetailStudent() {
       });
 
       if (result.isConfirmed) {
-        const response = await axios.delete(
-          `/api/students/${student.login_ID}`
-        );
+        const response = await axios.delete(`/api/students/${student.login_ID}`);
 
         if (response.status === 200) {
           Swal.fire({
@@ -119,9 +120,44 @@ function DetailStudent() {
     }
   };
 
+  const handleEditToggle = () => {
+    setEditMode(!editMode);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUpdatedStudent((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleSave = async () => {
+    try {
+      const response = await axios.put(`/api/students/${student.login_ID}`, updatedStudent);
+      if (response.status === 200) {
+        Swal.fire({
+          title: "Updated!",
+          text: "The student's information has been updated.",
+          icon: "success",
+        });
+        setStudent(updatedStudent);
+        setEditMode(false);
+      } else {
+        throw new Error("Update operation failed");
+      }
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        title: "Error!",
+        text: "An error occurred while updating the student.",
+        icon: "error",
+      });
+    }
+  };
+
   return (
     <div>
-      {/* resume */}
       <div className="container mb-10 mx-auto md:px-20 pt-20">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
           <div className="flex justify-between">
@@ -136,64 +172,169 @@ function DetailStudent() {
           </div>
           <hr className="mb-3" />
           <div className="grid grid-cols-2 gap-4">
-            {student.role == "student" && <h1>รหัสนักศึกษา: {student.ID}</h1>}
-
+            {student.role == "student" && (
+              <h1>รหัสนักศึกษา: {editMode ? (
+                <input
+                  type="text"
+                  name="ID"
+                  value={updatedStudent.ID}
+                  onChange={handleInputChange}
+                  readOnly
+                />
+              ) : (
+                student.ID
+              )}
+              </h1>
+            )}
             <p>
-              ชื่อ-นามสกุล: {student.fname} {student.lname}
+              ชื่อ-นามสกุล: {editMode ? (
+                <>
+                  <input
+                    type="text"
+                    name="fname"
+                    value={updatedStudent.fname}
+                    onChange={handleInputChange}
+                  />
+                  <input
+                    type="text"
+                    name="lname"
+                    value={updatedStudent.lname}
+                    onChange={handleInputChange}
+                  />
+                </>
+              ) : (
+                `${student.fname} ${student.lname}`
+              )}
             </p>
             {student.role == "student" && (
               <p>
-                หมู่เรียน:
-                {student.sec_name}
+                หมู่เรียน: {editMode ? (
+                  <input
+                    type="text"
+                    name="sec_name"
+                    value={updatedStudent.sec_name}
+                    onChange={handleInputChange}
+                  />
+                ) : (
+                  student.sec_name
+                )}
               </p>
             )}
             {student.role == "teacher" && (
               <p>
-                อาจารย์ประจำหมู่เรียน:
-                {student.sec_name}
+                อาจารย์ประจำหมู่เรียน: {editMode ? (
+                  <input
+                    type="text"
+                    name="sec_name"
+                    value={updatedStudent.sec_name}
+                    onChange={handleInputChange}
+                  />
+                ) : (
+                  student.sec_name
+                )}
               </p>
             )}
-            {student.role == "student" && (
-              <p>
-                หมู่เรียน:
-                {student.sec_name}
-              </p>
-            )}
-            <p>Email: {student.email}</p>
-            <p>เบอร์โทรศัพท์: {student.mobile}</p>
-
+            <p>Email: {editMode ? (
+              <input
+                type="text"
+                name="email"
+                value={updatedStudent.email}
+                onChange={handleInputChange}
+              />
+            ) : (
+              student.email
+            )}</p>
+            <p>เบอร์โทรศัพท์: {editMode ? (
+              <input
+                type="text"
+                name="mobile"
+                value={updatedStudent.mobile}
+                onChange={handleInputChange}
+              />
+            ) : (
+              student.mobile
+            )}</p>
             {student.role != "admin" && (
               <>
-                <p>ที่อยู่: {student.address}</p>
-                <p>จังหวัด: {student.province}</p>
-                <p>อำเภอ: {student.district}</p>
-                <p>ตำบล: {student.subdistrict}</p>
-                <p>รหัสไปรษณีย์: {student.zipcode}</p>
+                <p>ที่อยู่: {editMode ? (
+                  <input
+                    type="text"
+                    name="address"
+                    value={updatedStudent.address}
+                    onChange={handleInputChange}
+                  />
+                ) : (
+                  student.address
+                )}</p>
+                <p>จังหวัด: {editMode ? (
+                  <input
+                    type="text"
+                    name="province"
+                    value={updatedStudent.province}
+                    onChange={handleInputChange}
+                  />
+                ) : (
+                  student.province
+                )}</p>
+                <p>อำเภอ: {editMode ? (
+                  <input
+                    type="text"
+                    name="district"
+                    value={updatedStudent.district}
+                    onChange={handleInputChange}
+                  />
+                ) : (
+                  student.district
+                )}</p>
+                <p>ตำบล: {editMode ? (
+                  <input
+                    type="text"
+                    name="subdistrict"
+                    value={updatedStudent.subdistrict}
+                    onChange={handleInputChange}
+                  />
+                ) : (
+                  student.subdistrict
+                )}</p>
+                <p>รหัสไปรษณีย์: {editMode ? (
+                  <input
+                    type="text"
+                    name="zipcode"
+                    value={updatedStudent.zipcode}
+                    onChange={handleInputChange}
+                  />
+                ) : (
+                  student.zipcode
+                )}</p>
               </>
             )}
           </div>
           <div className="mt-5">
+            {editMode ? (
+              <button
+                className="btn btn-primary px-6 py-4 text-white"
+                onClick={handleSave}
+              >
+                Save
+              </button>
+            ) : (
+              <button
+                className="btn btn-primary px-6 py-4 text-white"
+                onClick={handleEditToggle}
+              >
+                แก้ไขประวัติ
+              </button>
+            )}
             <button
-              className="btn btn-warning px-6 py-4 text-white"
+              className="btn btn-warning px-6 py-4 text-white mx-3"
               onClick={handleDelete}
             >
               Delete
-            </button>
-            <button
-              className="btn btn-primary px-6 py-4 mx-3 text-white"
-              onClick={() =>
-                navigate(
-                  `/admin/dashboard/detail/student/update/${student.username}`
-                )
-              }
-            >
-              แก้ไขประวัติ
             </button>
           </div>
         </div>
       </div>
 
-      {/* activity */}
       <div className="mb-10 container mx-auto md:px-20">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
           <div className="text-lg font-bold mb-2">ประวัติการทำกิจกรรม</div>
@@ -281,17 +422,16 @@ function DetailStudent() {
           </div>
           <div className="flex justify-between items-center mt-4">
             <button
-              onClick={() =>
-                setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))
-              }
+              onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
               className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               Previous
             </button>
-            <span className="text-sm text-gray-700 dark:text-gray-400">
-              Page
-            </span>
-            <button className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            <span className="text-sm text-gray-700 dark:text-gray-400">Page</span>
+            <button
+              onClick={() => setCurrentPage((prevPage) => prevPage + 1)}
+              className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
               Next
             </button>
           </div>

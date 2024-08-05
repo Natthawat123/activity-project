@@ -9,8 +9,9 @@ function Layout() {
     <main>
 
       <Header />
-
-      <Outlet />
+      <div className="md:mt-0 mt-32">
+        <Outlet />
+      </div>
       <Footer />
     </main>
   )

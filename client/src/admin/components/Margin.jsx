@@ -2,7 +2,7 @@
 
 function Magin() {
   return (
-    <div className='mt-6'></div>
+    <div className='md:mt-6 mt-32'></div>
   )
 }
 

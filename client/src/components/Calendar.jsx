@@ -3,8 +3,9 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import CloseIcon from "@mui/icons-material/Close";
-import Swal from "sweetalert2";
-import axios from "axios";
+// import Swal from "sweetalert2";
+// import axios from "axios";
+import { motion } from "framer-motion";
 
 const localizer = momentLocalizer(moment);
 
@@ -95,123 +96,150 @@ function CalendarFull() {
 
   return (
     <div className="App w-3/4 mx-auto my-10 bg-slate-50 rounded-lg shadow-xl p-10 z-50">
-      <h1 className="text-center text-3xl font-bold mb-5">ปฏิทินกิจกรรม</h1>
+      <motion.h1
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="text-center text-3xl font-bold mb-5"
+      >
+        ปฏิทินกิจกรรม
+      </motion.h1>
 
-      <Calendar
-        localizer={localizer}
-        defaultDate={new Date()}
-        defaultView="month"
-        events={events}
-        style={{ height: "70vh" }}
-        eventPropGetter={eventStyleGetter}
-        onSelectEvent={handleEventClick}
-        className="z-50"
-      />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Calendar
+          localizer={localizer}
+          defaultDate={new Date()}
+          defaultView="month"
+          events={events}
+          style={{ height: "70vh" }}
+          eventPropGetter={eventStyleGetter}
+          onSelectEvent={handleEventClick}
+          className="z-50"
+        />
+      </motion.div>
 
-      <div className="flex my-3 gap-5 z-50">
-        <div className="flex items-center">
-          <div className="me-1 bg-green-600 h-[18px] w-[18px] rounded-sm"></div>
-          <p className="me-2">เปิดลงทะเบียน</p>
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+        className="flex flex-wrap my-3 gap-5 z-50"
+      >
+        <div className="flex items-center space-x-2">
+          <div className="bg-green-600 h-4 w-4 rounded-sm"></div>
+          <p className="text-sm sm:text-base">เปิดลงทะเบียน</p>
         </div>
-        <div className="flex items-center">
-          <div className="me-1 bg-red-600 h-[18px] w-[18px] rounded-sm"></div>
-          <p className="me-2">ลงทะเบียนเต็มแล้ว/ปิดลงทะเบียน</p>
+        <div className="flex items-center space-x-2">
+          <div className="bg-red-600 h-4 w-4 rounded-sm"></div>
+          <p className="text-sm sm:text-base">ลงทะเบียนเต็มแล้ว/ปิดลงทะเบียน</p>
         </div>
-        <div className="flex items-center">
-          <div className="me-1 bg-blue-600 h-[18px] w-[18px] rounded-sm"></div>
-          <p className="me-2">กิจกรรมจบลงแล้ว</p>
+        <div className="flex items-center space-x-2">
+          <div className="bg-blue-600 h-4 w-4 rounded-sm"></div>
+          <p className="text-sm sm:text-base">กิจกรรมจบลงแล้ว</p>
         </div>
-        <div className="flex items-center">
-          <div className="me-1 bg-gray-600 h-[18px] w-[18px] rounded-sm"></div>
-          <p className="me-2">ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน</p>
+        <div className="flex items-center space-x-2">
+          <div className="bg-gray-600 h-4 w-4 rounded-sm"></div>
+          <p className="text-sm sm:text-base">
+            ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน
+          </p>
         </div>
-      </div>
+      </motion.div>
 
       {selectedEvent && showPopup && (
-        <div className="fixed w-72 md:w-fit top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg z-50">
-          <div className="w-full justify-end flex ">
-            <div className="cursor-pointer flex" onClick={closePopup}>
-              <CloseIcon />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 flex items-center justify-center p-4 z-50"
+        >
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md md:max-w-lg lg:max-w-xl">
+            <div className="w-full flex justify-end">
+              <div className="cursor-pointer" onClick={closePopup}>
+                <CloseIcon />
+              </div>
             </div>
-          </div>
-          <div className="text-left -mt-5">
-            <h2 className="text-xl font-bold mb-4">รายละเอียดกิจกรรม</h2>
-            <p className="text-xl">ชื่อกิจกรรม : {selectedEvent.title}</p>
-            <p>สถานที่ : {selectedEvent.location}</p>
-            <p>
-              วันที่ :{" "}
-              {selectedEvent.start.toLocaleDateString("th-TH", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}{" "}
-              -{" "}
-              {selectedEvent.end.toLocaleDateString("th-TH", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
-            <p>
-              เปิดลงทะเบียน :{" "}
-              {selectedEvent.reserveStart.toLocaleDateString("th-TH", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}{" "}
-              -{" "}
-              {selectedEvent.reserveEnd.toLocaleDateString("th-TH", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
+            <div className="text-left">
+              <h2 className="text-xl font-bold mb-4">รายละเอียดกิจกรรม</h2>
+              <p className="text-xl">ชื่อกิจกรรม : {selectedEvent.title}</p>
+              <p>สถานที่ : {selectedEvent.location}</p>
+              <p>
+                วันที่ :{" "}
+                {selectedEvent.start.toLocaleDateString("th-TH", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}{" "}
+                -{" "}
+                {selectedEvent.end.toLocaleDateString("th-TH", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+              <p>
+                เปิดลงทะเบียน :{" "}
+                {selectedEvent.reserveStart.toLocaleDateString("th-TH", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}{" "}
+                -{" "}
+                {selectedEvent.reserveEnd.toLocaleDateString("th-TH", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
 
-            <p>
-              <span>จำนวนที่เปิดรับ :</span>
-              <span
+              <p>
+                <span>จำนวนที่เปิดรับ :</span>
+                <span
+                  style={{
+                    color:
+                      selectedEvent.numStd === selectedEvent.numStdReserve
+                        ? "red"
+                        : "green",
+                  }}
+                >
+                  {selectedEvent.numStd === selectedEvent.numStdReserve
+                    ? `${selectedEvent.numStdReserve} / ${selectedEvent.numStd}`
+                    : `${selectedEvent.numStdReserve} / ${selectedEvent.numStd}`}
+                </span>
+                <span> คน</span>
+              </p>
+
+              <p
                 style={{
                   color:
-                    selectedEvent.numStd === selectedEvent.numStdReserve
+                    selectedEvent.status === 2
+                      ? "blue"
+                      : selectedEvent.numStd === selectedEvent.numStdReserve
                       ? "red"
-                      : "green",
+                      : now >= selectedEvent.reserveStart &&
+                        now <= selectedEvent.reserveEnd
+                      ? selectedEvent.status === 1
+                        ? "green"
+                        : "red"
+                      : "gray",
                 }}
               >
-                {selectedEvent.numStd === selectedEvent.numStdReserve
-                  ? `${selectedEvent.numStdReserve} / ${selectedEvent.numStd}`
-                  : `${selectedEvent.numStdReserve} / ${selectedEvent.numStd}`}
-              </span>
-              <span> คน</span>
-            </p>
-
-            <p
-              style={{
-                color:
-                  selectedEvent.status === 2
-                    ? "blue"
-                    : selectedEvent.numStd === selectedEvent.numStdReserve
-                    ? "red"
-                    : now >= selectedEvent.reserveStart &&
-                      now <= selectedEvent.reserveEnd
-                    ? selectedEvent.status === 1
-                      ? "green"
-                      : "red"
-                    : "gray",
-              }}
-            >
-              {selectedEvent.status === 2
-                ? "กิจกรรมสิ้นสุดแล้ว"
-                : selectedEvent.numStd === selectedEvent.numStdReserve
-                ? "ลงทะเบียนเต็มแล้ว"
-                : now >= selectedEvent.reserveStart &&
-                  now <= selectedEvent.reserveEnd
-                ? selectedEvent.status === 1
-                  ? "เปิดลงทะเบียน"
-                  : "ปิดลงทะเบียน"
-                : "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"}
-            </p>
+                {selectedEvent.status === 2
+                  ? "กิจกรรมสิ้นสุดแล้ว"
+                  : selectedEvent.numStd === selectedEvent.numStdReserve
+                  ? "ลงทะเบียนเต็มแล้ว"
+                  : now >= selectedEvent.reserveStart &&
+                    now <= selectedEvent.reserveEnd
+                  ? selectedEvent.status === 1
+                    ? "เปิดลงทะเบียน"
+                    : "ปิดลงทะเบียน"
+                  : "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"}
+              </p>
+            </div>
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );

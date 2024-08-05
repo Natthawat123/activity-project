@@ -7,6 +7,7 @@ import ArticleIcon from "@mui/icons-material/Article";
 import Button from "@mui/material/Button";
 
 const ListActivity = () => {
+  
   const now = new Date();
 
   const [error, setError] = useState(null);
@@ -25,6 +26,7 @@ const ListActivity = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    
     fetch("/api/activitys")
       .then((res) => res.json())
       .then(
@@ -49,6 +51,45 @@ const ListActivity = () => {
     });
   };
 
+  // const getStatus = (activityID) => {
+  //   // ตรวจสอบข้อมูลการเข้าร่วม
+  //   const joinEntry = join.find(
+  //     (j) => j.actID === activityID && j.stdIDs.includes(BigInt(stdID))
+  //   );
+  //   if (joinEntry) {
+  //     return { message: "เข้าร่วมกิจกรรมแล้ว", color: "blue" };
+  //   }
+
+  //   // ตรวจสอบข้อมูลการลงทะเบียน
+  //   const reserveEntry = reserve.find(
+  //     (r) => r.act_ID === activityID && r.std_ID === stdID
+  //   );
+  //   if (reserveEntry) {
+  //     return { message: "ลงทะเบียนสำเร็จ", color: "green" };
+  //   }
+
+  //   // ตรวจสอบข้อมูลกิจกรรม
+  //   const activityEntry = activity.find((a) => a.act_ID === activityID);
+  //   if (!activityEntry) {
+  //     return { message: "ไม่พบข้อมูล", color: "gray" };
+  //   }
+
+  //   const now = new Date();
+  //   const activityStartDate = new Date(activityEntry.act_dateStart);
+  //   const activityEndDate = new Date(activityEntry.act_dateEnd);
+
+  //   // ตรวจสอบช่วงเวลาการลงทะเบียน
+  //   if (
+  //     now < moment(activityStartDate).subtract(2, "weeks").toDate() ||
+  //     now > moment(activityStartDate).subtract(1, "day").toDate()
+  //   ) {
+  //     return { message: "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน", color: "gray" };
+  //   }
+
+  //   // หากไม่พบข้อมูลการเข้าร่วม หรือ การลงทะเบียน
+  //   return { message: "ยังไม่ได้ลงทะเบียน", color: "gray" };
+  // };
+
   const getStatus = (activityID) => {
     // ตรวจสอบข้อมูลการเข้าร่วม
     const joinEntry = join.find(
@@ -57,7 +98,7 @@ const ListActivity = () => {
     if (joinEntry) {
       return { message: "เข้าร่วมกิจกรรมแล้ว", color: "blue" };
     }
-
+  
     // ตรวจสอบข้อมูลการลงทะเบียน
     const reserveEntry = reserve.find(
       (r) => r.act_ID === activityID && r.std_ID === stdID
@@ -65,25 +106,22 @@ const ListActivity = () => {
     if (reserveEntry) {
       return { message: "ลงทะเบียนสำเร็จ", color: "green" };
     }
-
+  
     // ตรวจสอบข้อมูลกิจกรรม
     const activityEntry = activity.find((a) => a.act_ID === activityID);
     if (!activityEntry) {
       return { message: "ไม่พบข้อมูล", color: "gray" };
     }
-
+  
     const now = new Date();
     const activityStartDate = new Date(activityEntry.act_dateStart);
-    const activityEndDate = new Date(activityEntry.act_dateEnd);
-
+    // const activityEndDate = new Date(activityEntry.act_dateEnd);
+    
     // ตรวจสอบช่วงเวลาการลงทะเบียน
-    if (
-      now < moment(activityStartDate).subtract(2, "weeks").toDate() ||
-      now > moment(activityStartDate).subtract(1, "day").toDate()
-    ) {
+    if (now < moment(activityStartDate).subtract(2, "weeks").toDate() || now > moment(activityStartDate).subtract(1, "day").toDate()) {
       return { message: "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน", color: "gray" };
     }
-
+  
     // หากไม่พบข้อมูลการเข้าร่วม หรือ การลงทะเบียน
     return { message: "ยังไม่ได้ลงทะเบียน", color: "gray" };
   };
@@ -230,7 +268,7 @@ const ListActivity = () => {
               </div>
             </div>
           </div>
-
+          
           <table className="text-center w-full text-sm rtl:text-center text-gray-500 dark:text-gray-400">
             <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
               <tr className="flex w-full">

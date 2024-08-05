@@ -20,6 +20,7 @@ const ListUsers = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+     
       try {
         axios
           .get("/api/users")

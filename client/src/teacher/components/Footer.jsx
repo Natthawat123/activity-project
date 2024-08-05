@@ -2,7 +2,7 @@
 
 function Footer() {
   return (
-    <footer className="bg-gray-800 text-white p-4 text-center   w-screen">
+    <footer className="bg-gray-800 text-white p-4 text-center w-full">
       <p>&copy; 2023 Create by IT student @NPRU.</p>
     </footer>
   );

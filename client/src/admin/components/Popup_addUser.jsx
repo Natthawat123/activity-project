@@ -36,8 +36,8 @@ class Popup extends Component {
                         </svg>
                     </div>
                 </button>
-                <Modal visible={this.state.visible} width="720" height="230" effect="fadeInUp" onClickAway={this.closeModal}>
-                    <div className="-mt-40">
+                <Modal visible={this.state.visible} width="720" height="20" effect="fadeInUp" onClickAway={this.closeModal}>
+                    <div className="-mt-56">
                         <Add_Users closeModal={this.closeModal} /> {/* Pass closeModal directly */}
                     </div>
                 </Modal>
