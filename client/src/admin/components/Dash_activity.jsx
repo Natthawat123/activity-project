@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import Popup from "./Popup_addAc";
 
-// import Popup from './Popup_addUser';
-
 function Dash_users() {
   const [items, setItems] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
