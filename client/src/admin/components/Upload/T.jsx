@@ -16,18 +16,20 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Button from "@mui/material/Button";
 
-function T({ activities = [] }) {
+function T({ activities = [], join = [] }) {
   const [checkedItems, setCheckedItems] = useState({});
   const [checkAllStates, setCheckAllStates] = useState({});
   const [selectedRows, setSelectedRows] = useState([]);
   const [web3, setWeb3] = useState(null);
   const [contract, setContract] = useState(null);
 
-  const handleCheckboxChange = (actID, stdID, date, checked) => {
-    console.log(
-      `Checkbox Change - Activity ID: ${actID}, Student ID: ${stdID}, Date: ${date}, Checked: ${checked}`
-    );
+  // Filter activities based on join array
+  const filteredActivities = activities.filter(
+    (activity) =>
+      !join.some((j) => j.activityId.toString() === activity.act_ID.toString())
+  );
 
+  const handleCheckboxChange = (actID, stdID, date, checked) => {
     setCheckedItems((prev) => {
       const updated = { ...prev };
       if (!updated[actID]) updated[actID] = {};
@@ -121,13 +123,14 @@ function T({ activities = [] }) {
       });
     }
   };
+  console.log(join);
+  console.log(filteredActivities);
 
   return (
     <div>
-      {activities.map((activity) => {
+      {filteredActivities.map((activity) => {
         const days = range(activity.act_dateStart, activity.act_dateEnd);
 
-        // Define columns specific to each activity
         const columns = [
           { field: "id", headerName: "รหัสนักศึกษา", width: 90 },
           {
@@ -214,7 +217,6 @@ function T({ activities = [] }) {
                   },
                 }}
                 pageSizeOptions={[5]}
-                checkboxSelection
                 disableSelectionOnClick
                 selectionModel={selectedRows}
                 onSelectionModelChange={(newSelection) => {
@@ -250,6 +252,14 @@ T.propTypes = {
           std_lname: PropTypes.string.isRequired,
         })
       ).isRequired,
+    })
+  ).isRequired,
+  join: PropTypes.arrayOf(
+    PropTypes.shape({
+      activityId: PropTypes.number.isRequired,
+      studentIds: PropTypes.arrayOf(PropTypes.number).isRequired,
+      dayJoin: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number))
+        .isRequired,
     })
   ).isRequired,
 };
