@@ -3,9 +3,10 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import CloseIcon from "@mui/icons-material/Close";
-// import Swal from "sweetalert2";
-// import axios from "axios";
 import { motion } from "framer-motion";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import Tooltip from "@mui/material/Tooltip";
+import { useNavigate } from "react-router";
 
 const localizer = momentLocalizer(moment);
 
@@ -13,7 +14,7 @@ function CalendarFull() {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
-
+  const navigate = useNavigate();
   const now = new Date();
 
   useEffect(() => {
@@ -53,14 +54,14 @@ function CalendarFull() {
               item.act_status === 2
                 ? "blue"
                 : item.act_numStd === item.act_numStdReserve
-                  ? "red"
-                  : now >=
+                ? "red"
+                : now >=
                     moment(item.act_dateStart).subtract(2, "weeks").toDate() &&
-                    now <= moment(item.act_dateStart).subtract(1, "day").toDate()
-                    ? item.act_status === 1
-                      ? "green"
-                      : "red"
-                    : "gray",
+                  now <= moment(item.act_dateStart).subtract(1, "day").toDate()
+                ? item.act_status === 1
+                  ? "green"
+                  : "red"
+                : "gray",
           }));
         setEvents(eventList);
       })
@@ -99,7 +100,7 @@ function CalendarFull() {
       <motion.h1
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.3 }}
         className="text-center text-3xl font-bold mb-5"
       >
         ปฏิทินกิจกรรม
@@ -115,7 +116,7 @@ function CalendarFull() {
           defaultDate={new Date()}
           defaultView="month"
           events={events}
-          style={{ height: "70vh"}}
+          style={{ height: "70vh" }}
           eventPropGetter={eventStyleGetter}
           onSelectEvent={handleEventClick}
           className="z-50"
@@ -142,10 +143,11 @@ function CalendarFull() {
         </div>
         <div className="flex items-center space-x-2">
           <div className="bg-gray-600 h-4 w-4 rounded-sm"></div>
-          <p className="text-sm sm:text-base">ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน</p>
+          <p className="text-sm sm:text-base">
+            ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน
+          </p>
         </div>
       </motion.div>
-
 
       {selectedEvent && showPopup && (
         <motion.div
@@ -161,7 +163,23 @@ function CalendarFull() {
               </div>
             </div>
             <div className="text-left">
-              <h2 className="text-xl font-bold mb-4">รายละเอียดกิจกรรม</h2>
+              <h2 className="text-xl font-bold mb-4">
+                รายละเอียดกิจกรรม{" "}
+                <Tooltip title="รายชื่อผู้ลงทะเบียน" placement="bottom-start">
+                  <LibraryBooksIcon
+                    sx={{
+                      color: "teal",
+                      transition: "0.3s ease",
+                      marginLeft: 0.5,
+                      "&:hover": {
+                        color: "indigo",
+                        transform: "scale(1.5) translateX(5px)",
+                      },
+                    }}
+                    onClick={() => navigate(`/reserve/${selectedEvent.id}`)}
+                  />
+                </Tooltip>
+              </h2>
               <p className="text-xl">ชื่อกิจกรรม : {selectedEvent.title}</p>
               <p>สถานที่ : {selectedEvent.location}</p>
               <p>
@@ -216,30 +234,29 @@ function CalendarFull() {
                     selectedEvent.status === 2
                       ? "blue"
                       : selectedEvent.numStd === selectedEvent.numStdReserve
-                        ? "red"
-                        : now >= selectedEvent.reserveStart &&
-                          now <= selectedEvent.reserveEnd
-                          ? selectedEvent.status === 1
-                            ? "green"
-                            : "red"
-                          : "gray",
+                      ? "red"
+                      : now >= selectedEvent.reserveStart &&
+                        now <= selectedEvent.reserveEnd
+                      ? selectedEvent.status === 1
+                        ? "green"
+                        : "red"
+                      : "gray",
                 }}
               >
                 {selectedEvent.status === 2
                   ? "กิจกรรมสิ้นสุดแล้ว"
                   : selectedEvent.numStd === selectedEvent.numStdReserve
-                    ? "ลงทะเบียนเต็มแล้ว"
-                    : now >= selectedEvent.reserveStart &&
-                      now <= selectedEvent.reserveEnd
-                      ? selectedEvent.status === 1
-                        ? "เปิดลงทะเบียน"
-                        : "ปิดลงทะเบียน"
-                      : "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"}
+                  ? "ลงทะเบียนเต็มแล้ว"
+                  : now >= selectedEvent.reserveStart &&
+                    now <= selectedEvent.reserveEnd
+                  ? selectedEvent.status === 1
+                    ? "เปิดลงทะเบียน"
+                    : "ปิดลงทะเบียน"
+                  : "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"}
               </p>
             </div>
           </div>
         </motion.div>
-
       )}
     </div>
   );

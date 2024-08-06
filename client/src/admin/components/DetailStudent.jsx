@@ -17,6 +17,7 @@ function DetailStudent() {
   const [filter, setFilter] = useState("default");
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
+  const [selectedRole, setSelectedRole] = useState('student');
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -28,6 +29,7 @@ function DetailStudent() {
         const response = await axios.get(`/api/users/${id}`);
         setStudent(response.data[0]);
         setUpdatedStudent(response.data[0]);
+        setItemsPerPage
       } catch (error) {
         console.error(error);
       }
@@ -64,9 +66,16 @@ function DetailStudent() {
     fetchActivity();
   }, [id]);
 
-  const isStudentJoined = useCallback((actID) => {
-    return join.some((j) => j.actID === actID && j.stdIDs.includes(BigInt(id)));
-  }, [join, id]);
+  const isStudentJoined = useCallback(
+    (actID) => {
+      return join.some(
+        (j) => j.actID === actID && j.stdIDs.includes(BigInt(id))
+      );
+    },
+    [join, id]
+  );
+
+
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -95,7 +104,9 @@ function DetailStudent() {
       });
 
       if (result.isConfirmed) {
-        const response = await axios.delete(`/api/students/${student.login_ID}`);
+        const response = await axios.delete(
+          `/api/students/${student.login_ID}`
+        );
 
         if (response.status === 200) {
           Swal.fire({
@@ -134,7 +145,10 @@ function DetailStudent() {
 
   const handleSave = async () => {
     try {
-      const response = await axios.put(`/api/students/${student.login_ID}`, updatedStudent);
+      const response = await axios.put(
+        `/api/students/${student.login_ID}`,
+        updatedStudent
+      );
       if (response.status === 200) {
         Swal.fire({
           title: "Updated!",
@@ -158,13 +172,14 @@ function DetailStudent() {
 
   // Implement pagination
   const paginatedActivities = activity
-    .filter(act => {
+    .filter((act) => {
       // Apply search and filter
       return (
         act.act_title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (filter === "default" || (filter === "joinEntry" && isStudentJoined(act.act_ID)) ||
-         (filter === "reserveEntry" && !isStudentJoined(act.act_ID)) ||
-         (filter === "notjoin" && !isStudentJoined(act.act_ID)))
+        (filter === "default" ||
+          (filter === "joinEntry" && isStudentJoined(act.act_ID)) ||
+          (filter === "reserveEntry" && !isStudentJoined(act.act_ID)) ||
+          (filter === "notjoin" && !isStudentJoined(act.act_ID)))
       );
     })
     .sort((a, b) => {
@@ -192,50 +207,76 @@ function DetailStudent() {
           </div>
           <hr className="mb-3" />
           <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-          <tbody className="bg-white divide-y divide-gray-200 text-md">
-              <tr>
-                <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">รหัสนักศึกษา</td>
-                <td className="px-6 py-3">
-                  {editMode ? (
-                    <input
-                      type="text"
-                      name="ID"
-                      value={updatedStudent.ID}
-                      onChange={handleInputChange}
-                      readOnly
-                    />
-                  ) : (
-                    student.ID
-                  )}
-                </td>
-             
-                <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">ชื่อ-นามสกุล</td>
-                <td className="px-6 py-3">
-                  {editMode ? (
-                    <>
+            <table className="min-w-full divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-gray-200 text-md">
+                <tr>
+                  <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                    รหัสนักศึกษา
+                  </td>
+                  <td className="px-6 py-3">
+                    {editMode ? (
                       <input
                         type="text"
-                        name="fname"
-                        value={updatedStudent.fname}
+                        name="ID"
+                        value={updatedStudent.ID}
                         onChange={handleInputChange}
+                        readOnly
                       />
-                      <input
-                        type="text"
-                        name="lname"
-                        value={updatedStudent.lname}
-                        onChange={handleInputChange}
-                      />
-                    </>
-                  ) : (
-                    `${student.fname} ${student.lname}`
-                  )}
-                </td>
-              </tr>
-              {student.role === "student" && (
-                <>
+                    ) : (
+                      student.ID
+                    )}
+                  </td>
+
+                  <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                    ชื่อ-นามสกุล
+                  </td>
+                  <td className="px-6 py-3">
+                    {editMode ? (
+                      <>
+                        <input
+                          type="text"
+                          name="fname"
+                          value={updatedStudent.fname}
+                          onChange={handleInputChange}
+                        />
+                        <input
+                          type="text"
+                          name="lname"
+                          value={updatedStudent.lname}
+                          onChange={handleInputChange}
+                        />
+                      </>
+                    ) : (
+                      `${student.fname} ${student.lname}`
+                    )}
+                  </td>
+                </tr>
+                {student.role === "student" && (
+                  <>
+                    <tr>
+                      <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                        หมู่เรียน
+                      </td>
+                      <td className="px-6 py-3">
+                        {editMode ? (
+                          <input
+                            type="text"
+                            name="sec_name"
+                            value={updatedStudent.sec_name}
+                            onChange={handleInputChange}
+                          />
+                        ) : (
+                          student.sec_name
+                        )}
+                      </td>
+                    </tr>
+                  </>
+                )}
+                {student.role === "teacher" && (
                   <tr>
-                    <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">หมู่เรียน</td>
+                    <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                      อาจารย์ประจำหมู่เรียน
+                    </td>
                     <td className="px-6 py-3">
                       {editMode ? (
                         <input
@@ -249,133 +290,129 @@ function DetailStudent() {
                       )}
                     </td>
                   </tr>
-                </>
-              )}
-              {student.role === "teacher" && (
+                )}
                 <tr>
-                  <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">อาจารย์ประจำหมู่เรียน</td>
+                  <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                    อีเมล
+                  </td>
                   <td className="px-6 py-3">
                     {editMode ? (
                       <input
                         type="text"
-                        name="sec_name"
-                        value={updatedStudent.sec_name}
+                        name="email"
+                        value={updatedStudent.email}
                         onChange={handleInputChange}
                       />
                     ) : (
-                      student.sec_name
+                      student.email
+                    )}
+                  </td>
+
+                  <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                    เบอร์โทรศัพท์
+                  </td>
+                  <td className="px-6 py-3">
+                    {editMode ? (
+                      <input
+                        type="text"
+                        name="mobile"
+                        value={updatedStudent.mobile}
+                        onChange={handleInputChange}
+                      />
+                    ) : (
+                      student.mobile
                     )}
                   </td>
                 </tr>
-              )}
-              <tr>
-                <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">อีเมล</td>
-                <td className="px-6 py-3">
-                  {editMode ? (
-                    <input
-                      type="text"
-                      name="email"
-                      value={updatedStudent.email}
-                      onChange={handleInputChange}
-                    />
-                  ) : (
-                    student.email
-                  )}
-                </td>
-        
-                <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">เบอร์โทรศัพท์</td>
-                <td className="px-6 py-3">
-                  {editMode ? (
-                    <input
-                      type="text"
-                      name="mobile"
-                      value={updatedStudent.mobile}
-                      onChange={handleInputChange}
-                    />
-                  ) : (
-                    student.mobile
-                  )}
-                </td>
-              </tr>
-              {student.role !== "admin" && (
-                <>
-                  <tr>
-                    <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">ที่อยู่</td>
-                    <td className="px-6 py-3">
-                      {editMode ? (
-                        <input
-                          type="text"
-                          name="address"
-                          value={updatedStudent.address}
-                          onChange={handleInputChange}
-                        />
-                      ) : (
-                        student.address
-                      )}
-                    </td>
-                
-                    <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">จังหวัด</td>
-                    <td className="px-6 py-3">
-                      {editMode ? (
-                        <input
-                          type="text"
-                          name="province"
-                          value={updatedStudent.province}
-                          onChange={handleInputChange}
-                        />
-                      ) : (
-                        student.province
-                      )}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">อำเภอ</td>
-                    <td className="px-6 py-3">
-                      {editMode ? (
-                        <input
-                          type="text"
-                          name="district"
-                          value={updatedStudent.district}
-                          onChange={handleInputChange}
-                        />
-                      ) : (
-                        student.district
-                      )}
-                    </td>
-               
-                    <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">ตำบล</td>
-                    <td className="px-6 py-3">
-                      {editMode ? (
-                        <input
-                          type="text"
-                          name="subdistrict"
-                          value={updatedStudent.subdistrict}
-                          onChange={handleInputChange}
-                        />
-                      ) : (
-                        student.subdistrict
-                      )}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">รหัสไปรษณีย์</td>
-                    <td className="px-6 py-3">
-                      {editMode ? (
-                        <input
-                          type="text"
-                          name="zipcode"
-                          value={updatedStudent.zipcode}
-                          onChange={handleInputChange}
-                        />
-                      ) : (
-                        student.zipcode
-                      )}
-                    </td>
-                  </tr>
-                </>
-              )}
-            </tbody>
-          </table>
+                {student.role !== "admin" && (
+                  <>
+                    <tr>
+                      <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                        ที่อยู่
+                      </td>
+                      <td className="px-6 py-3">
+                        {editMode ? (
+                          <input
+                            type="text"
+                            name="address"
+                            value={updatedStudent.address}
+                            onChange={handleInputChange}
+                          />
+                        ) : (
+                          student.address
+                        )}
+                      </td>
+
+                      <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                        จังหวัด
+                      </td>
+                      <td className="px-6 py-3">
+                        {editMode ? (
+                          <input
+                            type="text"
+                            name="province"
+                            value={updatedStudent.province}
+                            onChange={handleInputChange}
+                          />
+                        ) : (
+                          student.province
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                        อำเภอ
+                      </td>
+                      <td className="px-6 py-3">
+                        {editMode ? (
+                          <input
+                            type="text"
+                            name="district"
+                            value={updatedStudent.district}
+                            onChange={handleInputChange}
+                          />
+                        ) : (
+                          student.district
+                        )}
+                      </td>
+
+                      <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                        ตำบล
+                      </td>
+                      <td className="px-6 py-3">
+                        {editMode ? (
+                          <input
+                            type="text"
+                            name="subdistrict"
+                            value={updatedStudent.subdistrict}
+                            onChange={handleInputChange}
+                          />
+                        ) : (
+                          student.subdistrict
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                        รหัสไปรษณีย์
+                      </td>
+                      <td className="px-6 py-3">
+                        {editMode ? (
+                          <input
+                            type="text"
+                            name="zipcode"
+                            value={updatedStudent.zipcode}
+                            onChange={handleInputChange}
+                          />
+                        ) : (
+                          student.zipcode
+                        )}
+                      </td>
+                    </tr>
+                  </>
+                )}
+              </tbody>
+            </table>
           </div>
 
           <div className="mt-5">
@@ -420,6 +457,8 @@ function DetailStudent() {
         </div>
       </div>
 
+
+      {selectedRole === "student" && (
       <div className="mb-10 container mx-auto md:px-20">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
           <div className="text-lg font-bold mb-2">ประวัติการทำกิจกรรม</div>
@@ -507,12 +546,16 @@ function DetailStudent() {
           </div>
           <div className="flex justify-between items-center mt-4">
             <button
-              onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
+              onClick={() =>
+                setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))
+              }
               className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               Previous
             </button>
-            <span className="text-sm text-gray-700 dark:text-gray-400">Page {currentPage + 1}</span>
+            <span className="text-sm text-gray-700 dark:text-gray-400">
+              Page {currentPage + 1}
+            </span>
             <button
               onClick={() => setCurrentPage((prevPage) => prevPage + 1)}
               className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -522,6 +565,7 @@ function DetailStudent() {
           </div>
         </div>
       </div>
+            )}
     </div>
   );
 }

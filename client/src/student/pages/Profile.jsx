@@ -97,7 +97,7 @@ const StudentForm = () => {
   };
 
   const [value, setValue] = useState({
-    std_ID: "",
+    login_ID: "",
     std_fname: "",
     std_lname: "",
     sec_ID: "",
@@ -197,7 +197,7 @@ const StudentForm = () => {
       std_fname: `${title}${value.std_fname}`.trim(),
     };
 
-    fetch(`/api/update/student/${stdID}`, {
+    fetch(`/api/students/${stdID}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -263,8 +263,8 @@ const StudentForm = () => {
               <input
                 type="text"
                 id="username"
-                name="std_ID"
-                value={value.login_ID}
+                name="login_ID"
+                value={value.username}
                 readOnly
                 className="mt-1 p-2 border w-full rounded-md"
               />
@@ -292,22 +292,33 @@ const StudentForm = () => {
               </select>
             </div>
 
-            <div>
-              <label
-                htmlFor="firstName"
-                className="block text-sm font-medium text-gray-600"
-              >
-                ชื่อ
-              </label>
-              <input
-                type="text"
-                id="fname"
-                name="std_fname"
-                onChange={handlechange}
-                value={value.std_fname}
-                className="mt-1 p-2 border w-full rounded-md"
-              />
+            <div className="flex gap-2">
+              <div className="w-1/6">
+                <label htmlFor="title" className="block text-sm font-medium text-gray-600">
+                  คำนำหน้า
+                </label>
+                <select value={title} onChange={handleTitleChange} name="title" id="title" className="mt-1 p-2 border w-full rounded-md">
+                  <option value="">เลือกคำนำหน้า</option>
+                  <option value="นาย">นาย</option>
+                  <option value="นาง">นาง</option>
+                  <option value="น.ส.">น.ส.</option>
+                </select>
+              </div>
+              <div className="w-5/6">
+                <label htmlFor="firstName" className="block text-sm font-medium text-gray-600">
+                  ชื่อ
+                </label>
+                <input
+                  type="text"
+                  id="fname"
+                  name="std_fname"
+                  onChange={handlechange}
+                  value={value.std_fname}
+                  className="mt-1 p-2 border w-full rounded-md"
+                />
+              </div>
             </div>
+
 
             <div>
               <label

@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
+import moment from "moment";
 import Popup from "./Popup_addAc";
+import { motion } from "framer-motion";
 
 function Dash_users() {
   const [items, setItems] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(null);
-  const [countActivity, setCountActivity] = useState(0);
-  //   const [countVolunteer, setCountVolunteer] = useState(0);
 
   useEffect(() => {
     fetch("/api/activitys")
@@ -15,9 +15,7 @@ function Dash_users() {
         (result) => {
           setIsLoaded(true);
           const filteredItems = result.filter((item) => item.act_title);
-          const countActivity = filteredItems.length;
-          setCountActivity(countActivity);
-          setItems(result);
+          setItems(filteredItems);
         },
         (error) => {
           setIsLoaded(true);
@@ -26,56 +24,149 @@ function Dash_users() {
       );
   }, []);
 
-  return (
-    <div className="container mx-auto  md:px-10 mb-5">
+  const getActivityStatus = (item, now) => {
+    const dateStart = moment(item.act_dateStart);
+    const twoWeeksBefore = dateStart.subtract(2, 'weeks').toDate();
+    const oneDayBefore = dateStart.subtract(1, 'day').toDate();
+
+    if (item.act_status === 2) {
+      return "กิจกรรมสิ้นสุดแล้ว";
+    } else if (item.act_numStd === item.act_numStdReserve) {
+      return "ลงทะเบียนเต็มแล้ว";
+    } else if (now >= twoWeeksBefore && now <= oneDayBefore) {
+      return item.act_status === 1 ? "เปิดลงทะเบียน" : "ปิดลงทะเบียน";
+    } else {
+      return "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน";
+    }
+  };
+
+  const now = new Date();
+
+  // Count activities by status
+  const statusCounts = {
+    'เปิดลงทะเบียน': 0,
+    'ปิดลงทะเบียน': 0,
+    'ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน': 0,
+    'ลงทะเบียนเต็มแล้ว': 0,
+    'กิจกรรมสิ้นสุดแล้ว': 0
+  };
+
+  items.forEach(item => {
+    const status = getActivityStatus(item, now);
+    if (statusCounts.hasOwnProperty(status)) {
+      statusCounts[status]++;
+    }
+  });
+
+  if (error) {
+    return (
       <div>
-        {isLoaded ? (
-          <div>
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold">การจัดการกิจกรรม</h2>
-              <Popup />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4  pt-3">
-              <div className="bg-blue-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-blue-600">
-                <div className="text-2xl flex items-center gap-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"
-                    />
-                  </svg>
+        <h2>Error</h2>
+        <p>{error.message}</p>
+      </div>
+    );
+  }
 
-                  <div className="text-sm font-semibold">
-                    จำนวนกิจกรรมทั้งหมด
-                  </div>
-                </div>
-                <div className="text-center text-4xl font-bold">
-                  {items.length}
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <p>Loading...</p>
-        )}
+  if (!isLoaded) {
+    return <p>Loading...</p>;
+  }
 
-        {error && (
-          <div>
-            <h2>Error</h2>
-            <p>{error.message}</p>
-          </div>
-        )}
+  return (
+    <div className="container mx-auto md:px-10 mb-5">
+      <div>
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-bold">การจัดการกิจกรรม</h2>
+          <Popup />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-3">
+          <motion.div
+            className="bg-blue-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-blue-600"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="text-sm font-semibold">
+              จำนวนกิจกรรมทั้งหมด
+            </div>
+            <div className="text-center text-4xl font-bold">
+              {items.length}
+            </div>
+          </motion.div>
+          
+          <motion.div
+            className="bg-green-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-green-600"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="text-sm font-semibold">
+              จำนวนกิจกรรมที่เปิดลงทะเบียน
+            </div>
+            <div className="text-center text-4xl font-bold">
+              {statusCounts['เปิดลงทะเบียน']}
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="bg-red-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-red-600"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="text-sm font-semibold">
+              จำนวนกิจกรรมที่ปิดลงทะเบียน
+            </div>
+            <div className="text-center text-4xl font-bold">
+              {statusCounts['ปิดลงทะเบียน']}
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="bg-blue-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-blue-600"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="text-sm font-semibold">
+              จำนวนกิจกรรมที่ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน
+            </div>
+            <div className="text-center text-4xl font-bold">
+              {statusCounts['ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน']}
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="bg-blue-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-blue-600"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="text-sm font-semibold">
+              จำนวนกิจกรรมที่ลงทะเบียนเต็มแล้ว
+            </div>
+            <div className="text-center text-4xl font-bold">
+              {statusCounts['ลงทะเบียนเต็มแล้ว']}
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="bg-red-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-red-600"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="text-sm font-semibold">
+              จำนวนกิจกรรมที่กิจกรรมสิ้นสุดแล้ว
+            </div>
+            <div className="text-center text-4xl font-bold">
+              {statusCounts['กิจกรรมสิ้นสุดแล้ว']}
+            </div>
+          </motion.div>
+        </div>
       </div>
     </div>
   );
 }
 
 export default Dash_users;
+

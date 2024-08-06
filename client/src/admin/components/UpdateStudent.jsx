@@ -8,19 +8,19 @@ const StudentForm = () => {
   const [provinces, setProvinces] = useState([]);
   const [amphures, setAmphures] = useState([]);
   const [tambons, setTambons] = useState([]);
-  const [zipcodeS, setZipcode] = useState();
+  const [zipcodeS, setZipcode] = useState("");
   const [selected, setSelected] = useState({
-    province_id: undefined,
-    amphure_id: undefined,
-    tambon_id: undefined,
-    zip_code: undefined,
+    province_id: "",
+    amphure_id: "",
+    tambon_id: "",
+    zip_code: "",
   });
   const [section, setSection] = useState([]);
-
   const [title, setTitle] = useState("");
+  const [value, setValue] = useState({});
 
   const navigate = useNavigate();
-  const { std_ID } = useParams();
+  const { id } = useParams();
 
   const onChangeHandle = (id, selectedValue) => {
     if (id === "province_id") {
@@ -51,11 +51,11 @@ const StudentForm = () => {
   }) => {
     const onChangeHandleLocal = (event) => {
       setChilds.forEach((setChild) => setChild([]));
-      const entries = childsId.map((child) => [child, undefined]);
+      const entries = childsId.map((child) => [child, ""]);
       const unSelectChilds = Object.fromEntries(entries);
 
       const input = event.target.value;
-      const dependId = input ? Number(input) : undefined;
+      const dependId = input ? Number(input) : "";
       setSelected((prev) => ({ ...prev, ...unSelectChilds, [id]: dependId }));
 
       if (!input) return;
@@ -75,45 +75,28 @@ const StudentForm = () => {
     };
 
     return (
-      <>
-        <select
+      <select
+        value={selected[id]}
+        onChange={onChangeHandleLocal}
+        className="mt-1 p-2 border w-full rounded-md"
+      >
+        <option
+          key={selected[id]}
           value={selected[id]}
-          onChange={onChangeHandleLocal}
-          className="mt-1 p-2 border w-full rounded-md"
-        >
-          <option
-            key={selected[id]}
-            value={selected[id]}
-            label={addressValue_PDS}
-          />
-
-          {list &&
-            list.map((item) => (
-              <option key={item.id} value={item.id} label={item.name_th}>
-                {item.name_th}
-              </option>
-            ))}
-        </select>
-      </>
+          label={addressValue_PDS}
+        />
+        {list &&
+          list.map((item) => (
+            <option key={item.id} value={item.id} label={item.name_th}>
+              {item.name_th}
+            </option>
+          ))}
+      </select>
     );
   };
 
-  const [value, setValue] = useState({
-    username: "",
-    std_fname: "",
-    std_lname: "",
-    sec_ID: "",
-    std_mobile: "",
-    std_email: "",
-    std_address: "",
-    province: "",
-    district: "",
-    subdistrict: "",
-    zipcode: "",
-  });
-
   useEffect(() => {
-    fetch("/api/students/" + std_ID)
+    fetch("/api/users/" + id)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Error fetching data");
@@ -121,24 +104,33 @@ const StudentForm = () => {
         return response.json();
       })
       .then((data) => {
-        setValue((prev) => ({
-          ...prev,
-          ...data,
-        }));
-
-        const titles = ["นาย", "นาง", "น.ส."];
-        const title = titles.find((t) => data.std_fname.match(t));
-        if (title) {
-          setTitle(title);
-          setValue((prev) => ({
-            ...prev,
-            std_fname: data.std_fname.replace(title, "").trim(),
-          }));
+        setValue(data[0]);
+        if (data[0].role === "student") {
+          const titles = ["นาย", "นาง", "น.ส."];
+          const title = titles.find((t) => data[0].fname.startsWith(t));
+          if (title) {
+            setTitle(title);
+            setValue((prev) => ({
+              ...prev,
+              fname: data[0].fname.replace(title, "").trim(),
+            }));
+          }
+        } else if (data[0].role === "teacher") {
+          const titles = ["อ.", "ดร.", "รศ. ดร.", "ผศ. ดร."];
+          const title = titles.find((t) => data[0].fname.startsWith(t));
+          if (title) {
+            setTitle(title);
+            setValue((prev) => ({
+              ...prev,
+              fname: data[0].fname.replace(title, "").trim(),
+            }));
+          }
         }
       })
       .catch((error) => {
         console.error("Error:", error);
       });
+
     fetch("/api/sections/")
       .then((response) => {
         if (!response.ok) {
@@ -148,16 +140,6 @@ const StudentForm = () => {
       })
       .then((data) => {
         setSection(data);
-
-        const titles = ["นาย", "นาง", "น.ส."];
-        const title = titles.find((t) => data.std_fname.match(t));
-        if (title) {
-          setTitle(title);
-          setValue((prev) => ({
-            ...prev,
-            std_fname: data.std_fname.replace(title, "").trim(),
-          }));
-        }
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -173,7 +155,7 @@ const StudentForm = () => {
         );
         setProvinces(sortedProvinces);
       });
-  }, [std_ID]);
+  }, [id]);
 
   const handlechange = (e) => {
     setValue((prev) => ({
@@ -200,10 +182,13 @@ const StudentForm = () => {
     const updatedValue = {
       ...value,
       zipcode: zipcodeS || value.zipcode,
-      std_fname: `${title}${value.std_fname}`.trim(),
+      fname: `${title}${value.fname}`.trim(),
+      role: value.role,
     };
 
-    fetch("/api/students/" + std_ID, {
+    console.log("Updated Value:", updatedValue); // Log the updated value
+
+    fetch("/api/users/" + id, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -212,11 +197,15 @@ const StudentForm = () => {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Error updating data");
+          return response.json().then((error) => {
+            throw new Error(
+              `Server responded with ${response.status}: ${error.message}`
+            );
+          });
         }
         return response.json();
       })
-      .then((data) => {
+      .then(() => {
         Swal.fire({
           title: "แก้ไขประวัติส่วนตัวเสร็จสิ้น",
           icon: "success",
@@ -235,10 +224,6 @@ const StudentForm = () => {
         });
       });
   };
-
-  if (!value.username) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="container mx-auto mb-10 md:px-20 pt-24">
@@ -259,30 +244,43 @@ const StudentForm = () => {
         <hr className="mb-3" />
         <form>
           <div className="grid grid-cols-2 gap-4 mt-2">
-            <div>
-              <label
-                htmlFor="studentId"
-                className="block text-sm font-medium text-gray-600"
-              >
-                รหัสนักศึกษา
-              </label>
-              <input
-                type="text"
-                id="username"
-                name="std_ID"
-                value={value.username}
-                readOnly
-                className="mt-1 p-2 border w-full rounded-md"
-              />
-            </div>
+            {value.role == "student" ? (
+              <div>
+                <label
+                  htmlFor="studentId"
+                  className="block text-sm font-medium text-gray-600"
+                >
+                  รหัสนักศึกษา
+                </label>
+
+                <input
+                  type="text"
+                  id="username"
+                  name="ID"
+                  value={value.username}
+                  readOnly
+                  className="mt-1 p-2 border w-full rounded-md"
+                />
+              </div>
+            ) : null}
 
             <div>
-              <label
-                htmlFor="classGroup"
-                className="block text-sm font-medium text-gray-600"
-              >
-                หมู่เรียน
-              </label>
+              {value.role === "student" ? (
+                <label
+                  htmlFor="classGroup"
+                  className="block text-sm font-medium text-gray-600"
+                >
+                  หมู่เรียน
+                </label>
+              ) : (
+                <label
+                  htmlFor="classGroup"
+                  className="block text-sm font-medium text-gray-600"
+                >
+                  อาจารย์ที่ปรึกษาประจำหมู่เรียน
+                </label>
+              )}
+
               <select
                 value={value.sec_ID}
                 onChange={handleSectionChange}
@@ -314,9 +312,20 @@ const StudentForm = () => {
                   className="mt-1 p-2 border w-full rounded-md"
                 >
                   <option value="">เลือกคำนำหน้า</option>
-                  <option value="นาย">นาย</option>
-                  <option value="นาง">นาง</option>
-                  <option value="น.ส.">น.ส.</option>
+                  {value.role === "student" ? (
+                    <>
+                      <option value="นาย">นาย</option>
+                      <option value="นาง">นาง</option>
+                      <option value="น.ส.">น.ส.</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="อ.">อ.</option>
+                      <option value="ดร.">ดร.</option>
+                      <option value="รศ. ดร.">รศ. ดร.</option>
+                      <option value="ผศ. ดร.">ผศ. ดร.</option>
+                    </>
+                  )}
                 </select>
               </div>
               <div className="w-5/6">
@@ -329,9 +338,9 @@ const StudentForm = () => {
                 <input
                   type="text"
                   id="fname"
-                  name="std_fname"
+                  name="fname"
                   onChange={handlechange}
-                  value={value.std_fname}
+                  value={value.fname}
                   className="mt-1 p-2 border w-full rounded-md"
                 />
               </div>
@@ -347,9 +356,9 @@ const StudentForm = () => {
               <input
                 type="text"
                 id="lname"
-                name="std_lname"
+                name="lname"
                 onChange={handlechange}
-                value={value.std_lname}
+                value={value.lname}
                 className="mt-1 p-2 border w-full rounded-md"
               />
             </div>
@@ -364,9 +373,9 @@ const StudentForm = () => {
               <input
                 type="tel"
                 id="tel"
-                name="std_mobile"
+                name="mobile"
                 onChange={handlechange}
-                value={value.std_mobile}
+                value={value.mobile}
                 className="mt-1 p-2 border w-full rounded-md"
               />
             </div>
@@ -381,9 +390,9 @@ const StudentForm = () => {
               <input
                 type="email"
                 id="email"
-                name="std_email"
+                name="email"
                 onChange={handlechange}
-                value={value.std_email}
+                value={value.email}
                 className="mt-1 p-2 border w-full rounded-md"
               />
             </div>
@@ -397,9 +406,9 @@ const StudentForm = () => {
               </label>
               <input
                 id="address"
-                name="std_address"
+                name="address"
                 onChange={handlechange}
-                value={value.std_address}
+                value={value.address}
                 className="mt-1 p-2 border w-full rounded-md"
               />
             </div>
@@ -467,12 +476,12 @@ const StudentForm = () => {
                 id="zipcode"
                 name="zipcode"
                 onChange={handlechange}
-                value={zipcodeS ?? value.zipcode}
+                value={zipcodeS || value.zipcode}
                 className="mt-1 p-2 border w-full rounded-md"
               />
             </div>
 
-            <div className="flex justify-end items-center">
+            <div className="flex justify-end items-center col-span-2">
               <button
                 type="submit"
                 className="mt-4 bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"

@@ -1,6 +1,7 @@
 import express from 'express'
 import {
     readManage,
+    readManageOne,
     reserveActivity,
     cancelReserve,
     decreaseNumStd,
@@ -10,6 +11,7 @@ import {
 const router = express.Router()
 
 router.get('/reserve', readManage)
+router.get('/reserve/:id', readManageOne)
 router.get('/upload', upload)
 
 router.post('/reserve', reserveActivity)

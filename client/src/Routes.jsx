@@ -7,6 +7,7 @@ import Login from "./pages/Login.jsx";
 
 import Layoutm from "./components/Layout/Layout.jsx";
 import Calen from "./components/Calendar.jsx";
+import GetReserve from "./components/Reserve_Check.jsx";
 
 import Layout from "./student/components/Layout.jsx";
 import DashUser from "./student/pages/Dashboard.jsx";
@@ -33,12 +34,14 @@ import AddUsers from "./admin/components/Add_users.jsx";
 import UpdateUser from "./admin/components/Update_user.jsx";
 import UpdateStudent from "./admin/components/UpdateStudent.jsx";
 import UpdateStaff from "./admin/components/UpdateStaff.jsx";
-import DetailActivityA from "./admin/components/DetailActivity.jsx";
+import DetailActivityA from "./admin/components/Activity/Detail/Index.jsx";
 import DetailStudent from "./admin/components/DetailStudent.jsx";
-import DetailStaff from "./admin/components/DetailStaff.jsx";
+// import DetailStaff from "./admin/components/DetailStaff.jsx";
 import Table from "./admin/components/Upload/Table.jsx";
+import Test from "./admin/components/Test.jsx";
 
 import ManageActivity from "./admin/components/Manage_activity.jsx";
+
 // import Login from './pages/Login.jsx';
 
 export function Router() {
@@ -48,6 +51,8 @@ export function Router() {
         <Route path="/" element={<Calen />} />
       </Route>
       <Route path="/login" element={<Login />} />
+      <Route path="reserve/:act_ID" element={<GetReserve />} />
+      <Route path="test" element={<Test />} />
 
       <Route element={<PrivateRoutes />}>
         <Route path="/admin" element={<LayoutA />}>
@@ -62,10 +67,7 @@ export function Router() {
           <Route path="addusers" element={<AddUsers />} />
           <Route path="update" element={<UpdateUser />} />
           <Route path="wallet" element={<Wallet />} />
-          <Route
-            path="dashboard/detail/student/update/:std_ID"
-            element={<UpdateStudent />}
-          />
+          <Route path="dashboard/user/update/:id" element={<UpdateStudent />} />
           <Route
             path="dashboard/detail/teacher/update/:staff_ID"
             element={<UpdateStaff />}

@@ -69,7 +69,7 @@ const NavBar = () => {
                 onClick={() => handleItemClick("Dashboard")}
                 className={getItemClass("Dashboard")}
               >
-                จัดการข้อมูลผู้ใช้
+                จัดการผู้ใช้
               </li>
             </Link>
             <Link to="/admin/activity">
@@ -108,7 +108,6 @@ const NavBar = () => {
             </p>
             <Logout className="block md:hidden" />
           </div>
-
         </nav>
 
         <div className="relative block md:hidden w-full mt-5 ">
@@ -159,7 +158,7 @@ const NavBar = () => {
                   onClick={() => handleItemClick("Dashboard")}
                   className={getItemClassXs("Dashboard")}
                 >
-                จัดการผู้ใช้
+                  จัดการผู้ใช้
                 </li>
               </Link>
               <Link to="/admin/activity">
@@ -167,7 +166,7 @@ const NavBar = () => {
                   onClick={() => handleItemClick("Dashboard")}
                   className={getItemClassXs("Dashboard")}
                 >
-                กิจกรรม
+                  กิจกรรม
                 </li>
               </Link>
               <Link to="/admin/calendar">

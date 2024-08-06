@@ -73,24 +73,11 @@ export const userOne = (req, res) => {
 
 // update user (either teacher or student)
 export const updateUser = (req, res) => {
-    const {
-        id
-    } = req.params;
-    const {
-        role,
-        fname,
-        lname,
-        email,
-        mobile,
-        address,
-        province,
-        district,
-        subdistrict,
-        zipcode
-    } = req.body;
+    const { id } = req.params;
+    const { role, fname, lname, email, mobile, address, province, district, subdistrict, sec_ID, zipcode } = req.body;
 
     let sql;
-    let values = [fname, lname, email, mobile, address, province, district, subdistrict, zipcode, id];
+    let values = [fname, lname, email, mobile, address, sec_ID, province, district, subdistrict, zipcode, id];
 
     if (role === 'teacher') {
         sql = `
@@ -101,6 +88,7 @@ export const updateUser = (req, res) => {
                 staff_email = ?,               
                 staff_mobile = ?,                
                 staff_address = ?,
+                sec_ID = ?,
                 province = ?,            
                 district = ?,            
                 subdistrict = ?,               
@@ -117,6 +105,7 @@ export const updateUser = (req, res) => {
                 std_email = ?,               
                 std_mobile = ?,                
                 std_address = ?,
+                sec_ID = ?,
                 province = ?,            
                 district = ?,            
                 subdistrict = ?,               
@@ -131,7 +120,7 @@ export const updateUser = (req, res) => {
     }
 
     db.query(sql, values, (err, result) => {
-        if (err) return res.status(500).json(err);
+        if (err) return res.status(500).json({ message: 'Database query failed', error: err });
         return res.json({
             message: `User updated successfully in the ${role} table`
         });

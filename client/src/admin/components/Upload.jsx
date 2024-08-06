@@ -82,8 +82,7 @@ const Upload = () => {
           (item) =>
             item.std_ID.includes(searchTerm) ||
             item.std_fname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.std_lname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.act_title.toLowerCase().includes(searchTerm.toLowerCase())
+            item.std_lname.toLowerCase().includes(searchTerm.toLowerCase())
         ),
       }))
       .filter((group) => group.activities.length > 0);

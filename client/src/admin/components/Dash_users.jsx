@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import Popup from "./Popup_addUser";
 import { BarChart } from "@mui/x-charts/BarChart";
+import { green } from "@mui/material/colors";
 
 function Dash_users() {
   const [items, setItems] = useState([]);
@@ -52,7 +54,12 @@ function Dash_users() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pr-2 pl-2 pt-3">
-                <div className="bg-blue-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-blue-600">
+                <motion.div
+                  className="bg-blue-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-blue-600"
+                  initial={{ opacity: 0, scale: 0.8  }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
                   <div className="text-2xl flex items-center gap-2">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -75,31 +82,46 @@ function Dash_users() {
                   <div className="text-center text-4xl font-bold">
                     {items.length}
                   </div>
-                </div>
+                </motion.div>
 
-                <div className="bg-green-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-green-600">
+                <motion.div
+                  className="bg-green-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-green-600"
+                  initial={{ opacity: 0, scale: .7 }}
+                  animate={{ opacity: 3, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
                   <p className="text-sm font-semibold">จำนวนนักศึกษา</p>
                   <div className="text-center text-4xl font-bold">
                     {countStudentRoles}
                   </div>
-                </div>
+                </motion.div>
 
-                <div className="bg-green-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-green-600">
+                <motion.div
+                  className="bg-green-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-green-600"
+                  initial={{ opacity: 0, scale: 0.6 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
                   <p className="text-sm font-semibold">จำนวนอาจารย์</p>
                   <div className="text-center text-4xl font-bold">
                     {countTeacherRoles}
                   </div>
-                </div>
+                </motion.div>
 
-                <div className="bg-red-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-red-600">
+                <motion.div
+                  className="bg-red-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-red-600"
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
                   <p className="text-sm font-semibold">จำนวนผู้ดูแลระบบ</p>
                   <div className="text-center text-4xl font-bold">
                     {countAdminRoles}
                   </div>
-                </div>
+                </motion.div>
               </div>
             </div>
-            <BarChart
+            {/* <BarChart
               xAxis={[
                 {
                   scaleType: "band",
@@ -113,7 +135,8 @@ function Dash_users() {
               ]}
               width={500}
               height={300}
-            /> 
+              borderRadius={12}
+            /> */}
           </>
         ) : (
           <p>Loading...</p>

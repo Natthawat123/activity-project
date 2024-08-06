@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import PropTypes from "prop-types";
 import CloseIcon from "@mui/icons-material/Close";
@@ -9,6 +9,21 @@ const Add_Users = ({ closeModal }) => {
   const [selectedRole, setSelectedRole] = useState("");
   const [activeTab, setActiveTab] = useState("single");
   const [title, setTitle] = useState("");
+  const [section, setSection] = useState([]);
+  const [selectedSection, setSelectedSection] = useState("");
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [newSection, setNewSection] = useState("");
+
+  useEffect(() => {
+    axios
+      .get("/api/sections")
+      .then((response) => {
+        setSection(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching sections:", error);
+      });
+  }, []);
 
   const handleRoleChange = (event) => {
     setSelectedRole(event.target.value);
@@ -20,21 +35,52 @@ const Add_Users = ({ closeModal }) => {
 
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
-    console.log(title);
   };
+
+  const handleSectionChange = (event) => {
+    const value = event.target.value;
+    if (value === "add-new") {
+      setIsAddingNew(true);
+    } else {
+      setIsAddingNew(false);
+      setSelectedSection(value);
+    }
+  };
+
+  const handleNewSectionChange = (event) => {
+    setNewSection(event.target.value);
+  };
+
+  // const handleAddNewSection = () => {
+  //   if (newSection.trim() === '') {
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Invalid Input",
+  //       text: "Section name cannot be empty",
+  //     });
+  //     return;
+  //   }
+
+  //   const newSectionObj = { sec_ID: Date.now().toString(), sec_name: newSection };
+  //   setSection([...section, newSectionObj]);
+  //   setSelectedSection(newSectionObj.sec_ID);
+  //   setIsAddingNew(false);
+  //   setNewSection('');
+  // };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const username = data.get("username");
     const jsonData = {
-      username: data.get("username"),
+      username: username,
       password: data.get("password"),
       role: data.get("role"),
-      fname: data.get("firstName"),
-      lname: data.get("lastName"),
-      email: data.get("email"),
+      fname: title + data.get("firstName") || "กรุณเปลี่ยนชื่อของท่าน",
+      lname: data.get("lastName") || "กรุณาเปลี่ยนนามสกุลของท่าน",
+      email: data.get("email") || `${username}@webmail.npru.ac.th`,
       mobile: data.get("phoneNumber"),
-      title: title, // Ensure title is included
+      sec_id: selectedSection,
     };
 
     try {
@@ -42,76 +88,8 @@ const Add_Users = ({ closeModal }) => {
       const loginData = loginResponse.data;
       console.log("Login response:", loginData);
 
-      if (loginData.status !== "ok" || !loginData.login_ID) {
+      if (loginData.status !== "ok") {
         throw new Error("Failed to register user");
-      }
-
-      const loginID = loginData.login_ID;
-
-      if (jsonData.role === "student") {
-        const additionalData = {
-          std_ID: data.get("username"),
-          login_ID: loginID,
-          std_fname:
-            title + (data.get("firstName") || "กรุณาเปลี่ยนชื่อของคุณ"),
-          std_lname: data.get("lastName") || "กรุณาเปลี่ยนนามสกุลของคุณ",
-          sec_ID: 1,
-          std_email:
-            data.get("email") || `${data.get("username")}@webmail.npru.ac.th`,
-          std_mobile: data.get("phoneNumber") || null,
-          std_address: null,
-          province: null,
-          district: null,
-          subdistrict: null,
-          zipcode: null,
-        };
-
-        const additionalResponse = await axios.post(
-          "/api/create/student",
-          additionalData
-        );
-        const additionalDataResponse = additionalResponse.data;
-        console.log("Additional response:", additionalDataResponse);
-
-        if (additionalDataResponse.status !== "ok") {
-          throw new Error(`Failed to create ${jsonData.role}`);
-        }
-      } else if (jsonData.role === "teacher" || jsonData.role === "admin") {
-        const additionalData = {
-          login_ID: loginID,
-          staff_fname:
-            jsonData.role === "admin"
-              ? "admin"
-              : title + (data.get("firstName") || "กรุณาเปลี่ยนชื่อของคุณ"),
-          staff_lname:
-            jsonData.role === "admin"
-              ? null
-              : data.get("lastName") || "กรุณาเปลี่ยนนามสกุลของคุณ",
-          staff_email:
-            data.get("email") ||
-            `${data.get("username")}${
-              jsonData.role === "admin"
-                ? "@ITinfo.npru.ac.th"
-                : "@webmail.npru.ac.th"
-            }`,
-          staff_mobile: data.get("phoneNumber") || null,
-          staff_address: null,
-          province: null,
-          district: null,
-          subdistrict: null,
-          zipcode: null,
-        };
-
-        const additionalResponse = await axios.post(
-          "/api/create/staff",
-          additionalData
-        );
-        const additionalDataResponse = additionalResponse.data;
-        console.log("Additional response:", additionalDataResponse);
-
-        if (additionalDataResponse.status !== "ok") {
-          throw new Error(`Failed to create ${jsonData.role}`);
-        }
       }
 
       Swal.fire({
@@ -123,8 +101,8 @@ const Add_Users = ({ closeModal }) => {
 
       closeModal();
       setTimeout(() => {
-        window.location.reload(); // รีเฟรชหน้าจอ
-      }, 2000); // ล่าช้าการรีเฟรชให้เกิดชั่วโมง 2 วินาที
+        window.location.reload(); // Refresh the screen
+      }, 2000); // Delay the refresh by 2 seconds
     } catch (error) {
       console.error("Error:", error);
       if (error.response) {
@@ -160,42 +138,45 @@ const Add_Users = ({ closeModal }) => {
   const renderTitleOptions = () => {
     if (selectedRole === "student") {
       return (
-        <>
-          <select
-            id="title"
-            name="title"
-            className="mt-1 p-1 w-full border-b-2 rounded-md"
-            onChange={handleTitleChange}
-          >
-            <option value="">เลือกคำนำหน้า</option>
-            <option value="นาย">นาย</option>
-            <option value="นาง">นาง</option>
-            <option value="น.ส.">น.ส.</option>
-          </select>
-        </>
+        <select
+          id="title"
+          name="title"
+          className="mt-1 p-1 w-full border-b-2 rounded-md"
+          onChange={handleTitleChange}
+        >
+          <option value="">เลือกคำนำหน้า</option>
+          <option value="นาย">นาย</option>
+          <option value="นาง">นาง</option>
+          <option value="น.ส.">น.ส.</option>
+        </select>
       );
     } else if (selectedRole === "teacher") {
       return (
-        <>
-          <select
-            id="title"
-            name="title"
-            className="mt-1 p-1 w-full border-b-2 rounded-md"
-            onChange={handleTitleChange}
-          >
-            <option value="">เลือกคำนำหน้า</option>
-            <option value="อ.">อ.</option>
-            <option value="ดร.">ดร.</option>
-            <option value="รศ. ดร.">รศ.ดร.</option>
-            <option value="ผศ. ดร.">ผศ.ดร.</option>
-          </select>
-        </>
+        <select
+          id="title"
+          name="title"
+          className="mt-1 p-1 w-full border-b-2 rounded-md"
+          onChange={handleTitleChange}
+        >
+          <option value="">เลือกคำนำหน้า</option>
+          <option value="อ.">อ.</option>
+          <option value="ดร.">ดร.</option>
+          <option value="รศ. ดร.">รศ.ดร.</option>
+          <option value="ผศ. ดร.">ผศ.ดร.</option>
+        </select>
       );
     }
     return (
-      <option value="" disabled>
-        เลือกคำนำหน้า
-      </option>
+      <select
+        id="title"
+        name="title"
+        className="mt-1 p-1 w-full border-b-2 rounded-md"
+        disabled
+      >
+        <option value="" disabled>
+          เลือกคำนำหน้า
+        </option>
+      </select>
     );
   };
 
@@ -216,13 +197,12 @@ const Add_Users = ({ closeModal }) => {
     };
 
     return (
-      <>
-        <input
-          type="file"
-          onChange={handleFileChange}
-          className="mt-1 p-1 w-full border-b-2 rounded-md"
-        />
-      </>
+      <input
+        type="file"
+        onChange={handleFileChange}
+        className="mt-1 p-1 w-full border-b-2 rounded-md"
+        accept=".csv"
+      />
     );
   };
 
@@ -232,6 +212,11 @@ const Add_Users = ({ closeModal }) => {
         username: item.username,
         password: `${item.password}`,
         role: item.role,
+        fname: item.fname,
+        lname: item.lname,
+        email: item.email || `${item.username}@webmail.npru.ac.th`,
+        mobile: item.mobile,
+        sec_ID: item.section,
       }));
 
       const registerResponse = await axios.post(
@@ -242,74 +227,6 @@ const Add_Users = ({ closeModal }) => {
 
       if (registerData.some((response) => response.status !== "ok")) {
         throw new Error("Failed to register some users");
-      }
-
-      const studentsData = [];
-      const staffsData = [];
-
-      jsonData.forEach((user, index) => {
-        if (user.role === "student") {
-          const registerUser = registerData[index];
-          if (!registerUser || !registerUser.login_ID) {
-            throw new Error(`Missing login_ID for user ${user.username}`);
-          }
-
-          const loginID = registerUser.login_ID;
-          studentsData.push({
-            std_ID: user.username,
-            login_ID: loginID,
-            std_fname: csvData[index].std_fname || "กรุณาเปลี่ยนชื่อของคุณ",
-            std_lname: csvData[index].std_lname || "กรุณาเปลี่ยนนามสกุลของคุณ",
-            sec_ID: 1,
-            std_email: csvData[index].email,
-            std_mobile: csvData[index].phone || null,
-            std_address: null,
-            province: null,
-            district: null,
-            subdistrict: null,
-            zipcode: null,
-          });
-        } else {
-          const registerUser = registerData[index];
-          if (!registerUser || !registerUser.login_ID) {
-            throw new Error(`Missing login_ID for user ${user.username}`);
-          }
-
-          const loginID = registerUser.login_ID;
-          staffsData.push({
-            login_ID: loginID,
-            staff_fname: csvData[index].std_fname || "กรุณาเปลี่ยนชื่อของคุณ",
-            staff_lname:
-              csvData[index].std_lname || "กรุณาเปลี่ยนนามสกุลของคุณ",
-            staff_email: csvData[index].email,
-            staff_mobile: csvData[index].phone || null,
-            staff_address: null,
-            province: null,
-            district: null,
-            subdistrict: null,
-            zipcode: null,
-          });
-        }
-      });
-
-      const createStudentResponse = await axios.post(
-        "/api/create/students",
-        studentsData
-      );
-      const createStudentData = createStudentResponse.data;
-
-      if (createStudentData.status !== "ok") {
-        throw new Error("Unexpected response format from /api/create/students");
-      }
-
-      const createStaffResponse = await axios.post(
-        "/api/create/staffs",
-        staffsData
-      );
-      const createStaffData = createStaffResponse.data;
-
-      if (createStaffData.status !== "ok") {
-        throw new Error("Unexpected response format from /api/create/staffs");
       }
 
       Swal.fire({
@@ -351,7 +268,7 @@ const Add_Users = ({ closeModal }) => {
             }`}
             onClick={() => handleTabChange("single")}
           >
-            เพิ่มผู้ใช้คนเดียว
+            เพิ่มผู้ใช้งานคนเดียว
           </button>
           <button
             className={`p-2 w-1/2 ${
@@ -359,7 +276,7 @@ const Add_Users = ({ closeModal }) => {
             }`}
             onClick={() => handleTabChange("bulk")}
           >
-            อัปโหลด CSV
+            เพิ่มผู้ใช้งานหลายคน โดยอัปโหลด CSV
           </button>
         </div>
         {activeTab === "single" ? (
@@ -420,7 +337,6 @@ const Add_Users = ({ closeModal }) => {
                   >
                     คำนำหน้า
                   </label>
-
                   {renderTitleOptions()}
                 </div>
                 <div className="mb-4 col-span-2">
@@ -465,7 +381,7 @@ const Add_Users = ({ closeModal }) => {
                     className="mt-1 p-1 w-full border-b-2 rounded-md"
                   />
                 </div>
-                <div className="mb-4 col-span-2">
+                <div className="mb-4">
                   <label
                     htmlFor="phoneNumber"
                     className="block text-sm font-medium text-gray-600"
@@ -478,6 +394,40 @@ const Add_Users = ({ closeModal }) => {
                     name="phoneNumber"
                     className="mt-1 p-1 w-full border-b-2 rounded-md"
                   />
+                </div>
+                <div className="mb-4">
+                  <label
+                    htmlFor="section"
+                    className="block text-sm font-medium text-gray-600"
+                  >
+                    Section
+                  </label>
+                  {isAddingNew ? (
+                    <div>
+                      <input
+                        id="newSection"
+                        name="newSection"
+                        type="text"
+                        value={newSection}
+                        onChange={handleNewSectionChange}
+                        placeholder="New Section Name"
+                        className="mt-1 p-1 w-full border-b-2 rounded-md"
+                      />
+                    </div>
+                  ) : (
+                    <select
+                      className="mt-1 p-1 w-full border-b-2 rounded-md"
+                      onChange={handleSectionChange}
+                      value={selectedSection}
+                    >
+                      {section.map((s) => (
+                        <option key={s.sec_ID} value={s.sec_ID}>
+                          {s.sec_name}
+                        </option>
+                      ))}
+                      <option value="add-new">Add New Section</option>
+                    </select>
+                  )}
                 </div>
               </>
             ) : null}

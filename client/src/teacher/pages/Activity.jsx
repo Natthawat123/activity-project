@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import BuildIcon from "@mui/icons-material/Build";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import moment from "moment";
-
+import Button from "@mui/material/Button";
 const ListActivity = () => {
   const now = new Date();
 
@@ -217,12 +217,10 @@ const ListActivity = () => {
                         : "กิจกรรมยังไม่เริ่ม"}
                     </td>
                     <td scope="col" className="px-6 py-3 w-2/12 text-center">
-                      <Link
-                        to={`detail/${item.act_ID}`}
-                        className="flex items-center justify-center"
-                      >
-                        <BuildIcon />
-                        <ListAltIcon />
+                      <Link to={`detail/${item.act_ID}`}>
+                        <Button variant="outlined" startIcon={<ListAltIcon />}>
+                          รายละเอียด
+                        </Button>
                       </Link>
                     </td>
                   </tr>

@@ -19,8 +19,8 @@ const ListActivity = () => {
   const [sortOrder, setSortOrder] = useState("latest");
   const [filter, setFilter] = useState("default");
 
-  const [join, setJoin] = useState([]);
-  const [reserve, setReserve] = useState([]);
+  // const [join, setJoin] = useState([]);
+  // const [reserve, setReserve] = useState([]);
   const [stdID, setStdID] = useState(null);
 
   const navigate = useNavigate();
@@ -33,6 +33,7 @@ const ListActivity = () => {
         (result) => {
           setIsLoaded(true);
           setActivity(result);
+       
         },
         (error) => {
           setIsLoaded(true);
@@ -41,7 +42,7 @@ const ListActivity = () => {
       );
 
     setStdID(localStorage.getItem("stdID"));
-  }, []);
+  }, [stdID]);
   const removeDuplicates = (items) => {
     const seenTitles = new Set();
     return items.filter((item) => {
@@ -51,92 +52,14 @@ const ListActivity = () => {
     });
   };
 
-  // const getStatus = (activityID) => {
-  //   // ตรวจสอบข้อมูลการเข้าร่วม
-  //   const joinEntry = join.find(
-  //     (j) => j.actID === activityID && j.stdIDs.includes(BigInt(stdID))
-  //   );
-  //   if (joinEntry) {
-  //     return { message: "เข้าร่วมกิจกรรมแล้ว", color: "blue" };
-  //   }
 
-  //   // ตรวจสอบข้อมูลการลงทะเบียน
-  //   const reserveEntry = reserve.find(
-  //     (r) => r.act_ID === activityID && r.std_ID === stdID
-  //   );
-  //   if (reserveEntry) {
-  //     return { message: "ลงทะเบียนสำเร็จ", color: "green" };
-  //   }
-
-  //   // ตรวจสอบข้อมูลกิจกรรม
-  //   const activityEntry = activity.find((a) => a.act_ID === activityID);
-  //   if (!activityEntry) {
-  //     return { message: "ไม่พบข้อมูล", color: "gray" };
-  //   }
-
-  //   const now = new Date();
-  //   const activityStartDate = new Date(activityEntry.act_dateStart);
-  //   const activityEndDate = new Date(activityEntry.act_dateEnd);
-
-  //   // ตรวจสอบช่วงเวลาการลงทะเบียน
-  //   if (
-  //     now < moment(activityStartDate).subtract(2, "weeks").toDate() ||
-  //     now > moment(activityStartDate).subtract(1, "day").toDate()
-  //   ) {
-  //     return { message: "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน", color: "gray" };
-  //   }
-
-  //   // หากไม่พบข้อมูลการเข้าร่วม หรือ การลงทะเบียน
-  //   return { message: "ยังไม่ได้ลงทะเบียน", color: "gray" };
-  // };
-
-  const getStatus = (activityID) => {
-    // ตรวจสอบข้อมูลการเข้าร่วม
-    const joinEntry = join.find(
-      (j) => j.actID === activityID && j.stdIDs.includes(BigInt(stdID))
-    );
-    if (joinEntry) {
-      return { message: "เข้าร่วมกิจกรรมแล้ว", color: "blue" };
-    }
-  
-    // ตรวจสอบข้อมูลการลงทะเบียน
-    const reserveEntry = reserve.find(
-      (r) => r.act_ID === activityID && r.std_ID === stdID
-    );
-    if (reserveEntry) {
-      return { message: "ลงทะเบียนสำเร็จ", color: "green" };
-    }
-  
-    // ตรวจสอบข้อมูลกิจกรรม
-    const activityEntry = activity.find((a) => a.act_ID === activityID);
-    if (!activityEntry) {
-      return { message: "ไม่พบข้อมูล", color: "gray" };
-    }
-  
-    const now = new Date();
-    const activityStartDate = new Date(activityEntry.act_dateStart);
-    // const activityEndDate = new Date(activityEntry.act_dateEnd);
-    
-    // ตรวจสอบช่วงเวลาการลงทะเบียน
-    if (now < moment(activityStartDate).subtract(2, "weeks").toDate() || now > moment(activityStartDate).subtract(1, "day").toDate()) {
-      return { message: "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน", color: "gray" };
-    }
-  
-    // หากไม่พบข้อมูลการเข้าร่วม หรือ การลงทะเบียน
-    return { message: "ยังไม่ได้ลงทะเบียน", color: "gray" };
-  };
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
     setCurrentPage(0); // Reset current page to 0 on search
   };
 
-  const filteredItems = activity.filter((item) => {
-    return (
-      item.act_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.act_location.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
+
 
   const handleSortChange = () => {
     setSortOrder((prevOrder) => (prevOrder === "latest" ? "oldest" : "latest"));
@@ -161,27 +84,61 @@ const ListActivity = () => {
   };
 
 
+  const filteredItems = activity.filter((item) => {
+    return (
+      item.act_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.act_location.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+
+  const getActivityStatus = (item, now) => {
+    const dateStart = moment(item.act_dateStart);
+    const twoWeeksBefore = dateStart.subtract(2, 'weeks').toDate();
+    const oneDayBefore = dateStart.subtract(1, 'day').toDate();
+  
+    if (item.act_status === 2) {
+      return "กิจกรรมสิ้นสุดแล้ว";
+    } else if (item.act_numStd === item.act_numStdReserve) {
+      return "ลงทะเบียนเต็มแล้ว";
+    } else if (now >= twoWeeksBefore && now <= oneDayBefore) {
+      return item.act_status === 1 ? "เปิดลงทะเบียน" : "ปิดลงทะเบียน";
+    } else {
+      return "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน";
+    }
+  };
+
 const handleFilterChange = (event) => {
   setFilter(event.target.value);
   setCurrentPage(0);
 };
 
-const filteredAndFilteredItems = filteredItems.filter((item) => {
-  const status = getStatus(item.act_ID);
-  return (
-    filter === "default" ||
-    (filter === "openRegistration" && status.message === "เปิดลงทะเบียน") ||
-    (filter === "closedRegistration" && status.message === "ปิดลงทะเบียน") ||
-    (filter === "notInRegistrationPeriod" && status.message === "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน")
-  );
+const filteredData = filteredItems.filter(item => {
+  const status = getActivityStatus(item, now);
+
+  switch (filter) {
+    case 'open':
+      return status === "เปิดลงทะเบียน";
+    case 'closed':
+      return status === "ปิดลงทะเบียน";
+    case 'not-open':
+      return status === "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน";
+    case 'full':
+      return status === "ลงทะเบียนเต็มแล้ว";
+    case 'ended':
+      return status === "กิจกรรมสิ้นสุดแล้ว";
+    default:
+      return true; // แสดงข้อมูลทั้งหมดในกรณีค่าเริ่มต้น
+  }
 });
+
+
 
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {
     return <div>Loading...</div>;
   } else {
-    const uniqueItems = removeDuplicates(filteredItems);
+    const uniqueItems = removeDuplicates(filteredData);
     const sortedItems = sortItems(uniqueItems);
     const lastPage = Math.ceil(sortedItems.length / itemsPerPage) - 1;
     const visibleItems = sortedItems.slice(
@@ -240,20 +197,19 @@ const filteredAndFilteredItems = filteredItems.filter((item) => {
                   Filter
                 </label>
                 <div className="relative">
-                  <select
-                    value={filter}
-                    onChange={handleFilterChange}
-                    className="text-xs block p-1 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  >
-                    <option value="default" className="text-center">
-                      ทั้งหมด
-                    </option>
-                    <option value="">เปิดลงทะเบียน</option>
-                    <option value="">ปิดลงทะเบียน</option>
-                    <option value="">ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน</option>
-                  </select>
-                </div>
-
+                <select
+                  value={filter}
+                  onChange={handleFilterChange}
+                  className="text-xs block p-1 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                >
+                  <option value="default" className="text-center">ทั้งหมด</option>
+                  <option value="open">เปิดลงทะเบียน</option>
+                  <option value="closed">ปิดลงทะเบียน</option>
+                  <option value="not-open">ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน</option>
+                  <option value="full">ลงทะเบียนเต็มแล้ว</option>
+                  <option value="ended">กิจกรรมสิ้นสุดแล้ว</option>
+                </select>
+              </div>
                 
               </div>
               <div className="flex pb-4 items-center">

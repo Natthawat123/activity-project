@@ -43,6 +43,8 @@ function Test() {
     const fetchActivity = async () => {
       try {
         const res = await axios.get("/api/activitys");
+
+        
         setActivity(res.data);
       } catch (err) {
         console.log(err);
@@ -60,8 +62,8 @@ function Test() {
     if (joinEntry) {
       return { message: "เข้าร่วมกิจกรรมแล้ว", color: "blue" };
     }
-    const reserveEntry = reserve.find(
-      (r) => r.act_ID == activityID && r.std_ID == stdID
+    const reserveEntry = activity.find(
+      (r) => r.act_ID === activityID && r.login_ID === stdID
     );
     if (reserveEntry) {
       return { message: "ลงทะเบียนสำเร็จ", color: "green" };
@@ -111,6 +113,10 @@ function Test() {
   const visibleItems = sortedItems.slice(
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
+  );
+
+  const uniqueVisibleItems = Array.from(
+    new Map(visibleItems.map(item => [item.act_ID, item])).values()
   );
 
   const pageNumbers = [];
@@ -204,7 +210,7 @@ function Test() {
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-gray-200 dark:divide-gray-700">
-              {visibleItems.map((item) => {
+              {uniqueVisibleItems.map((item) => {
                 const status = getStatus(item.act_ID);
                 return (
                   <tr

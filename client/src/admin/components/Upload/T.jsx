@@ -1,427 +1,257 @@
-import * as React from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
-import { alpha } from "@mui/material/styles";
+import Swal from "sweetalert2";
+import Web3 from "web3";
+import abi from "../../../components/contract/abi2.json";
+const contractAddress = "0xc9811A01727735E9c9aE046b7690b2AC9021E1B7";
+import { formatDate, range, dateToUint32 } from "./Fx";
+
+//mui
 import Box from "@mui/material/Box";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TablePagination from "@mui/material/TablePagination";
-import TableRow from "@mui/material/TableRow";
-import TableSortLabel from "@mui/material/TableSortLabel";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Paper from "@mui/material/Paper";
-import Checkbox from "@mui/material/Checkbox";
-import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
-import DeleteIcon from "@mui/icons-material/Delete";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import { visuallyHidden } from "@mui/utils";
+import { DataGrid } from "@mui/x-data-grid";
+import Accordion from "@mui/material/Accordion";
+import AccordionActions from "@mui/material/AccordionActions";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Button from "@mui/material/Button";
 
-export default function EnhancedTable({ students, activity }) {
-  const [order, setOrder] = React.useState("asc");
-  const [orderBy, setOrderBy] = React.useState("calories");
-  const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [checkedDates, setCheckedDates] = React.useState({});
-  const [actData, setActData] = React.useState({});
+function T({ activities = [] }) {
+  const [checkedItems, setCheckedItems] = useState({});
+  const [checkAllStates, setCheckAllStates] = useState({});
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [web3, setWeb3] = useState(null);
+  const [contract, setContract] = useState(null);
 
-  const act = activity;
-  const index = 1;
+  const handleCheckboxChange = (actID, stdID, date, checked) => {
+    console.log(
+      `Checkbox Change - Activity ID: ${actID}, Student ID: ${stdID}, Date: ${date}, Checked: ${checked}`
+    );
 
-  const options = { year: "numeric", month: "long", day: "numeric" };
-  const formatDate = (date) => date.toLocaleDateString("th-TH", options);
-  const dateStart = new Date(act.act_dateStart.slice(0, 10));
-  const dateEnd = new Date(act.act_dateEnd.slice(0, 10));
-  const range = Math.ceil((dateEnd - dateStart) / (1000 * 60 * 60 * 24)) + 1;
-  const datesInRange = [];
+    setCheckedItems((prev) => {
+      const updated = { ...prev };
+      if (!updated[actID]) updated[actID] = {};
+      if (!updated[actID][stdID]) updated[actID][stdID] = [];
 
-  for (let i = 0; i < range; i++) {
-    const currentDate = new Date(dateStart);
-    currentDate.setDate(dateStart.getDate() + i);
-    datesInRange.push(formatDate(currentDate));
-  }
-
-  const rows = students.map((student) => ({
-    id: student.std_ID,
-    fname: student.std_fname,
-    lname: student.std_lname,
-  }));
-
-  function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-      return -1;
-    }
-    if (b[orderBy] > a[orderBy]) {
-      return 1;
-    }
-    return 0;
-  }
-
-  function getComparator(order, orderBy) {
-    return order === "desc"
-      ? (a, b) => descendingComparator(a, b, orderBy)
-      : (a, b) => -descendingComparator(a, b, orderBy);
-  }
-
-  function stableSort(array, comparator) {
-    const stabilizedThis = array.map((el, index) => [el, index]);
-    stabilizedThis.sort((a, b) => {
-      const order = comparator(a[0], b[0]);
-      if (order !== 0) {
-        return order;
+      if (checked) {
+        updated[actID][stdID] = [...new Set([...updated[actID][stdID], date])];
+      } else {
+        updated[actID][stdID] = updated[actID][stdID].filter((d) => d !== date);
+        if (updated[actID][stdID].length === 0) delete updated[actID][stdID];
       }
-      return a[1] - b[1];
+
+      if (Object.keys(updated[actID]).length === 0) delete updated[actID];
+
+      return updated;
     });
-    return stabilizedThis.map((el) => el[0]);
-  }
-
-  const headCells = [
-    {
-      id: "index",
-      numeric: false,
-      disablePadding: true,
-      label: "ลำดับ",
-    },
-    {
-      id: "id",
-      numeric: false,
-      disablePadding: true,
-      label: "รหัสนักศึกษา",
-    },
-    {
-      id: "fname",
-      numeric: true,
-      disablePadding: false,
-      label: "ชื่อ",
-    },
-    {
-      id: "lname",
-      numeric: true,
-      disablePadding: false,
-      label: "นามสกุล",
-    },
-    ...Array.from({ length: range }, (_, i) => ({
-      id: `day${i + 1}`,
-      numeric: true,
-      disablePadding: false,
-      label: datesInRange[i],
-    })),
-  ];
-
-  function EnhancedTableHead(props) {
-    const {
-      onSelectAllClick,
-      order,
-      orderBy,
-      numSelected,
-      rowCount,
-      onRequestSort,
-    } = props;
-    const createSortHandler = (property) => (event) => {
-      onRequestSort(event, property);
-    };
-
-    return (
-      <TableHead>
-        <TableRow>
-          {headCells.map((headCell) => (
-            <TableCell
-              key={headCell.id}
-              align={headCell.numeric ? "left" : "left"}
-              padding={headCell.disablePadding ? "none" : "normal"}
-              sortDirection={orderBy === headCell.id ? order : false}
-            >
-              <TableSortLabel
-                active={orderBy === headCell.id}
-                direction={orderBy === headCell.id ? order : "asc"}
-                onClick={createSortHandler(headCell.id)}
-              >
-                {headCell.label}
-                {orderBy === headCell.id ? (
-                  <Box component="span" sx={visuallyHidden}>
-                    {order === "desc"
-                      ? "sorted descending"
-                      : "sorted ascending"}
-                  </Box>
-                ) : null}
-              </TableSortLabel>
-            </TableCell>
-          ))}
-          <TableCell padding="checkbox">
-            <Checkbox
-              color="primary"
-              indeterminate={numSelected > 0 && numSelected < rowCount}
-              checked={rowCount > 0 && numSelected === rowCount}
-              onChange={onSelectAllClick}
-              inputProps={{
-                "aria-label": "select all desserts",
-              }}
-            />
-          </TableCell>
-        </TableRow>
-      </TableHead>
-    );
-  }
-
-  EnhancedTableHead.propTypes = {
-    numSelected: PropTypes.number.isRequired,
-    onRequestSort: PropTypes.func.isRequired,
-    onSelectAllClick: PropTypes.func.isRequired,
-    order: PropTypes.oneOf(["asc", "desc"]).isRequired,
-    orderBy: PropTypes.string.isRequired,
-    rowCount: PropTypes.number.isRequired,
   };
 
-  function EnhancedTableToolbar(props) {
-    const { numSelected } = props;
-
-    return (
-      <Toolbar
-        sx={{
-          pl: { sm: 2 },
-          pr: { xs: 1, sm: 1 },
-          ...(numSelected > 0 && {
-            bgcolor: (theme) =>
-              alpha(
-                theme.palette.primary.main,
-                theme.palette.action.activatedOpacity
-              ),
-          }),
-        }}
-      >
-        {numSelected > 0 ? (
-          <Typography
-            sx={{ flex: "1 1 100%" }}
-            color="inherit"
-            variant="subtitle1"
-            component="div"
-          >
-            {numSelected} รายชื่อที่เลือก
-          </Typography>
-        ) : (
-          <Typography
-            sx={{ flex: "1 1 100%" }}
-            variant="h6"
-            id="tableTitle"
-            component="div"
-          >
-            รายชื่อนักศึกษา
-          </Typography>
-        )}
-
-        {numSelected > 0 ? (
-          <Tooltip title="Delete">
-            <IconButton>
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        ) : (
-          <Tooltip title="Filter list">
-            <IconButton>
-              <FilterListIcon />
-            </IconButton>
-          </Tooltip>
-        )}
-      </Toolbar>
-    );
-  }
-
-  EnhancedTableToolbar.propTypes = {
-    numSelected: PropTypes.number.isRequired,
-  };
-
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
-  };
-
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelected = rows.map((n) => n.id);
-      setSelected(newSelected);
-      return;
-    }
-    setSelected([]);
-  };
-
-  const handleClick = (event, id) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelected(newSelected);
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const handleChangeDense = (event) => {
-    setDense(event.target.checked);
-  };
-
-  const isSelected = (id) => selected.indexOf(id) !== -1;
-
-  const handleCheckboxChange = (event, date, studentId, act_ID) => {
-    setCheckedDates((prev) => ({
+  const handleCheckAllChange = (actID, checked) => {
+    setCheckAllStates((prev) => ({
       ...prev,
-      [`${studentId}_${date}`]: event.target.checked,
+      [actID]: checked,
     }));
 
-    const updatedActData = { ...actData };
-    if (!updatedActData[studentId]) {
-      updatedActData[studentId] = [];
-    }
+    const activity = activities.find((a) => a.act_ID === actID);
+    const days = range(activity.act_dateStart, activity.act_dateEnd);
 
-    if (event.target.checked) {
-      updatedActData[studentId].push(date);
-    } else {
-      updatedActData[studentId] = updatedActData[studentId].filter(
-        (d) => d !== date
-      );
-    }
+    setCheckedItems((prev) => {
+      const updated = { ...prev };
+      if (!updated[actID]) updated[actID] = {};
 
-    setActData(updatedActData);
+      activity.students.forEach((s) => {
+        if (checked) {
+          updated[actID][s.std_ID] = days.map((d) => dateToUint32(d));
+        } else {
+          delete updated[actID][s.std_ID];
+        }
+      });
+
+      if (Object.keys(updated[actID]).length === 0) delete updated[actID];
+
+      return updated;
+    });
   };
 
-  console.log(actData);
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  const upload = async () => {
+    if (!window.ethereum) {
+      Swal.fire({
+        icon: "error",
+        title: "MetaMask Not Detected",
+        text: "Please install MetaMask to proceed.",
+      });
+      return;
+    }
 
-  const visibleRows = React.useMemo(
-    () =>
-      stableSort(rows, getComparator(order, orderBy)).slice(
-        page * rowsPerPage,
-        page * rowsPerPage + rowsPerPage
-      ),
-    [order, orderBy, page, rowsPerPage]
-  );
+    try {
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      const web3Instance = new Web3(window.ethereum);
+      const contractInstance = new web3Instance.eth.Contract(
+        abi,
+        contractAddress
+      );
+
+      setWeb3(web3Instance);
+      setContract(contractInstance);
+
+      for (const actID in checkedItems) {
+        const studentIds = Object.keys(checkedItems[actID] || {});
+        const dayJoin = studentIds.map((stdId) => checkedItems[actID][stdId]);
+
+        const tx = await contractInstance.methods
+          .add(actID, studentIds, dayJoin)
+          .send({ from: accounts[0] });
+        console.log("Upload transaction sent:", tx);
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: `Transaction: ${tx.transactionHash}`,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+    } catch (err) {
+      console.error("Error handling upload:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Upload Failed",
+        text: err.message || "An error occurred during upload.",
+      });
+    }
+  };
 
   return (
-    <Box sx={{ width: "100%" }}>
-      <Paper sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
-        <TableContainer>
-          <Table
-            sx={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? "small" : "medium"}
-          >
-            <EnhancedTableHead
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
-              rowCount={rows.length}
-            />
-            <TableBody>
-              {visibleRows.map((row, index) => {
-                const isItemSelected = isSelected(row.id);
-                const labelId = `enhanced-table-checkbox-${index}`;
+    <div>
+      {activities.map((activity) => {
+        const days = range(activity.act_dateStart, activity.act_dateEnd);
 
-                return (
-                  <TableRow
-                    hover
-                    onClick={(event) => handleClick(event, row.id)}
-                    role="checkbox"
-                    aria-checked={isItemSelected}
-                    tabIndex={-1}
-                    key={row.id}
-                    selected={isItemSelected}
-                    sx={{ cursor: "pointer" }}
-                  >
-                    <TableCell align="right">{index + 1}</TableCell>
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      padding="none"
-                    >
-                      {row.id}
-                    </TableCell>
-                    <TableCell align="right">{row.fname}</TableCell>
-                    <TableCell align="right">{row.lname}</TableCell>
-                    {Array.from({ length: range }, (_, i) => (
-                      <TableCell key={`day${i + 1}`} align="right">
-                        <Checkbox
-                          color="primary"
-                          checked={
-                            !!checkedDates[`${row.id}_${datesInRange[i]}`]
-                          }
-                          onChange={(event) =>
-                            handleCheckboxChange(
-                              event,
-                              datesInRange[i],
-                              row.id,
-                              act.act_ID
-                            )
-                          }
-                          inputProps={{ "aria-labelledby": labelId }}
-                        />
-                      </TableCell>
-                    ))}
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        color="success"
-                        checked={isItemSelected}
-                        inputProps={{ "aria-labelledby": labelId }}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: (dense ? 33 : 53) * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-      />
-    </Box>
+        // Define columns specific to each activity
+        const columns = [
+          { field: "id", headerName: "รหัสนักศึกษา", width: 90 },
+          {
+            field: "firstName",
+            headerName: "ชื่อ-นามสกุล",
+            width: 150,
+          },
+          ...days.map((d) => ({
+            field: `day_${activity.act_ID}_${dateToUint32(d)}`,
+            headerName: formatDate(d).thdm,
+            width: 100,
+            editable: true,
+            renderCell: (params) => (
+              <input
+                type="checkbox"
+                checked={params.value}
+                onChange={(e) =>
+                  handleCheckboxChange(
+                    activity.act_ID,
+                    params.row.id,
+                    dateToUint32(d),
+                    e.target.checked
+                  )
+                }
+              />
+            ),
+          })),
+          {
+            field: "checkAll",
+            headerName: "ทั้งหมด",
+            width: 120,
+            renderCell: () => (
+              <input
+                type="checkbox"
+                checked={checkAllStates[activity.act_ID] || false}
+                onChange={(e) =>
+                  handleCheckAllChange(activity.act_ID, e.target.checked)
+                }
+              />
+            ),
+          },
+        ];
+
+        const rows = activity.students.map((student) => {
+          return {
+            id: student.std_ID,
+            firstName: `${student.std_fname} ${student.std_lname}`,
+            ...days.reduce((acc, d) => {
+              acc[`day_${activity.act_ID}_${dateToUint32(d)}`] =
+                checkedItems[activity.act_ID]?.[student.std_ID]?.includes(
+                  dateToUint32(d)
+                ) || false;
+              return acc;
+            }, {}),
+            act_ID: activity.act_ID,
+          };
+        });
+
+        return (
+          <div key={activity.act_ID}>
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls={`panel${activity.act_ID}-content`}
+                id={`panel${activity.act_ID}-header`}
+              >
+                <h2>{`${activity.act_title} (ID: ${activity.act_ID})`}</h2>
+              </AccordionSummary>
+              <AccordionDetails>
+                <p>Description: {activity.act_desc}</p>
+                <p>Duration: {days.length} days</p>
+                <p>Dates: {days.map((d) => formatDate(d).th).join(", ")}</p>
+              </AccordionDetails>
+            </Accordion>
+            <Box sx={{ height: 400, width: "100%" }}>
+              <DataGrid
+                rows={rows}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: {
+                      pageSize: 5,
+                    },
+                  },
+                }}
+                pageSizeOptions={[5]}
+                checkboxSelection
+                disableSelectionOnClick
+                selectionModel={selectedRows}
+                onSelectionModelChange={(newSelection) => {
+                  setSelectedRows(newSelection);
+                  handleCheckAllChange(activity.act_ID, newSelection);
+                }}
+              />
+            </Box>
+            <AccordionActions>
+              <Button variant="contained" color="secondary" onClick={upload}>
+                Upload
+              </Button>
+            </AccordionActions>
+          </div>
+        );
+      })}
+    </div>
   );
 }
+
+T.propTypes = {
+  activities: PropTypes.arrayOf(
+    PropTypes.shape({
+      act_ID: PropTypes.number.isRequired,
+      act_title: PropTypes.string.isRequired,
+      act_desc: PropTypes.string,
+      act_dateStart: PropTypes.string.isRequired,
+      act_dateEnd: PropTypes.string.isRequired,
+      students: PropTypes.arrayOf(
+        PropTypes.shape({
+          std_ID: PropTypes.string.isRequired,
+          std_fname: PropTypes.string.isRequired,
+          std_lname: PropTypes.string.isRequired,
+        })
+      ).isRequired,
+    })
+  ).isRequired,
+};
+
+export default T;
