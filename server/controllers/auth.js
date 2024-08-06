@@ -94,7 +94,7 @@ export const register = async (req, res) => {
       let sql2;
       let values;
 
-      if (role == "teacher") {
+      if (role === "teacher") {
         sql2 =
           "INSERT INTO teacher (staff_fname, staff_lname, staff_mobile, staff_email, login_ID, sec_ID) VALUES (?, ?, ?, ?, ?, ?)";
         values = [fname, lname, mobile, email, loginID, sec_ID];

@@ -1,10 +1,16 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridToolbar,
+  GridToolbarContainer,
+  GridToolbarExportContainer,
+  GridPrintExportMenuItem,
+} from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { BarChart } from '@mui/x-charts/BarChart';
+import { BarChart } from "@mui/x-charts/BarChart";
 
 export default function DataGridDemo() {
   const [reserves, setReserves] = useState([]);
@@ -20,6 +26,10 @@ export default function DataGridDemo() {
         console.error("Error fetching reserves:", error);
       });
   }, [act_ID]);
+
+  // const actTitle = reserves.map((r) => r.find((r) => ))
+
+  
 
   const columns = [
     { field: "std_ID", headerName: "Student ID", width: 150 },
@@ -80,39 +90,52 @@ export default function DataGridDemo() {
     { field: "login_ID", headerName: "Login ID", width: 150 },
   ];
 
+
+
   return (
-        <div>
-            <Box sx={{ height: 600, width: "100%", padding: "6rem"}}>
-              <DataGrid
-                rows={reserves}
-                columns={columns}
-                getRowId={(row) => row.std_ID}
-                initialState={{
-                  pagination: {
-                    paginationModel: {
-                      pageSize: 5,
-                    },
-                  },
-                }}
-                pageSizeOptions={[5]}
-                checkboxSelection
-                disableRowSelectionOnClick
-                slots={{
-                  toolbar: GridToolbar,
-                  loadingOverlay: {
-                    variant: "skeleton",
-                    noRowsVariant: "skeleton",
-                  },
-                }}
-              />
-            </Box>
-            <BarChart
-            xAxis={[{ scaleType: 'band', data: ['group A', 'group B', 'group C'] }]}
-            series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }, { data: [2, 5, 6] }]}
-            width={500}
-            height={300}
-                  />
-        </div>
-        
+    <div>
+      <Box sx={{ height: 600, width: "100%", padding: "6rem" }}>
+        <DataGrid
+          rows={reserves}
+          columns={columns}
+          getRowId={(row) => row.std_ID}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 5,
+              },
+            },
+          }}
+          pageSizeOptions={[5]}
+          checkboxSelection
+          disableRowSelectionOnClick
+          slots={{
+            toolbar: GridToolbar,
+            loadingOverlay: {
+              variant: "skeleton",
+              noRowsVariant: "skeleton",
+            },
+          }}
+          slotProps={{
+            toolbar: {
+              printOptions: {
+                hideFooter: true,
+                hideToolbar: true,
+              },
+              csvOptions: {
+                fileName: `รายชื่อผู้ลงทะเบียนเข้าร่วมกิจกรรม ${actTitle}`,
+                utf8WithBom: true,
+              }
+            }
+          }}
+        />
+      </Box>
+      <BarChart
+        xAxis={[{ scaleType: "band", data: ["group A", "group B", "group C"] }]}
+        series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }, { data: [2, 5, 6] }]}
+        width={500}
+        height={300}
+      />
+    </div>
   );
 }
