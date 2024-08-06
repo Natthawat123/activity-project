@@ -8,6 +8,7 @@ import PersonPinIcon from "@mui/icons-material/PersonPin";
 const NavBar = () => {
   const ID = localStorage.getItem("staff_ID");
   const [username, setUsername] = useState("");
+  const Homeurl = 'localhost:5173/admin/dashboard';
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -18,6 +19,11 @@ const NavBar = () => {
         console.error("Error fetching the username:", error);
       }
     };
+
+    if(Homeurl){
+      setSelectedItem("Dashboard");
+      setListVisible(false);
+    }
 
     if (ID) {
       fetchUsername();

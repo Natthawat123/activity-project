@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import T from "./T";
+import Web3 from "web3";
+import Abi from "../../../components/contract/abi2.json";
+const contractAddress = "0xc9811A01727735E9c9aE046b7690b2AC9021E1B7";
 
 function Table() {
   const [activity, setActivity] = useState([]);
+  const [join, setJoin] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -14,7 +18,17 @@ function Table() {
         console.error("Error fetching data:", error);
       }
     };
-
+    const fetchSmartContract = async () => {
+      try {
+        const web3 = new Web3("https://rpc.sepolia.org");
+        const contract = new web3.eth.Contract(Abi, contractAddress);
+        const res = await contract.methods.get().call();
+        setJoin(res);
+      } catch (err) {
+        console.error("Error fetching smart contract:", err);
+      }
+    };
+    fetchSmartContract();
     fetchData();
   }, []);
 
@@ -39,7 +53,7 @@ function Table() {
     <>
       <div className="mb-10 container mx-auto md:px-20 py-40">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
-          <T activities={Activities} />
+          <T activities={Activities} join={join} />
         </div>
       </div>
     </>
