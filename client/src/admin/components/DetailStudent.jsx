@@ -90,24 +90,31 @@ function DetailStudent() {
   const handleDelete = async () => {
     try {
       const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
+        title: `คุณแน่ใจที่จะลบ ${student.fname} ${student.lname} ไหม?`,
+        text: "คุณจะไม่สามารถกลับไปแก้ไขได้หากยืนยันที่จะลบ",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "ยกเลิก",
+        confirmButtonText: "ลบ",
       });
 
       if (result.isConfirmed) {
-        const response = await axios.delete(
-          `/api/students/${student.login_ID}`
-        );
+        let api;
+
+        if (student.role == 'student'){
+          api = `/api/students/${student.username}`
+        }else if(student.role == 'teacher'){
+          api = `/api/teachers/${student.login_ID}`
+        }
+
+        const response = await axios.delete(api);
 
         if (response.status === 200) {
           Swal.fire({
             title: "Deleted!",
-            text: "The student has been deleted.",
+            text: `The ${student.role} has been deleted.`,
             icon: "success",
           });
           setTimeout(() => {
@@ -205,8 +212,10 @@ function DetailStudent() {
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <tbody className="bg-white divide-y divide-gray-200 text-md">
-                <tr>
-                  <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                <tr> 
+                  {student.role == 'student' ? (
+                    <>
+                     <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
                     รหัสนักศึกษา
                   </td>
                   <td className="px-6 py-3">
@@ -222,6 +231,9 @@ function DetailStudent() {
                       student.ID
                     )}
                   </td>
+                    </>
+                ) : null}
+                 
 
                   <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
                     ชื่อ-นามสกุล
@@ -413,12 +425,12 @@ function DetailStudent() {
 
           <div className="mt-5">
             <button
-              className="btn btn-warning px-6 py-4 text-white"
+              className="btn bg-red-600 px-6 py-4 text-white"
               onClick={handleDelete}
             >
-              Delete
+              ลบผู้ใช้คนนี้
             </button>
-            {editMode ? (
+            {/* {editMode ? (
               <button
                 className="btn btn-primary px-6 py-4 mx-3 text-white"
                 onClick={handleSave}
@@ -432,28 +444,24 @@ function DetailStudent() {
               >
                 Edit
               </button>
-            )}
+            )} */}
             <button
               className="btn btn-primary px-6 py-4 mx-3 text-white"
               onClick={() =>
                 navigate(
-                  `/admin/dashboard/detail/student/update/${student.username}`
+                  `/admin/dashboard/user/update/${student.role != 'student' ? student.login_ID : student.username}`
                 )
               }
             >
               แก้ไขประวัติ
             </button>
-            <button
-              className="btn btn-warning px-6 py-4 text-white"
-              onClick={handleDelete}
-            >
-              Delete
-            </button>
           </div>
         </div>
       </div>
 
-      <div className="mb-10 container mx-auto md:px-20">
+      {student.role == 'student' ? (
+        <>
+        <div className="mb-10 container mx-auto md:px-20">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
           <div className="text-lg font-bold mb-2">ประวัติการทำกิจกรรม</div>
           <div className="flex justify-between">
@@ -559,6 +567,10 @@ function DetailStudent() {
           </div>
         </div>
       </div>
+        </>
+      ) : null}
+
+
     </div>
   );
 }

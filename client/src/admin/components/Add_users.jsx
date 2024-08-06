@@ -19,6 +19,9 @@ const Add_Users = ({ closeModal }) => {
       .get("/api/sections")
       .then((response) => {
         setSection(response.data);
+        if (response.data.length > 0) {
+          setSelectedSection(response.data[0].sec_ID);
+        }
       })
       .catch((error) => {
         console.error("Error fetching sections:", error);
@@ -80,8 +83,10 @@ const Add_Users = ({ closeModal }) => {
       lname: data.get("lastName") || "กรุณาเปลี่ยนนามสกุลของท่าน",
       email: data.get("email") || `${username}@webmail.npru.ac.th`,
       mobile: data.get("phoneNumber"),
-      sec_id: selectedSection,
+      sec_ID: selectedSection,
     };
+
+    console.log("jsonData:", jsonData);
 
     try {
       const loginResponse = await axios.post("/api/auth/register", jsonData);
