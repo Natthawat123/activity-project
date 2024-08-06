@@ -3,9 +3,10 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import CloseIcon from "@mui/icons-material/Close";
-// import Swal from "sweetalert2";
-// import axios from "axios";
 import { motion } from "framer-motion";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import Tooltip from "@mui/material/Tooltip";
+import { useNavigate } from "react-router";
 
 const localizer = momentLocalizer(moment);
 
@@ -13,7 +14,7 @@ function CalendarFull() {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
-
+  const navigate = useNavigate();
   const now = new Date();
 
   useEffect(() => {
@@ -94,7 +95,6 @@ function CalendarFull() {
     setShowPopup(false);
   };
 
-
   return (
     <div className="App w-3/4 mx-auto my-10 bg-slate-50 rounded-lg shadow-xl p-10 z-50">
       <motion.h1
@@ -163,7 +163,23 @@ function CalendarFull() {
               </div>
             </div>
             <div className="text-left">
-              <h2 className="text-xl font-bold mb-4">รายละเอียดกิจกรรม</h2>
+              <h2 className="text-xl font-bold mb-4">
+                รายละเอียดกิจกรรม{" "}
+                <Tooltip title="รายชื่อผู้ลงทะเบียน" placement="bottom-start">
+                  <LibraryBooksIcon
+                    sx={{
+                      color: "teal",
+                      transition: "0.3s ease",
+                      marginLeft: 0.5,
+                      "&:hover": {
+                        color: "indigo",
+                        transform: "scale(1.5) translateX(5px)",
+                      },
+                    }}
+                    onClick={() => navigate(`/reserve/${selectedEvent.id}`)}
+                  />
+                </Tooltip>
+              </h2>
               <p className="text-xl">ชื่อกิจกรรม : {selectedEvent.title}</p>
               <p>สถานที่ : {selectedEvent.location}</p>
               <p>

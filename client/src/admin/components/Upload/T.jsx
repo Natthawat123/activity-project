@@ -72,7 +72,6 @@ function T({ activities = [] }) {
       return updated;
     });
   };
-  console.log(checkedItems);
 
   const upload = async () => {
     if (!window.ethereum) {

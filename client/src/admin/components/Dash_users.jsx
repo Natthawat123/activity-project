@@ -100,7 +100,7 @@ function Dash_users() {
                 </div>
               </div>
             </div>
-            <BarChart
+            {/* <BarChart
               xAxis={[
                 {
                   scaleType: "band",
@@ -115,7 +115,7 @@ function Dash_users() {
               width={500}
               height={300}
               borderRadius={12}
-            />
+            /> */}
           </>
         ) : (
           <p>Loading...</p>
