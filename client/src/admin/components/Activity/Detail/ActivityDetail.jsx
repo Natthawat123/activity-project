@@ -14,7 +14,7 @@ function ActivityDetail({ activity, teacher, act_ID }) {
   const [isReadOnly, setIsReadOnly] = useState(true);
   const [editData, setEditData] = useState(activity);
   const [showButtons, setShowButtons] = useState(false);
-  const [status, setStatus] = useState(activity.act_status || "");
+  const [status, setStatus] = useState(activity.act_status);
   const navigate = useNavigate();
 
   const editButton = () => {
@@ -88,6 +88,7 @@ function ActivityDetail({ activity, teacher, act_ID }) {
   const endDateInput = editData.act_dateEnd
     ? formatISO(parseISO(editData.act_dateEnd), { representation: "date" })
     : "";
+
 
   return (
     <div>

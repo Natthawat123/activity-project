@@ -227,6 +227,17 @@ function DetailStudent() {
     pageNumbers.push(i);
   }
 
+  const uniqueVisibleItems = Array.from(
+    new Map(visibleItems.map(item => [item.act_ID, item])).values()
+  );
+
+  const formatDateThai = (dateString) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    const date = new Date(dateString);
+    return date.toLocaleDateString("th-TH", options);
+  };
+
+
   return (
     <div>
       <div className="container mb-10 mx-auto md:px-20 pt-20">
@@ -577,7 +588,7 @@ function DetailStudent() {
                   </tr>
                 </thead>
                 <tbody className="text-sm divide-y divide-gray-200 dark:divide-gray-700">
-                  {visibleItems.map((item) => {
+                  {uniqueVisibleItems.map((item) => {
                     const status = getStatus(item.act_ID);
                     return (
                       <>
@@ -660,9 +671,9 @@ function DetailStudent() {
                                       </TableCell>
                                       <TableCell>{item.act_amount}</TableCell>
                                       <TableCell>
-                                        {item.act_dateStart}
+                                        {formatDateThai(item.act_dateStart)}
                                       </TableCell>
-                                      <TableCell>{item.act_dateEnd}</TableCell>
+                                      <TableCell>{formatDateThai(item.act_dateEnd)}</TableCell>
                                     </TableRow>
                                   </TableBody>
                                 </Table>

@@ -130,6 +130,10 @@ function Test() {
     pageNumbers.push(i);
   }
 
+  const uniqueVisibleItems = Array.from(
+    new Map(visibleItems.map(item => [item.act_ID, item])).values()
+  );
+
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {
@@ -216,7 +220,7 @@ function Test() {
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-gray-200 dark:divide-gray-700">
-              {visibleItems.map((item) => {
+              {uniqueVisibleItems.map((item) => {
                 const status = getStatus(item.act_ID);
                 return (
                   <>
