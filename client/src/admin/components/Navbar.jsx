@@ -93,7 +93,7 @@ const NavBar = () => {
                 onClick={() => handleItemClick("Wallet")}
                 className={getItemClass("Wallet")}
               >
-                บล็อคเชน
+                บันทึกข้อมูลกิจกรรมขึ้น Blockchain
               </li>
             </Link>
 

@@ -62,7 +62,7 @@ export default function SignInSide() {
   const handleForgotPasswordSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch("/api/auth/reset-password", {
+      const response = await fetch("/api/forgotPassword", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -81,6 +81,8 @@ export default function SignInSide() {
       setResetMessage("An error occurred. Please try again later.");
     }
   };
+
+  
 
   return (
     <>

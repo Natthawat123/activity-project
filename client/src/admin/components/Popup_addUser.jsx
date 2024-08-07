@@ -50,7 +50,7 @@ class Popup extends Component {
         <Modal
           visible={this.state.visible}
           width="840"
-          height="230"
+          height="130"
           effect="fadeInUp"
           onClickAway={this.closeModal}
         >

@@ -8,6 +8,7 @@ import teacher from './routes/teacher.js'
 import activity from './routes/activity.js'
 import manage from './routes/manage.js'
 import section from './routes/section.js'
+import forgotPassword from './routes/forgotPassword.js'
 
 const app = express()
 app.use(express.json())
@@ -22,6 +23,7 @@ app.use('/', teacher)
 app.use('/', activity)
 app.use('/', manage)
 app.use('/', section)
+app.use('/', forgotPassword)
 
 app.listen(3000, () => console.log('server on port 3000'))
 

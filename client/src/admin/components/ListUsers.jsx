@@ -18,7 +18,6 @@ const ListUsers = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-     
       try {
         const res = await axios.get("/api/users");
         if (res.status === 200) {
@@ -50,8 +49,6 @@ const ListUsers = () => {
   useEffect(() => {
     applyFiltersAndSort();
   }, [selectedRole, selectedSection, sortOrder, searchTerm]);
-
-  console.log(selectedSection)
 
   const applyFiltersAndSort = () => {
     let filteredUsers = users;
@@ -88,6 +85,8 @@ const ListUsers = () => {
 
   const handleFilterChange = (event) => {
     setSelectedRole(event.target.value);
+    setSelectedSection("all");
+    setSortOrder("asc");
   };
 
   const handleSortChange = (event) => {
@@ -102,6 +101,12 @@ const ListUsers = () => {
     setSearchTerm(event.target.value);
     setCurrentPage(0);
   };
+
+   // Pagination calculations
+   const totalPages = Math.ceil(test.length / itemsPerPage);
+   const pageNumbers = Array.from({ length: totalPages }, (_, index) => index);
+   const lastPage = totalPages - 1;
+ 
 
   if (error) {
     return <div>Error: {error.message}</div>;
@@ -150,137 +155,151 @@ const ListUsers = () => {
             </div>
 
             <div className="flex pb-4 items-center gap-2 ">
-              <div className="items-center justify-center text-center">
-                <label htmlFor="filter-activity-type" className="text-xs">
-                  เรียงตามบทบาท
-                </label>
-                <div className="relative  justify-center flex">
-                  <select
-                    value={selectedRole}
-                    onChange={handleFilterChange}
-                    className="cursor-pointer text-xs block p-1 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  >
-                    <option value="all" className="text-center">
-                      ทั้งหมด
-                    </option>
-                    <option value="admin">ผู้ดูแลระบบ</option>
-                    <option value="teacher">อาจารย์</option>
-                    <option value="student">นักศึกษา</option>
-                  </select>
-                </div>
-              </div>
+         
 
-              <div className="items-center justify-center">
-                <label htmlFor="sort-order" className="text-xs">
-                  เรียงตามรหัสนศ.
-                </label>
-                <div className="relative justify-center flex">
-                  <select
-                    value={sortOrder}
-                    onChange={handleSortChange}
-                    className="text-xs block p-1 cursor-pointer border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  >
-                    <option value="asc">น้อยไปมาก</option>
-                    <option value="desc">มากไปน้อย</option>
-                  </select>
-                </div>
-              </div>
+              {(selectedRole === "student" || selectedRole === "teacher") && (
+                <>
+               
+
+                  <div className="items-center justify-center text-center">
+                    <label htmlFor="filter-section" className="text-xs">
+                      แยกตามหมู่เรียน
+                    </label>
+                    <div className="relative justify-center flex">
+                      <select
+                        id="filter-section"
+                        value={selectedSection}
+                        onChange={handleSectionFilterChange}
+                        className="text-xs cursor-pointer block p-1 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      >
+                        <option value="all">ทั้งหมด</option>
+                        {section.map((sec) => (
+                          <option key={sec.sec_ID} value={sec.sec_ID}>
+                            {sec.sec_name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {selectedRole === "student" && (
+                    <>
+                    <div className="items-center justify-center">
+                      <label htmlFor="sort-order" className="text-xs">
+                        เรียงตามรหัสนศ.
+                      </label>
+                      <div className="relative justify-center flex">
+                        <select
+                          value={sortOrder}
+                          onChange={handleSortChange}
+                          className="text-xs block p-1 cursor-pointer border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        >
+                          <option value="asc">น้อยไปมาก</option>
+                          <option value="desc">มากไปน้อย</option>
+                        </select>
+                      </div>
+                    </div>
+                    </>
+                  )}
+                </>
+              )}
 
               <div className="items-center justify-center text-center">
-                <label htmlFor="filter-section" className="text-xs">
-                  แยกตามหมู่เรียน
-                </label>
-                <div className="relative justify-center flex">
-                  <select
-                    id="filter-section"
-                    value={selectedSection}
-                    onChange={handleSectionFilterChange}
-                    className="text-xs cursor-pointer block p-1 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  >
-                    <option value="all">ทั้งหมด</option>
-                    {section.map((sec) => (
-                      <option key={sec.sec_ID} value={sec.sec_ID}>
-                        {sec.sec_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <label htmlFor="filter-activity-type" className="text-xs">
+                เรียงตามบทบาท
+              </label>
+              <div className="relative  justify-center flex">
+                <select
+                  value={selectedRole}
+                  onChange={handleFilterChange}
+                  className="cursor-pointer text-xs block p-1 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                >
+                  <option value="all" className="text-center">
+                    ทั้งหมด
+                  </option>
+                  <option value="admin">ผู้ดูแลระบบ</option>
+                  <option value="teacher">อาจารย์</option>
+                  <option value="student">นักศึกษา</option>
+                </select>
               </div>
+            </div>
             </div>
           </div>
 
           <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
-              <tr className="flex w-full">
-                <th scope="col" className="px-6 py-3 w-1/12 text-center">
-                  ลำดับ
-                </th>
-                {selectedRole == "student" && (
-                  <th scope="col" className="px-6 py-3 w-3/12 text-center">
-                    รหัสนักศึกษา
-                  </th>
-                )}
+  <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
+    <tr className="flex w-full">
+      <th scope="col" className="px-6 py-3 w-1/12 text-center">
+        ลำดับ
+      </th>
+      {selectedRole === "student" && (
+        <th scope="col" className="px-6 py-3 w-3/12 text-center">
+          รหัสนักศึกษา
+        </th>
+      )}
+  
+      <th scope="col" className="px-6 py-3 w-4/12 text-center">
+        ชื่อ-นามสกุล
+      </th>
+      <th scope="col" className="px-6 py-3 w-2/12 text-center">
+        บทบาท
+      </th>
+      {selectedRole === "student" && (
+        <th scope="col" className="px-6 py-3 w-4/12 text-center">
+          หมู่เรียน
+        </th>
+      )}
+      {selectedRole === "teacher" && (
+        <th scope="col" className="px-6 py-3 w-4/12 text-center">
+          อาจารย์ที่ปรึกษาหมู่เรียน
+        </th>
+      )}
+      <th scope="col" className="px-6 py-3 w-2/12 text-center">
+        รายละเอียด
+      </th>
+    </tr>
+  </thead>
+  <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
+  {test.map((item, index) => (
+    <tr
+      key={item.login_ID}
+      className="border-b-2 flex w-full items-center"
+    >
+      <td className="px-6 py-3 w-1/12 text-center">{index + 1}</td>
+      {selectedRole === "student" && (
+        <td className="px-6 py-3 w-3/12 text-center">
+          {item.username}
+        </td>
+      )}
 
-                <th scope="col" className="px-6 py-3 w-4/12 text-center">
-                  ชื่อ-นามสกุล
-                </th>
-                <th scope="col" className="px-6 py-3 w-2/12 text-center">
-                  บทบาท
-                </th>
-                {selectedRole == "student" && (
-                  <th scope="col" className="px-6 py-3 w-2/12 text-center">
-                    หมู่เรียน
-                  </th>
-                )}
-                {selectedRole == "teacher" && (
-                  <th scope="col" className="px-6 py-3 w-2/12 text-center">
-                    อาจารที่ปรึกษาหมู่เรียน
-                  </th>
-                )}
+      <td className="px-6 py-3 w-4/12">
+        {item.fname} {item.lname}
+      </td>
+      <td className="px-6 py-3 w-2/12 text-center">
+        {item.role === 'student' ? 'นักศึกษา' : item.role === 'teacher' ? 'อาจารย์' : 'ผู้ดูแลระบบ'}
+      </td>
+      {(selectedRole === "student" || selectedRole === "teacher") && (
+        <td className="px-6 py-3 w-4/12 text-center">
+          {item.sec_name || 'N/A'}
+        </td>
+      )}
+      <td className="px-6 py-3 w-2/12 text-center">
+        <Link to={`user/${item.ID}`}>
+          <button className="bg-cyan-400 hover:bg-cyan-500 px-2 py-1 text-white rounded">
+            เรียกดู
+          </button>
+        </Link>
+      </td>
+    </tr>
+  ))}
+</tbody>
 
-                <th scope="col" className="px-6 py-3 w-2/12 text-center">
-                  รายละเอียด
-                </th>
-              </tr>
-            </thead>
-            <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
-              {test.map((item, index) => (
-                <tr
-                  key={item.login_ID}
-                  className="border-b-2 flex w-full items-center"
-                >
-                  <td className="px-6 py-3 w-1/12 text-center">{index + 1}</td>
-                  {selectedRole == "student" && (
-                    <td className="px-6 py-3 w-3/12 text-center">
-                      {item.role === "student" ? item.username : item.login_ID}
-                    </td>
-                  )}
+</table>
 
-                  <td className="px-6 py-3 w-4/12">
-                    {item.fname} {item.lname}
-                  </td>
-                  <td className="px-6 py-3 w-2/12 text-center">{item.role == 'student' ? 'นักศึกษา' : item.role == 'teacher' ? 'อาจารย์' : 'ผู้ดูแลระบบ'}</td>
-                  {selectedRole != "all" && (
-                    <td className="px-6 py-3 w-2/12 text-center">
-                      {item.sec_name}
-                    </td>
-                  )}
-
-                  <td className="px-6 py-3 w-2/12 text-center">
-                    <Link to={`user/${item.ID}`}>
-                      <button className="bg-cyan-400 hover:bg-cyan-500 px-2 py-1 text-white rounded">
-                        เรียกดู
-                      </button>
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
 
           <div className="flex justify-between mt-2">
             <div className="flex gap-2 w-24"></div>
-            {/* <div className="flex gap-2">
+            <div className="flex gap-2">
               <button
                 onClick={() =>
                   setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))
@@ -316,7 +335,7 @@ const ListUsers = () => {
               >
                 ถัดไป
               </button>
-            </div> */}
+            </div> 
             <div className="flex gap-2">
               <select
                 value={itemsPerPage}
