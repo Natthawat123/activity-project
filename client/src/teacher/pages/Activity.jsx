@@ -93,7 +93,7 @@ const ListActivity = () => {
     );
 
     return (
-      <div className="mb-10 container mx-auto">
+      <div className="container mx-auto md:px-20 pt-20 my-10">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
           <div className="flex justify-between">
             <div className="text-lg font-bold mb-2">รายชื่อกิจกรรม</div>

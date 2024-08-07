@@ -41,15 +41,6 @@ function DetailStudent() {
       }
     };
 
-    const fetchManage = async () => {
-      try {
-        const res = await axios.get("/api/reserve");
-        setReserve(res.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
     const fetchSmartContract = async () => {
       try {
         const web3 = new Web3("https://rpc.sepolia.org");
@@ -70,23 +61,24 @@ function DetailStudent() {
     fetchActivity();
     fetchStudent();
     fetchSmartContract();
-    fetchManage();
   }, [std_ID]);
+
+  const stdID = student.username
 
   const getStatus = (activityID) => {
     const joinEntry = join.find(
-      (j) => j.actID == activityID && j.stdIDs.includes(BigInt(std_ID))
+      (j) => j.actID == activityID && j.stdIDs.includes(BigInt(stdID))
     );
     if (joinEntry) {
-      return "เข้าร่วมกิจกรรมแล้ว";
+      return { message: "เข้าร่วมกิจกรรมแล้ว", color: "blue" };
     }
-    const reserveEntry = reserve.find(
-      (r) => r.act_ID == activityID && r.std_ID == std_ID
+    const reserveEntry = activity.find(
+      (r) => r.act_ID === activityID && r.login_ID === stdID
     );
     if (reserveEntry) {
-      return "ลงทะเบียนสำเร็จ";
+      return { message: "ลงทะเบียนสำเร็จ", color: "green" };
     }
-    return "ยังไม่ได้เข้าร่วมกิจกรรม";
+    return { message: "ยังไม่ได้ลงทะเบียน", color: "gray" };
   };
 
   const handleSearch = (event) => {
@@ -104,9 +96,9 @@ function DetailStudent() {
     return (
       item.act_title.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (filter === "default" ||
-        (filter === "joinEntry" && status === "เข้าร่วมกิจกรรมแล้ว") ||
-        (filter === "reserveEntry" && status === "ลงทะเบียนสำเร็จ") ||
-        (filter === "notjoin" && status === "ยังไม่ได้เข้าร่วมกิจกรรม"))
+        (filter === "joinEntry" && status.message === "เข้าร่วมกิจกรรมแล้ว") ||
+        (filter === "reserveEntry" && status.message === "ลงทะเบียนสำเร็จ") ||
+        (filter === "notjoin" && status.message === "ยังไม่ได้ลงทะเบียน"))
     );
   });
 
@@ -125,46 +117,14 @@ function DetailStudent() {
     pageNumbers.push(i);
   }
 
-  const handleDelete = async () => {
-    try {
-      const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
-      });
+  
+  const uniqueVisibleItems = Array.from(
+    new Map(visibleItems.map(item => [item.act_ID, item])).values()
+  );
 
-      if (result.isConfirmed) {
-        const response = await axios.delete(`/api/student/${student.login_ID}`);
-
-        if (response.status === 200) {
-          Swal.fire({
-            title: "Deleted!",
-            text: "The student has been deleted.",
-            icon: "success",
-          });
-          setTimeout(() => {
-            navigate(-1);
-          }, 1500);
-        } else {
-          throw new Error("Delete operation failed");
-        }
-      }
-    } catch (error) {
-      console.error(error);
-      Swal.fire({
-        title: "Error!",
-        text: "An error occurred while deleting the student.",
-        icon: "error",
-      });
-    }
-  };
 
   return (
-    <div>
+    <div className="container mx-auto md:px-20 pt-20 my-10">
       {/* resume */}
       <div className="container mb-10  mx-auto md:px-20">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
@@ -177,13 +137,12 @@ function DetailStudent() {
           </div>
           <hr className="mb-3" />
           <div className="grid grid-cols-2 gap-4">
-            <h1>รหัสนักศึกษา: {student.std_ID}</h1>
+            <h1>รหัสนักศึกษา: {student.username}</h1>
             <p>
               ชื่อ-นามสกุล: {student.std_fname} {student.std_lname}
             </p>
             <p>
-              หมู่เรียน:
-              {student.sec_name}
+              หมู่เรียน: {student.sec_name}
             </p>
             <p>Email: {student.std_email}</p>
             <p>เบอร์โทรศัพท์: {student.std_mobile}</p>
@@ -192,14 +151,6 @@ function DetailStudent() {
             <p>อำเภอ: {student.district}</p>
             <p>ตำบล: {student.subdistrict}</p>
             <p>รหัสไปรษณีย์: {student.zipcode}</p>
-          </div>
-          <div className="mt-5">
-            <button
-              className="btn btn-warning px-6 py-4 text-white"
-              onClick={handleDelete}
-            >
-              Delete
-            </button>
           </div>
         </div>
       </div>
@@ -234,7 +185,7 @@ function DetailStudent() {
                 <input
                   type="text"
                   id="table-search"
-                  className="block pl-10 p-2 text-sm border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="block pl-10 p-2 text-sm border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="ค้นหากิจกรรม"
                   value={searchTerm}
                   onChange={handleSearch}
@@ -250,10 +201,10 @@ function DetailStudent() {
                   <select
                     value={filter}
                     onChange={handleFilterChange}
-                    className="text-xs block p-1.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className="text-xs block p-1.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
                     <option value="default" className="text-center">
-                      กิจกรรมทั้งหมด
+                      ทั้งหมด
                     </option>
                     <option value="joinEntry">เข้าร่วมกิจกรรมแล้ว</option>
                     <option value="reserveEntry">ลงทะเบียนสำเร็จ</option>
@@ -264,73 +215,57 @@ function DetailStudent() {
               <div className="flex pb-4 items-center">
                 <button
                   onClick={handleSortChange}
-                  className="block p-2 text-xs border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="block p-2 text-xs border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
                   วันที่ ({sortOrder === "latest" ? "ใหม่สุด" : "เก่าสุด"})
                 </button>
               </div>
             </div>
           </div>
-
-          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-            <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
-              <tr className="flex w-full">
-                <th scope="col" className="text-center px-6 py-3 w-1/12">
-                  ลำดับ
-                </th>
-                <th scope="col" className="text-center px-6 py-3 w-3/12">
-                  ชื่อกิจกรรม
-                </th>
-
-                <th scope="col" className="text-center px-6 py-3 w-3/12">
-                  วันที่จัดกิจกรรม
-                </th>
-                <th scope="col" className="text-center px-6 py-3 w-3/12">
-                  สถานะการเข้าร่วม
-                </th>
-                <th scope="col" className="text-center px-6 py-3 w-2/12">
-                  รายละเอียด
-                </th>
+          <table
+            className="min-w-full bg-white dark:bg-gray-800"
+            style={{ maxHeight: "50vh" }}
+          >
+            <thead className="bg-gray-200 dark:bg-gray-700">
+              <tr className="w-96 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 uppercase text-left">
+                <th className="px-4 py-3">ชื่อกิจกรรม</th>
+                <th className="px-4 py-3">สถานที่</th>
+                <th className="px-4 py-3">วันที่</th>
+                <th className="px-4 py-3">สถานะ</th>
+                <th className="px-4 py-3 w-2/12">การดำเนินการ</th>
               </tr>
             </thead>
-            <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
-              {visibleItems.map((item, index) => (
-                <tr key={item.act_ID} className="border-b-2 flex w-full">
-                  <td className="text-center px-6 py-3 w-1/12">{index + 1}</td>
-                  <td className="text-start px-6 py-3 w-3/12">
-                    {item.act_title}
-                  </td>
-
-                  <td className="text-center px-6 py-3 w-3/12">
-                    {item.act_dateStart.slice(0, 10)} -{" "}
-                    {item.act_dateEnd.slice(0, 10)}
-                  </td>
-                  <td
-                    className={`text-center px-6 py-3 w-3/12 ${
-                      getStatus(item.act_ID) === "เข้าร่วมกิจกรรมแล้ว"
-                        ? "text-green-500"
-                        : getStatus(item.act_ID) === "ยังไม่ได้เข้าร่วมกิจกรรม"
-                        ? "text-red-500"
-                        : ""
-                    }`}
+            <tbody className="text-sm divide-y divide-gray-200 dark:divide-gray-700">
+              {uniqueVisibleItems.map((item) => {
+                const status = getStatus(item.act_ID);
+                return (
+                  <tr
+                    key={item.act_ID}
+                    className="text-gray-700 dark:text-gray-400"
                   >
-                    {getStatus(item.act_ID)}
-                  </td>
-                  <td className="text-center px-6 py-3 w-2/12">
-                    <button
-                      className="text-blue-600 dark:text-blue-500 hover:underline"
-                      onClick={() =>
-                        navigate(`/activity/detail/${item.act_ID}`)
-                      }
-                    >
-                      รายละเอียด
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                    <td className="px-4 py-3">{item.act_title}</td>
+                    <td className="px-4 py-3">{item.act_location}</td>
+                    <td className="px-4 py-3">
+                      {item.act_dateStart.slice(0, 10)}
+                    </td>
+                    <td className="px-4 py-3" style={{ color: status.color }}>
+                      {status.message}
+                    </td>
+                    <td className="px-6 py-3">
+                      <button
+                        className="text-blue-600 dark:text-blue-500 hover:underline"
+                        onClick={() =>
+                          navigate(`/activity/detail2/${item.act_ID}`)
+                        }
+                      >
+                        รายละเอียด
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
-
           <div className="flex justify-between mt-2">
             <div className="flex gap-2 w-24"></div>
             <div className="flex gap-2">
@@ -349,7 +284,7 @@ function DetailStudent() {
                 <button
                   key={pageNumber}
                   onClick={() => setCurrentPage(pageNumber)}
-                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                  className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
                     pageNumber === currentPage ? "bg-blue-200" : ""
                   }`}
                 >
