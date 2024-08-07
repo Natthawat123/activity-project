@@ -5,6 +5,7 @@ import Web3 from "web3";
 import abi from "../../../components/contract/abi2.json";
 const contractAddress = "0xc9811A01727735E9c9aE046b7690b2AC9021E1B7";
 import { formatDate, range, dateToUint32 } from "./Fx";
+import axios from "axios";
 
 //mui
 import Box from "@mui/material/Box";
@@ -105,6 +106,12 @@ function T({ activities = [], join = [] }) {
         const tx = await contractInstance.methods
           .add(actID, studentIds, dayJoin)
           .send({ from: accounts[0] });
+        await axios.put(`/api/updateStatus/${actID}`);
+        await axios.put(
+          `/api/transection/${actID}`,
+          { act_transaction: tx.transactionHash } // Send as JSON body
+        );
+
         console.log("Upload transaction sent:", tx);
         Swal.fire({
           position: "top-end",
@@ -113,6 +120,9 @@ function T({ activities = [], join = [] }) {
           showConfirmButton: false,
           timer: 1500,
         });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       }
     } catch (err) {
       console.error("Error handling upload:", err);
@@ -123,8 +133,6 @@ function T({ activities = [], join = [] }) {
       });
     }
   };
-  console.log(join);
-  console.log(filteredActivities);
 
   return (
     <div>

@@ -17,14 +17,12 @@ function Add_Activity({ closeModal }) {
     axios
       .get("/api/users")
       .then((response) => {
-        setStaffName(response.data.filter((staff) => staff.role != 'student'));
+        setStaffName(response.data.filter((staff) => staff.role != "student"));
       })
       .catch((error) => {
         console.error("Error fetching staff list:", error);
       });
   }, []);
-
-
 
   const handleTitle = (event) => {
     setInputTitle(event.target.value);
@@ -72,10 +70,10 @@ function Add_Activity({ closeModal }) {
           title: "เพิ่มกิจกรรมใหม่สำเร็จ",
           icon: "success",
         });
+        closeModal();
         setTimeout(() => {
-          closeModal();
-        }, 0);
-        console.log(result);
+          window.location.reload();
+        }, 1000);
       })
       .catch((error) => {
         console.error("Error:", error);

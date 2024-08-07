@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Web3 from "web3";
-import Abi from "../../components/contract/abi.json";
-import { useNavigate } from "react-router-dom";
+import Abi from "../../components/contract/abi2.json";
 
 function Dash_users() {
   const [activity, setActivity] = useState([]);
@@ -14,6 +13,9 @@ function Dash_users() {
   const [joinedCount, setJoinedCount] = useState(0);
   const [registeredCount, setRegisteredCount] = useState(0);
   const [notJoinedCount, setNotJoinedCount] = useState(0);
+  const contractAddress = "0xc9811A01727735E9c9aE046b7690b2AC9021E1B7";
+
+  const id = localStorage.getItem("std_ID");
 
   useEffect(() => {
     fetch("/api/activitys")
@@ -22,7 +24,6 @@ function Dash_users() {
         (result) => {
           setIsLoaded(true);
           setActivity(result);
-
           setCountActivity(result.length);
         },
         (error) => {
@@ -31,9 +32,6 @@ function Dash_users() {
         }
       );
   }, []);
-
-  const contractAddress = "0x9A00B0CB3A626c44c19f868b85A3819C8b630494";
-  const stdID = localStorage.getItem("std_ID");
 
   useEffect(() => {
     const fetchManage = async () => {
@@ -49,14 +47,8 @@ function Dash_users() {
       try {
         const web3 = new Web3("https://rpc.sepolia.org");
         const contract = new web3.eth.Contract(Abi, contractAddress);
-        const res = await contract.methods.getAll().call();
-
-        const format = res[0].map((actID, index) => ({
-          actID: Number(actID),
-          stdIDs: res[1][index],
-        }));
-
-        setJoin(format);
+        const res = await contract.methods.get().call();
+        setJoin(res);
       } catch (err) {
         console.error(err);
       }
@@ -69,31 +61,38 @@ function Dash_users() {
 
   useEffect(() => {
     if (activity.length > 0) {
-      const joined = activity.filter(
-        (item) => getStatus(item.act_ID) == "เข้าร่วมกิจกรรมแล้ว"
-      ).length;
-      const registered = activity.filter(
-        (item) => getStatus(item.act_ID) == "ลงทะเบียนสำเร็จ"
-      ).length;
-      const notJoined = activity.filter(
-        (item) => getStatus(item.act_ID) == "ยังไม่ได้เข้าร่วมกิจกรรม"
-      ).length;
+      const statusCounts = {
+        joined: 0,
+        registered: 0,
+        notJoined: 0,
+      };
 
-      setJoinedCount(joined);
-      setRegisteredCount(registered);
-      setNotJoinedCount(notJoined);
+      activity.forEach((item) => {
+        const status = getStatus(item.act_ID);
+        if (status === "เข้าร่วมกิจกรรมแล้ว") {
+          statusCounts.joined += 1;
+        } else if (status === "ลงทะเบียนสำเร็จ") {
+          statusCounts.registered += 1;
+        } else if (status === "ยังไม่ได้เข้าร่วมกิจกรรม") {
+          statusCounts.notJoined += 1;
+        }
+      });
+
+      setJoinedCount(statusCounts.joined);
+      setRegisteredCount(statusCounts.registered);
+      setNotJoinedCount(statusCounts.notJoined);
     }
   }, [activity, join, reserve]);
 
   const getStatus = (activityID) => {
     const joinEntry = join.find(
-      (j) => j.actID == activityID && j.stdIDs.includes(BigInt(stdID))
+      (j) => j.actID == activityID && j.stdIDs.includes(BigInt(id))
     );
     if (joinEntry) {
       return "เข้าร่วมกิจกรรมแล้ว";
     }
     const reserveEntry = reserve.find(
-      (r) => r.act_ID == activityID && r.std_ID == stdID
+      (r) => r.act_ID == activityID && r.std_ID == id
     );
     if (reserveEntry) {
       return "ลงทะเบียนสำเร็จ";
@@ -101,52 +100,58 @@ function Dash_users() {
     return "ยังไม่ได้เข้าร่วมกิจกรรม";
   };
 
-  return (
-    <div className="container mx-auto px-10 md:px-20 mb-5">
-      <div>
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  } else if (!isLoaded) {
+    return <div>Loading...</div>;
+  } else {
+    return (
+      <div className="container mx-auto px-10 md:px-20 mb-5">
         <div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pr-2 pl-2 pt-3">
-            <div className="bg-teal-600 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-blue-600">
-              <div className="text-2xl flex items-center gap-2">
-                <div className="text-sm font-semibold">จำนวนกิจกรรมทั้งหมด</div>
+          <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pr-2 pl-2 pt-3">
+              <div className="bg-teal-600 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-blue-600">
+                <div className="text-2xl flex items-center gap-2">
+                  <div className="text-sm font-semibold">
+                    จำนวนกิจกรรมทั้งหมด
+                  </div>
+                </div>
+                <div className="text-center text-4xl font-bold">
+                  {countActivity}
+                </div>
               </div>
-              <div className="text-center text-4xl font-bold">
-                {countActivity}
-              </div>
-            </div>
 
-            <div className="bg-green-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-green-600">
-              <p className="text-sm font-semibold">
-                จำนวนกิจกรรมที่เข้าร่วมแล้ว
-              </p>
-              <div className="text-center text-4xl font-bold">
-                {" "}
-                {joinedCount}
+              <div className="bg-green-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-green-600">
+                <p className="text-sm font-semibold">
+                  จำนวนกิจกรรมที่เข้าร่วมแล้ว
+                </p>
+                <div className="text-center text-4xl font-bold">
+                  {joinedCount}
+                </div>
               </div>
-            </div>
 
-            <div className="bg-green-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-green-600">
-              <p className="text-sm font-semibold">
-                {" "}
-                จำนวนกิจกรรมที่ลงทะเบียนแล้ว{" "}
-              </p>
-              <div className="text-center text-4xl font-bold">
-                {registeredCount}
+              <div className="bg-green-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-green-600">
+                <p className="text-sm font-semibold">
+                  จำนวนกิจกรรมที่ลงทะเบียนแล้ว
+                </p>
+                <div className="text-center text-4xl font-bold">
+                  {registeredCount}
+                </div>
               </div>
-            </div>
-            <div className="bg-green-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-green-600">
-              <p className="text-sm font-semibold">
-                จำนวนกิจกรรมที่ยังไม่ได้เข้าร่วม{" "}
-              </p>
-              <div className="text-center text-4xl font-bold">
-                {notJoinedCount}
+              <div className="bg-green-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-green-600">
+                <p className="text-sm font-semibold">
+                  จำนวนกิจกรรมที่ยังไม่ได้เข้าร่วม
+                </p>
+                <div className="text-center text-4xl font-bold">
+                  {notJoinedCount}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
 
 export default Dash_users;

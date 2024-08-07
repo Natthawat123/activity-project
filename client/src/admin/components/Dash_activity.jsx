@@ -26,8 +26,8 @@ function Dash_users() {
 
   const getActivityStatus = (item, now) => {
     const dateStart = moment(item.act_dateStart);
-    const twoWeeksBefore = dateStart.subtract(2, 'weeks').toDate();
-    const oneDayBefore = dateStart.subtract(1, 'day').toDate();
+    const twoWeeksBefore = dateStart.subtract(2, "weeks").toDate();
+    const oneDayBefore = dateStart.subtract(1, "day").toDate();
 
     if (item.act_status === 2) {
       return "กิจกรรมสิ้นสุดแล้ว";
@@ -44,14 +44,14 @@ function Dash_users() {
 
   // Count activities by status
   const statusCounts = {
-    'เปิดลงทะเบียน': 0,
-    'ปิดลงทะเบียน': 0,
-    'ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน': 0,
-    'ลงทะเบียนเต็มแล้ว': 0,
-    'กิจกรรมสิ้นสุดแล้ว': 0
+    เปิดลงทะเบียน: 0,
+    ปิดลงทะเบียน: 0,
+    ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน: 0,
+    ลงทะเบียนเต็มแล้ว: 0,
+    กิจกรรมสิ้นสุดแล้ว: 0,
   };
 
-  items.forEach(item => {
+  items.forEach((item) => {
     const status = getActivityStatus(item, now);
     if (statusCounts.hasOwnProperty(status)) {
       statusCounts[status]++;
@@ -85,14 +85,10 @@ function Dash_users() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="text-sm font-semibold">
-              จำนวนกิจกรรมทั้งหมด
-            </div>
-            <div className="text-center text-4xl font-bold">
-              {items.length}
-            </div>
+            <div className="text-sm font-semibold">จำนวนกิจกรรมทั้งหมด</div>
+            <div className="text-center text-4xl font-bold">{items.length}</div>
           </motion.div>
-          
+
           <motion.div
             className="bg-green-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-green-600"
             initial={{ opacity: 0, scale: 0.9 }}
@@ -103,7 +99,7 @@ function Dash_users() {
               จำนวนกิจกรรมที่เปิดลงทะเบียน
             </div>
             <div className="text-center text-4xl font-bold">
-              {statusCounts['เปิดลงทะเบียน']}
+              {statusCounts["เปิดลงทะเบียน"]}
             </div>
           </motion.div>
 
@@ -117,7 +113,7 @@ function Dash_users() {
               จำนวนกิจกรรมที่ปิดลงทะเบียน
             </div>
             <div className="text-center text-4xl font-bold">
-              {statusCounts['ปิดลงทะเบียน']}
+              {statusCounts["ปิดลงทะเบียน"]}
             </div>
           </motion.div>
 
@@ -131,7 +127,7 @@ function Dash_users() {
               จำนวนกิจกรรมที่ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน
             </div>
             <div className="text-center text-4xl font-bold">
-              {statusCounts['ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน']}
+              {statusCounts["ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"]}
             </div>
           </motion.div>
 
@@ -145,7 +141,7 @@ function Dash_users() {
               จำนวนกิจกรรมที่ลงทะเบียนเต็มแล้ว
             </div>
             <div className="text-center text-4xl font-bold">
-              {statusCounts['ลงทะเบียนเต็มแล้ว']}
+              {statusCounts["ลงทะเบียนเต็มแล้ว"]}
             </div>
           </motion.div>
 
@@ -159,7 +155,7 @@ function Dash_users() {
               จำนวนกิจกรรมที่กิจกรรมสิ้นสุดแล้ว
             </div>
             <div className="text-center text-4xl font-bold">
-              {statusCounts['กิจกรรมสิ้นสุดแล้ว']}
+              {statusCounts["กิจกรรมสิ้นสุดแล้ว"]}
             </div>
           </motion.div>
         </div>
@@ -169,4 +165,3 @@ function Dash_users() {
 }
 
 export default Dash_users;
-

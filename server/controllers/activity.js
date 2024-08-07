@@ -17,7 +17,9 @@ export const manage = (req, res) => {
   });
 };
 export const reserve = (req, res) => {
-  const { act_ID } = req.params;
+  const {
+    act_ID
+  } = req.params;
 
   const sql = "DELETE FROM manage WHERE act_ID = ? ";
 
@@ -70,7 +72,9 @@ export const createActivity = (req, res) => {
 
 // update
 export const updateActivity = (req, res) => {
-  const { id } = req.params;
+  const {
+    id
+  } = req.params;
   const {
     act_title,
     act_desc,
@@ -124,27 +128,7 @@ export const updateActivity = (req, res) => {
   );
 };
 
-//transection
-export const transection = (req, res) => {
-  const { id } = req.params;
-  const { act_transaction } = req.body;
 
-  const sql = `UPDATE activity SET
-        act_transaction = ?
-        WHERE act_ID = ?`;
-
-  db.query(sql, [act_transaction, id], (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        error: err.message,
-      });
-    }
-    return res.json({
-      message: "transection updated successfully",
-      result,
-    });
-  });
-};
 
 // getAll
 export const readActivity = (req, res) => {
@@ -246,7 +230,9 @@ WHERE
 };
 
 export const deleteActivity = (req, res) => {
-  const { id } = req.params;
+  const {
+    id
+  } = req.params;
   const sql = "DELETE FROM activity WHERE act_ID = ?";
 
   db.query(sql, [id], (err, result) => {
@@ -266,16 +252,46 @@ export const deleteActivity = (req, res) => {
 export const updateStatus = (req, res) => {
   const id = req.params.id;
   const status = 2;
+
   const sql = "UPDATE activity SET act_status = ? WHERE act_ID = ?";
 
   db.query(sql, [status, id], (err, result) => {
+    if (err) {
+      console.error("Database update error: ", err.message); // Improved logging
+      return res.status(500).json({
+        error: err.message,
+      });
+    }
+    console.log("Database updated successfully: ", result); // Log successful update
+    return res.json({
+      message: "Activity updated successfully",
+      result,
+    });
+  });
+};
+
+
+//transection
+export const transection = (req, res) => {
+  const {
+    id
+  } = req.params;
+  const {
+    act_transaction
+  } = req.body;
+
+  const sql = `UPDATE activity SET
+        act_transaction = ?
+        WHERE act_ID = ?`;
+
+  db.query(sql, [act_transaction, id], (err, result) => {
     if (err) {
       return res.status(500).json({
         error: err.message,
       });
     }
     return res.json({
-      message: "Activity updated successfully",
+      message: "transection updated successfully",
       result,
     });
   });

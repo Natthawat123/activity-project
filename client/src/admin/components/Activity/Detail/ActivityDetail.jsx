@@ -89,6 +89,8 @@ function ActivityDetail({ activity, teacher, act_ID }) {
     ? formatISO(parseISO(editData.act_dateEnd), { representation: "date" })
     : "";
 
+  const url = `https://sepolia.etherscan.io/tx/${activity.act_transaction}`;
+
   return (
     <div>
       <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
@@ -224,6 +226,14 @@ function ActivityDetail({ activity, teacher, act_ID }) {
                       </option>
                     ))}
                   </select>
+                </td>
+              </tr>
+              <tr>
+                <td className="px-6 py-4 font-medium text-gray-900">ตรวจสอบ</td>
+                <td className="px-6 py-4 text-gray-500 ">
+                  <a href={url} target="_blank" rel="noopener noreferrer">
+                    ตรวจสอบ
+                  </a>
                 </td>
               </tr>
               {showButtons && (

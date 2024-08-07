@@ -8,6 +8,8 @@ const contractAddress = "0xc9811A01727735E9c9aE046b7690b2AC9021E1B7";
 function Table() {
   const [activity, setActivity] = useState([]);
   const [join, setJoin] = useState([]);
+  const [filteredActivities, setFilteredActivities] = useState([]);
+  const [loading, setLoading] = useState(true); // New state for loading
 
   useEffect(() => {
     const fetchData = async () => {
@@ -18,6 +20,7 @@ function Table() {
         console.error("Error fetching data:", error);
       }
     };
+
     const fetchSmartContract = async () => {
       try {
         const web3 = new Web3("https://rpc.sepolia.org");
@@ -28,32 +31,45 @@ function Table() {
         console.error("Error fetching smart contract:", err);
       }
     };
-    fetchSmartContract();
-    fetchData();
+
+    const fetchDataAndContract = async () => {
+      await Promise.all([fetchData(), fetchSmartContract()]);
+      setLoading(false); // Set loading to false once both fetches are complete
+    };
+
+    fetchDataAndContract();
   }, []);
 
-  const Activities = Object.values(
-    activity.reduce((acc, act) => {
-      if (!acc[act.act_ID]) {
-        acc[act.act_ID] = {
-          ...act,
-          students: [],
-        };
-      }
-      acc[act.act_ID].students.push({
-        std_ID: act.std_ID,
-        std_fname: act.std_fname,
-        std_lname: act.std_lname,
-      });
-      return acc;
-    }, {})
-  );
+  useEffect(() => {
+    if (activity.length > 0) {
+      const filtered = activity.reduce((acc, act) => {
+        if (!acc[act.act_ID]) {
+          acc[act.act_ID] = {
+            ...act,
+            students: [],
+          };
+        }
+        acc[act.act_ID].students.push({
+          std_ID: act.std_ID,
+          std_fname: act.std_fname,
+          std_lname: act.std_lname,
+        });
+        return acc;
+      }, {});
+
+      setFilteredActivities(Object.values(filtered));
+    }
+  }, [activity]);
+
+  if (loading) {
+    return <div>Loading...</div>; // Display loading indicator
+  }
 
   return (
     <>
       <div className="mb-10 container mx-auto md:px-20 py-40">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
-          <T activities={Activities} join={join} />
+          <T activities={filteredActivities} join={join} />
         </div>
       </div>
     </>
