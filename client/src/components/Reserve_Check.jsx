@@ -61,7 +61,7 @@ export default function DataGridDemo() {
           pageSizeOptions={[5]}
           disableRowSelectionOnClick
           slots={{
-            toolbar: role === 'admin' ? GridToolbar : null,
+            toolbar: role === 'admin' || role === 'teacher' ? GridToolbar : null,
             loadingOverlay: {
               variant: "skeleton",
               noRowsVariant: "skeleton",
