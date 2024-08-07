@@ -8,6 +8,7 @@ import PersonPinIcon from "@mui/icons-material/PersonPin";
 const Header = () => {
   const ID = localStorage.getItem("std_ID");
   const [username, setUsername] = useState("");
+  const Homeurl = 'localhost:5173/activity/calendar';
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -18,6 +19,11 @@ const Header = () => {
         console.error("Error fetching the username:", error);
       }
     };
+
+    if(Homeurl){
+      setSelectedItem("Calendar");
+      setListVisible(false);
+    }
 
     if (ID) {
       fetchUsername();

@@ -3,8 +3,6 @@ import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import Web3 from "web3";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArticleIcon from "@mui/icons-material/Article";
-import GroupIcon from "@mui/icons-material/Group";
 
 import Abi from "../../components/contract/abi2.json";
 
@@ -15,10 +13,12 @@ const formatDateThai = (dateString) => {
   return date.toLocaleDateString("th-TH", options);
 };
 
+
 function DetailActivity() {
   const [data, setData] = useState(null);
   const [join, setJoin] = useState([]);
   const [checkDay, setCheckDay] = useState([]);
+  const [day, setDay] = useState([]);
   const navigate = useNavigate();
   const { act_ID } = useParams();
   const [activity, setActivity] = useState(null);
@@ -56,7 +56,7 @@ function DetailActivity() {
         setData(res.data);
         setActivity(activityData);
         setStatus(activityData?.act_status || "");
-        setCheckDay(range(activityData.act_dateStart, activityData.act_dateEnd));
+        setDay(range(activityData.act_dateStart, activityData.act_dateEnd));
       } catch (err) {
         console.error("Error fetching activity:", err);
       }
@@ -95,13 +95,11 @@ function DetailActivity() {
     setActivity((prev) => ({ ...prev, act_status: event.target.value }));
   };
 
-  const updatedData = data?.map((item) => ({
-    ...item,
-    join:
-      stdIDs.length && item.login_ID !== null && stdIDs.includes(BigInt(item.login_ID))
-        ? "เข้าร่วมแล้ว"
-        : "ละทะเบียนแล้ว",
-  })) || [];
+  const dateS = (dateString) => {
+    return dateString.replace(/-/g, "");
+  };
+
+  const joinStudents = joinData?.students || [];
 
   if (!data) {
     return <p>Loading...</p>;
@@ -177,52 +175,58 @@ function DetailActivity() {
       </div>
 
       {/* Student Detail */}
-      <div className="container m-10 mx-auto md:px-20">
-        <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
-          <div className="flex gap-2">
-            <h1 className="text-lg font-bold mb-2">รายชื่อนักศึกษา</h1>
-          </div>
-          <hr className="mb-3" />
-          <table className="text-center w-3/4 m-auto text-sm rtl:text-center text-gray-500 dark:text-gray-400">
-            <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-              <tr>
-                <th className="px-6 py-3 w-1/6">ลำดับ</th>
-                <th className="px-6 py-3 w-2/6">รหัสนักศึกษา</th>
-                <th className="px-6 py-3 w-2/6">ชื่อ-นามสกุล</th>
-                {checkDay.map((day, index) => (
-                  <th className="px-6 py-3 w-2/6" key={index}>
-                    {day}
-                  </th>
-                ))}
-                <th className="px-6 py-3 w-2/6">สถานะ</th>
-              </tr>
-            </thead>
-            <tbody className="text-slate-600">
-              {updatedData.map((i, index) => {
-                const studentData = joinData?.students.find(
-                  (student) => student.studentId === BigInt(i.login_ID)
-                );
-                return (
-                  <tr key={i.act_ID}>
-                    <td className="px-6 py-3">{index + 1}</td>
-                    <td className="px-6 py-3">{i.login_ID}</td>
-                    <td className="px-6 py-3">
-                      {i.std_fname} {i.std_lname}
-                    </td>
-                    {checkDay.map((day, dayIndex) => (
-                      <td className="px-6 py-3" key={dayIndex}>
-                        {studentData && studentData.dayJoin.includes(day)
-                          ? "✓"
-                          : "✗"}
-                      </td>
-                    ))}
-                    <td className="px-6 py-3">{i.join}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+      <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 mt-8">
+        <div className="flex gap-2 mb-4">
+          <h1 className="text-lg font-bold">รายชื่อนักศึกษา</h1>
         </div>
+        <hr className="mb-3" />
+        <table className="text-center w-full m-auto text-sm rtl:text-center text-gray-500 dark:text-gray-400">
+          <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+              <th className="px-6 py-3 w-1/12">ลำดับ</th>
+              <th className="px-6 py-3 w-2/12">รหัสนักศึกษา</th>
+              <th className="px-6 py-3 w-2/12">ชื่อ-นามสกุล</th>
+              {day.map((d, index) => (
+                <th key={index} className="px-6 py-3 w-2/12">
+                  {dateS(d)}
+                </th>
+              ))}
+              <th className="px-6 py-3 w-2/12">สถานะ</th>
+            </tr>
+          </thead>
+          <tbody className="text-slate-600">
+            {data.map((i, index) => {
+              const studentData = joinStudents.find(
+                (student) => student.studentId === BigInt(i.login_ID)
+              );
+              const daysJoined = studentData
+                ? studentData.dayJoin.filter((day) => day).length
+                : 0;
+
+              return (
+                <tr key={i.login_ID}>
+                  <td className="px-6 py-3">{index + 1}</td>
+                  <td className="px-6 py-3">{i.login_ID}</td>
+                  <td className="px-6 py-3">
+                    {i.std_fname} {i.std_lname}
+                  </td>
+                  {day.map((d, dayIndex) => (
+                    <td key={dayIndex} className="px-6 py-3">
+                      {studentData && studentData.dayJoin.includes(dateS(d))
+                        ? "✔"
+                        : "✘"}
+                    </td>
+                  ))}
+                  <td className="px-6 py-3">
+                    {daysJoined > 0
+                      ? `เข้าร่วม ${daysJoined} วัน`
+                      : "ลงทะเบียนแล้ว"}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   );
