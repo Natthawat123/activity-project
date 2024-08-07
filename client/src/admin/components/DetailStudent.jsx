@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import Web3 from "web3";
-import Abi from "../../components/contract/abi.json";
+import Abi from "../../components/contract/abi2.json";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import Swal from "sweetalert2";
 
@@ -20,7 +20,7 @@ function DetailStudent() {
 
   const navigate = useNavigate();
   const { id } = useParams();
-  const contractAddress = "0x9A00B0CB3A626c44c19f868b85A3819C8b630494";
+  const contractAddress = "0xc9811A01727735E9c9aE046b7690b2AC9021E1B7";
 
   useEffect(() => {
     const fetchStudent = async () => {
@@ -46,14 +46,8 @@ function DetailStudent() {
       try {
         const web3 = new Web3("https://rpc.sepolia.org");
         const contract = new web3.eth.Contract(Abi, contractAddress);
-        const res = await contract.methods.getAll().call();
-
-        const format = res[0].map((actID, index) => ({
-          actID: Number(actID),
-          stdIDs: res[1][index],
-        }));
-
-        setJoin(format);
+        const res = await contract.methods.get().call();
+        setJoin(res);
       } catch (err) {
         console.error(err);
       }
@@ -63,15 +57,6 @@ function DetailStudent() {
     fetchSmartContract();
     fetchActivity();
   }, [id]);
-
-  const isStudentJoined = useCallback(
-    (actID) => {
-      return join.some(
-        (j) => j.actID === actID && j.stdIDs.includes(BigInt(id))
-      );
-    },
-    [join, id]
-  );
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -101,13 +86,10 @@ function DetailStudent() {
       });
 
       if (result.isConfirmed) {
-        let api;
-
-        if (student.role == 'student'){
-          api = `/api/students/${student.username}`
-        }else if(student.role == 'teacher'){
-          api = `/api/teachers/${student.login_ID}`
-        }
+        const api =
+          student.role === "student"
+            ? `/api/students/${student.username}`
+            : `/api/teachers/${student.login_ID}`;
 
         const response = await axios.delete(api);
 
@@ -120,8 +102,6 @@ function DetailStudent() {
           setTimeout(() => {
             navigate(-1);
           }, 1500);
-        } else {
-          throw new Error("Delete operation failed");
         }
       }
     } catch (error) {
@@ -134,10 +114,6 @@ function DetailStudent() {
     }
   };
 
-  const handleEditToggle = () => {
-    setEditMode((prev) => !prev);
-  };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUpdatedStudent((prevState) => ({
@@ -146,52 +122,11 @@ function DetailStudent() {
     }));
   };
 
-  const handleSave = async () => {
-    try {
-      const response = await axios.put(
-        `/api/students/${student.login_ID}`,
-        updatedStudent
-      );
-      if (response.status === 200) {
-        Swal.fire({
-          title: "Updated!",
-          text: "The student's information has been updated.",
-          icon: "success",
-        });
-        setStudent(updatedStudent);
-        setEditMode(false);
-      } else {
-        throw new Error("Update operation failed");
-      }
-    } catch (error) {
-      console.error(error);
-      Swal.fire({
-        title: "Error!",
-        text: "An error occurred while updating the student.",
-        icon: "error",
-      });
-    }
-  };
-
-  // Implement pagination
-  const paginatedActivities = activity
-    .filter((act) => {
-      // Apply search and filter
-      return (
-        act.act_title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (filter === "default" ||
-          (filter === "joinEntry" && isStudentJoined(act.act_ID)) ||
-          (filter === "reserveEntry" && !isStudentJoined(act.act_ID)) ||
-          (filter === "notjoin" && !isStudentJoined(act.act_ID)))
-      );
-    })
-    .sort((a, b) => {
-      if (sortOrder === "latest") {
-        return b.act_ID - a.act_ID;
-      } else {
-        return a.act_ID - b.act_ID;
-      }
-    })
+  // Filter and paginate activities
+  const filteredActivities = activity
+    .filter((act) =>
+      act.act_title.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     .slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
 
   return (
@@ -212,30 +147,28 @@ function DetailStudent() {
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <tbody className="bg-white divide-y divide-gray-200 text-md">
-                <tr> 
-                  {student.role == 'student' ? (
+                <tr>
+                  {student.role === "student" && (
                     <>
-                     <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
-                    รหัสนักศึกษา
-                  </td>
-                  <td className="px-6 py-3">
-                    {editMode ? (
-                      <input
-                        type="text"
-                        name="ID"
-                        value={updatedStudent.ID}
-                        onChange={handleInputChange}
-                        readOnly
-                      />
-                    ) : (
-                      student.ID
-                    )}
-                  </td>
+                      <td className="px-6 py-3 font-medium text-gray-900">
+                        รหัสนักศึกษา
+                      </td>
+                      <td className="px-6 py-3">
+                        {editMode ? (
+                          <input
+                            type="text"
+                            name="ID"
+                            value={updatedStudent.ID}
+                            onChange={handleInputChange}
+                            readOnly
+                          />
+                        ) : (
+                          student.ID
+                        )}
+                      </td>
                     </>
-                ) : null}
-                 
-
-                  <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                  )}
+                  <td className="px-6 py-3 font-medium text-gray-900">
                     ชื่อ-นามสกุล
                   </td>
                   <td className="px-6 py-3">
@@ -260,29 +193,27 @@ function DetailStudent() {
                   </td>
                 </tr>
                 {student.role === "student" && (
-                  <>
-                    <tr>
-                      <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
-                        หมู่เรียน
-                      </td>
-                      <td className="px-6 py-3">
-                        {editMode ? (
-                          <input
-                            type="text"
-                            name="sec_name"
-                            value={updatedStudent.sec_name}
-                            onChange={handleInputChange}
-                          />
-                        ) : (
-                          student.sec_name
-                        )}
-                      </td>
-                    </tr>
-                  </>
+                  <tr>
+                    <td className="px-6 py-3 font-medium text-gray-900">
+                      หมู่เรียน
+                    </td>
+                    <td className="px-6 py-3">
+                      {editMode ? (
+                        <input
+                          type="text"
+                          name="sec_name"
+                          value={updatedStudent.sec_name}
+                          onChange={handleInputChange}
+                        />
+                      ) : (
+                        student.sec_name
+                      )}
+                    </td>
+                  </tr>
                 )}
                 {student.role === "teacher" && (
                   <tr>
-                    <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                    <td className="px-6 py-3 font-medium text-gray-900">
                       อาจารย์ประจำหมู่เรียน
                     </td>
                     <td className="px-6 py-3">
@@ -300,9 +231,7 @@ function DetailStudent() {
                   </tr>
                 )}
                 <tr>
-                  <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
-                    อีเมล
-                  </td>
+                  <td className="px-6 py-3 font-medium text-gray-900">อีเมล</td>
                   <td className="px-6 py-3">
                     {editMode ? (
                       <input
@@ -315,8 +244,7 @@ function DetailStudent() {
                       student.email
                     )}
                   </td>
-
-                  <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                  <td className="px-6 py-3 font-medium text-gray-900">
                     เบอร์โทรศัพท์
                   </td>
                   <td className="px-6 py-3">
@@ -335,7 +263,7 @@ function DetailStudent() {
                 {student.role !== "admin" && (
                   <>
                     <tr>
-                      <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                      <td className="px-6 py-3 font-medium text-gray-900">
                         ที่อยู่
                       </td>
                       <td className="px-6 py-3">
@@ -350,8 +278,7 @@ function DetailStudent() {
                           student.address
                         )}
                       </td>
-
-                      <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                      <td className="px-6 py-3 font-medium text-gray-900">
                         จังหวัด
                       </td>
                       <td className="px-6 py-3">
@@ -368,7 +295,7 @@ function DetailStudent() {
                       </td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                      <td className="px-6 py-3 font-medium text-gray-900">
                         อำเภอ
                       </td>
                       <td className="px-6 py-3">
@@ -383,8 +310,7 @@ function DetailStudent() {
                           student.district
                         )}
                       </td>
-
-                      <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                      <td className="px-6 py-3 font-medium text-gray-900">
                         ตำบล
                       </td>
                       <td className="px-6 py-3">
@@ -401,7 +327,7 @@ function DetailStudent() {
                       </td>
                     </tr>
                     <tr>
-                      <td className="px-6 py-3 font-medium text-gray-900 dark:text-white">
+                      <td className="px-6 py-3 font-medium text-gray-900">
                         รหัสไปรษณีย์
                       </td>
                       <td className="px-6 py-3">
@@ -430,26 +356,15 @@ function DetailStudent() {
             >
               ลบผู้ใช้คนนี้
             </button>
-            {/* {editMode ? (
-              <button
-                className="btn btn-primary px-6 py-4 mx-3 text-white"
-                onClick={handleSave}
-              >
-                Save
-              </button>
-            ) : (
-              <button
-                className="btn btn-primary px-6 py-4 mx-3 text-white"
-                onClick={handleEditToggle}
-              >
-                Edit
-              </button>
-            )} */}
             <button
               className="btn btn-primary px-6 py-4 mx-3 text-white"
               onClick={() =>
                 navigate(
-                  `/admin/dashboard/user/update/${student.role != 'student' ? student.login_ID : student.username}`
+                  `/admin/dashboard/user/update/${
+                    student.role !== "student"
+                      ? student.login_ID
+                      : student.username
+                  }`
                 )
               }
             >
@@ -459,9 +374,7 @@ function DetailStudent() {
         </div>
       </div>
 
-      {student.role == 'student' ? (
-        <>
-        <div className="mb-10 container mx-auto md:px-20">
+      <div className="mb-10 container mx-auto md:px-20">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
           <div className="text-lg font-bold mb-2">ประวัติการทำกิจกรรม</div>
           <div className="flex justify-between">
@@ -470,27 +383,10 @@ function DetailStudent() {
                 Search
               </label>
               <div className="relative mt-1">
-                <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                  <svg
-                    className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                    />
-                  </svg>
-                </div>
                 <input
                   type="text"
                   id="table-search"
-                  className="block pl-10 p-2 text-sm border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="block pl-10 p-2 text-sm border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="ค้นหากิจกรรม"
                   value={searchTerm}
                   onChange={handleSearch}
@@ -500,46 +396,61 @@ function DetailStudent() {
             <div className="flex gap-2 mb-4">
               <button
                 onClick={handleSortChange}
-                className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                className="text-white bg-blue-500 hover:bg-blue-600"
               >
-                {sortOrder === "latest" ? "Sort by Oldest" : "Sort by Latest"}
+                Sort
               </button>
               <select
                 id="filter"
                 value={filter}
                 onChange={handleFilterChange}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="bg-gray-50 border border-gray-300"
               >
-                <option value="default">All</option>
-                <option value="joinEntry">Joined</option>
-                <option value="reserveEntry">Reserved</option>
+                <option value="default">ทั้งหมด</option>
+                <option value="joinEntry">เข้าร่วม</option>
+                <option value="reserveEntry">ลงทะเบียนแล้ว</option>
                 <option value="notjoin">Not Joined</option>
               </select>
             </div>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+            <table className="w-full text-sm text-left text-gray-500">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-100">
                 <tr>
                   <th scope="col" className="px-6 py-3">
-                    Activity ID
+                    ลำดับ
                   </th>
                   <th scope="col" className="px-6 py-3">
-                    Title
+                    กิจกรรม
                   </th>
                   <th scope="col" className="px-6 py-3">
-                    Status
+                    ระยะเวลา
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    สถานะการเข้าร่วม
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {paginatedActivities.map((i, index) => {
-                  const isJoined = isStudentJoined(i.act_ID);
+                {activity.map((i, index) => {
+                  // Check if the student has joined or reserved the activity
+                  const isRegistered = join.includes(i.act_ID); // This checks if the activity ID is in the join array
+
                   return (
                     <tr key={index}>
-                      <td>{i.act_ID}</td>
-                      <td>{i.act_title}</td>
-                      <td>{isJoined ? "เข้าร่วม" : "ไม่เข้าร่วม"}</td>
+                      <td>{index + 1}</td>
+                      <td>
+                        {i.act_title} {`(${i.act_ID})`}
+                      </td>
+                      <td>
+                        {i.act_dateStart.slice(0, 10)} -{" "}
+                        {i.act_dateEnd.slice(0, 10)}
+                      </td>
+                      <td>
+                        {isRegistered
+                          ? "You have registered for this activity"
+                          : "Not registered"}
+                      </td>
                     </tr>
                   );
                 })}
@@ -551,26 +462,22 @@ function DetailStudent() {
               onClick={() =>
                 setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))
               }
-              className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              className="text-white bg-blue-500 hover:bg-blue-600"
             >
               Previous
             </button>
-            <span className="text-sm text-gray-700 dark:text-gray-400">
+            <span className="text-sm text-gray-700">
               Page {currentPage + 1}
             </span>
             <button
               onClick={() => setCurrentPage((prevPage) => prevPage + 1)}
-              className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              className="text-white bg-blue-500 hover:bg-blue-600"
             >
               Next
             </button>
           </div>
         </div>
       </div>
-        </>
-      ) : null}
-
-
     </div>
   );
 }
