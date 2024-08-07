@@ -1,8 +1,19 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Web3 from "web3";
-import Abi from "../../components/contract/abi.json";
+import Abi from "../../components/contract/abi2.json";
 import { useNavigate } from "react-router-dom";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import IconButton from "@mui/material/IconButton";
+import Collapse from "@mui/material/Collapse";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 
 function Test() {
   const [reserve, setReserve] = useState([]);
@@ -15,10 +26,11 @@ function Test() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
   const [sortOrder, setSortOrder] = useState("latest");
+  const [openRows, setOpenRows] = useState({});
 
   const navigate = useNavigate();
 
-  const contractAddress = "0x9A00B0CB3A626c44c19f868b85A3819C8b630494";
+  const contractAddress = "0xc9811A01727735E9c9aE046b7690b2AC9021E1B7";
   const stdID = localStorage.getItem("std_ID");
 
   useEffect(() => {
@@ -26,16 +38,10 @@ function Test() {
       try {
         const web3 = new Web3("https://rpc.sepolia.org");
         const contract = new web3.eth.Contract(Abi, contractAddress);
-        const res = await contract.methods.getAll().call();
-
-        const format = res[0].map((actID, index) => ({
-          actID: Number(actID),
-          stdIDs: res[1][index],
-        }));
-
-        setJoin(format);
+        const res = await contract.methods.get().call();
+        setJoin(res);
       } catch (err) {
-        setError;
+        setError(err);
         console.error(err);
       }
     };
@@ -43,8 +49,6 @@ function Test() {
     const fetchActivity = async () => {
       try {
         const res = await axios.get("/api/activitys");
-
-        
         setActivity(res.data);
       } catch (err) {
         console.log(err);
@@ -55,9 +59,15 @@ function Test() {
     setIsLoaded(true);
   }, []);
 
+  const toggleRow = (actId) => {
+    setOpenRows((prev) => ({ ...prev, [actId]: !prev[actId] }));
+  };
+
   const getStatus = (activityID) => {
     const joinEntry = join.find(
-      (j) => j.actID == activityID && j.stdIDs.includes(BigInt(stdID))
+      (j) =>
+        Number(j.activityId) === activityID &&
+        j.studentIds.some((id) => Number(id) === Number(stdID))
     );
     if (joinEntry) {
       return { message: "เข้าร่วมกิจกรรมแล้ว", color: "blue" };
@@ -113,10 +123,6 @@ function Test() {
   const visibleItems = sortedItems.slice(
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
-  );
-
-  const uniqueVisibleItems = Array.from(
-    new Map(visibleItems.map(item => [item.act_ID, item])).values()
   );
 
   const pageNumbers = [];
@@ -206,36 +212,99 @@ function Test() {
                 <th className="px-4 py-3">สถานที่</th>
                 <th className="px-4 py-3">วันที่</th>
                 <th className="px-4 py-3">สถานะ</th>
-                <th className="px-4 py-3 w-2/12">การดำเนินการ</th>
+                <th className="px-4 py-3 w-2/12">รายละเอียด</th>
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-gray-200 dark:divide-gray-700">
-              {uniqueVisibleItems.map((item) => {
+              {visibleItems.map((item) => {
                 const status = getStatus(item.act_ID);
                 return (
-                  <tr
-                    key={item.act_ID}
-                    className="text-gray-700 dark:text-gray-400"
-                  >
-                    <td className="px-4 py-3">{item.act_title}</td>
-                    <td className="px-4 py-3">{item.act_location}</td>
-                    <td className="px-4 py-3">
-                      {item.act_dateStart.slice(0, 10)}
-                    </td>
-                    <td className="px-4 py-3" style={{ color: status.color }}>
-                      {status.message}
-                    </td>
-                    <td className="px-6 py-3">
-                      <button
-                        className="text-blue-600 dark:text-blue-500 hover:underline"
-                        onClick={() =>
-                          navigate(`/activity/detail2/${item.act_ID}`)
-                        }
+                  <>
+                    <tr
+                      key={item.act_ID}
+                      className="text-gray-700 dark:text-gray-400"
+                    >
+                      <td className="px-4 py-3">
+                        {item.act_title} ({item.act_ID})
+                      </td>
+                      <td className="px-4 py-3">{item.act_location}</td>
+                      <td className="px-4 py-3">
+                        {item.act_dateStart.slice(0, 10)}
+                      </td>
+                      <td className="px-4 py-3" style={{ color: status.color }}>
+                        {status.message}
+                      </td>
+                      {/* <td className="px-6 py-3">
+                        <button
+                          className="text-blue-600 dark:text-blue-500 hover:underline"
+                          onClick={() =>
+                            navigate(`/activity/detail2/${item.act_ID}`)
+                          }
+                        >
+                          รายละเอียด
+                        </button>
+                      </td> */}
+                      <td>
+                        <IconButton
+                          aria-label="expand row"
+                          size="small"
+                          onClick={() => toggleRow(item.act_ID)}
+                        >
+                          {openRows[item.act_ID] ? (
+                            <>
+                              <KeyboardArrowUpIcon />
+                            </>
+                          ) : (
+                            <>
+                              <KeyboardArrowDownIcon />
+                            </>
+                          )}
+                        </IconButton>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td
+                        style={{ paddingBottom: 0, paddingTop: 0 }}
+                        colSpan={6}
                       >
-                        รายละเอียด
-                      </button>
-                    </td>
-                  </tr>
+                        <Collapse
+                          in={openRows[item.act_ID]}
+                          timeout="auto"
+                          unmountOnExit
+                        >
+                          <Box sx={{ margin: 1 }}>
+                            <Typography
+                              variant="h6"
+                              gutterBottom
+                              component="div"
+                            >
+                              รายละเอียดเพิ่มเติม
+                            </Typography>
+                            <Table size="small" aria-label="purchases">
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell>รายละเอียด</TableCell>
+                                  <TableCell>จำนวนที่รับ</TableCell>
+                                  <TableCell>วันที่เริ่ม</TableCell>
+                                  <TableCell>วันที่สิ้นสุด</TableCell>
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                <TableRow>
+                                  <TableCell component="th" scope="row">
+                                    {item.act_detail}
+                                  </TableCell>
+                                  <TableCell>{item.act_amount}</TableCell>
+                                  <TableCell>{item.act_dateStart}</TableCell>
+                                  <TableCell>{item.act_dateEnd}</TableCell>
+                                </TableRow>
+                              </TableBody>
+                            </Table>
+                          </Box>
+                        </Collapse>
+                      </td>
+                    </tr>
+                  </>
                 );
               })}
             </tbody>
