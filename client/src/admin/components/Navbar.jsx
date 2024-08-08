@@ -4,11 +4,12 @@ import Logo from "../../images/IT_logo_Standard.png";
 import Logout from "../../components/Logout";
 import axios from "axios";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
+import SlideBar from "../../components/SlideBar";
 
 const NavBar = () => {
   const ID = localStorage.getItem("staff_ID");
   const [username, setUsername] = useState("");
-  const Homeurl = 'localhost:5173/admin/dashboard';
+  const Homeurl = "localhost:5173/admin/dashboard";
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -20,7 +21,7 @@ const NavBar = () => {
       }
     };
 
-    if(Homeurl){
+    if (Homeurl) {
       setSelectedItem("Dashboard");
       setListVisible(false);
     }
@@ -107,11 +108,13 @@ const NavBar = () => {
 
             {/* Add similar li elements for other menu items */}
           </ul>
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-5 ">
             <p className="md:flex items-center">
               <PersonPinIcon className="mx-2 text-blue-500" />
               {username.fname}
             </p>
+            <SlideBar />
+
             <Logout className="block md:hidden" />
           </div>
         </nav>

@@ -229,10 +229,12 @@ function ActivityDetail({ activity, teacher, act_ID }) {
                 </td>
               </tr>
               <tr>
-                <td className="px-6 py-4 font-medium text-gray-900">ตรวจสอบ</td>
+                <td className="px-6 py-4 font-medium text-gray-900">
+                  ตรวจสถานะการขึ้นบล้อกเชนจสอบ
+                </td>
                 <td className="px-6 py-4 text-gray-500 ">
                   <a href={url} target="_blank" rel="noopener noreferrer">
-                    ตรวจสอบ
+                    link
                   </a>
                 </td>
               </tr>

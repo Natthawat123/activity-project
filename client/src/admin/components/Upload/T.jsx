@@ -23,8 +23,13 @@ function T({ activities = [], join = [] }) {
   const [selectedRows, setSelectedRows] = useState([]);
   const [web3, setWeb3] = useState(null);
   const [contract, setContract] = useState(null);
+  const [news, setNews] = useState({
+    news_topic: "",
+    news_desc: "",
+    news_date: "",
+    news_login_ID: "",
+  });
 
-  // Filter activities based on join array
   const filteredActivities = activities.filter(
     (activity) =>
       !join.some((j) => j.activityId.toString() === activity.act_ID.toString())
@@ -111,6 +116,7 @@ function T({ activities = [], join = [] }) {
           `/api/transection/${actID}`,
           { act_transaction: tx.transactionHash } // Send as JSON body
         );
+        await axios.post("/api/news");
 
         console.log("Upload transaction sent:", tx);
         Swal.fire({
@@ -208,9 +214,13 @@ function T({ activities = [], join = [] }) {
                 <h2>{`${activity.act_title} (ID: ${activity.act_ID})`}</h2>
               </AccordionSummary>
               <AccordionDetails>
-                <p>Description: {activity.act_desc}</p>
-                <p>Duration: {days.length} days</p>
-                <p>Dates: {days.map((d) => formatDate(d).th).join(", ")}</p>
+                <p>รายละเอียด: {activity.act_desc}</p>
+
+                <p>ระยะเวลา: {days.length} วัน</p>
+                <p>
+                  เริ่ม: {formatDate(activity.act_dateStart).th} -{" "}
+                  {formatDate(activity.act_dateEnd).th}
+                </p>
               </AccordionDetails>
             </Accordion>
             <Box sx={{ height: 400, width: "100%" }}>

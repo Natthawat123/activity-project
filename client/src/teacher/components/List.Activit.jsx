@@ -59,6 +59,12 @@ function DetailStudent() {
     setIsLoaded(true);
   }, []);
 
+  const formatDateThai = (dateString) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    const date = new Date(dateString);
+    return date.toLocaleDateString("th-TH", options);
+  };
+
   const toggleRow = (actId) => {
     setOpenRows((prev) => ({ ...prev, [actId]: !prev[actId] }));
   };
@@ -214,7 +220,7 @@ function DetailStudent() {
               <tr className="w-96 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 uppercase text-left">
                 <th className="px-4 py-3">ชื่อกิจกรรม</th>
                 <th className="px-4 py-3">สถานที่</th>
-                <th className="px-4 py-3">วันที่</th>
+                <th className="px-4 py-3">อาจารย์ผู้จัดกิจกรรม</th>
                 <th className="px-4 py-3">สถานะ</th>
                 <th className="px-4 py-3 w-2/12">รายละเอียด</th>
               </tr>
@@ -233,7 +239,7 @@ function DetailStudent() {
                       </td>
                       <td className="px-4 py-3">{item.act_location}</td>
                       <td className="px-4 py-3">
-                        {item.act_dateStart.slice(0, 10)}
+                        {item.staff_fname} {item.staff_lname}
                       </td>
                       <td className="px-4 py-3" style={{ color: status.color }}>
                         {status.message}
@@ -296,11 +302,17 @@ function DetailStudent() {
                               <TableBody>
                                 <TableRow>
                                   <TableCell component="th" scope="row">
-                                    {item.act_detail}
+                                    {item.act_desc}
                                   </TableCell>
-                                  <TableCell>{item.act_amount}</TableCell>
-                                  <TableCell>{item.act_dateStart}</TableCell>
-                                  <TableCell>{item.act_dateEnd}</TableCell>
+                                  <TableCell>
+                                    {item.act_numStdReserve}/{item.act_numStd}คน
+                                  </TableCell>
+                                  <TableCell>
+                                    {formatDateThai(item.act_dateStart)}
+                                  </TableCell>
+                                  <TableCell>
+                                    {formatDateThai(item.act_dateEnd)}
+                                  </TableCell>
                                 </TableRow>
                               </TableBody>
                             </Table>

@@ -1,8 +1,8 @@
 // import Header from "./Header"
-import { Outlet } from "react-router-dom"
-import Margin from "./Margin"
-import Footer from "./Footer"
-import Navbar from "./Navbar"
+import { Outlet } from "react-router-dom";
+import Margin from "./Margin";
+import Footer from "./Footer";
+import Navbar from "./Navbar";
 // import PrivateRoute from "../../PrivateStudentRoute"
 
 function Layout() {
@@ -13,7 +13,7 @@ function Layout() {
       <Outlet />
       <Footer />
     </main>
-  )
+  );
 }
 
-export default Layout
+export default Layout;
