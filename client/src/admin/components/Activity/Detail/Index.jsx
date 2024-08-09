@@ -17,8 +17,7 @@ function Index() {
   const [activity, setActivity] = useState([]);
   const { act_ID } = useParams();
   const contractAddress = "0xc9811A01727735E9c9aE046b7690b2AC9021E1B7";
-
-  const [test, setTest] = useState([]);
+  const id = localStorage.getItem("staff_ID");
 
   useEffect(() => {
     const fetchTeacher = async () => {
@@ -64,7 +63,6 @@ function Index() {
     fetchActivity();
     fetchSmartContract();
   }, [act_ID]);
-  console.log(join);
 
   if (data.length === 0) {
     return <p>Loading...</p>;
@@ -76,7 +74,12 @@ function Index() {
   return (
     <div>
       <div className="container m-10 mx-auto md:px-20 pt-20">
-        <ActivityDetail activity={activity} teacher={teacher} act_ID={act_ID} />
+        <ActivityDetail
+          activity={activity}
+          teacher={teacher}
+          act_ID={act_ID}
+          id={id}
+        />
 
         <Student act_ID={act_ID} day={day} data={data} join={join} />
       </div>

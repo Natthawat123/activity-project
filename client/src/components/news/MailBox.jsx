@@ -3,11 +3,15 @@ import Box from "@mui/material/Box";
 import Badge from "@mui/material/Badge";
 import MailIcon from "@mui/icons-material/Mail";
 import DraftsIcon from "@mui/icons-material/Drafts";
-import "../App.css";
+import "../../App.css";
 
-export default function MailBox({ onClick }) {
-  const [count, setCount] = React.useState(1);
+export default function MailBox({ onClick, news = [] }) {
+  const [count, setCount] = React.useState(0);
   const [isHovered, setIsHovered] = React.useState(false);
+
+  React.useEffect(() => {
+    setCount(news.length);
+  }, [news]);
 
   return (
     <Box

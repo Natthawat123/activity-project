@@ -8,21 +8,22 @@ import Collapse from "@mui/material/Collapse";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import StarBorder from "@mui/icons-material/StarBorder";
+import StarIcon from "@mui/icons-material/Star";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
+import ArticleIcon from "@mui/icons-material/Article";
+import Box from "@mui/material/Box";
 import axios from "axios";
 
-export default function NewsList() {
-  const [open, setOpen] = React.useState(true);
-  const [news, setNews] = React.useState([]);
+export default function NewsList({ news = [] }) {
+  const [open, setOpen] = React.useState({});
   const [selectedNews, setSelectedNews] = React.useState(null);
 
-  const handleClick2 = () => {
-    setOpen(!open);
+  const handleClick = (news_ID) => () => {
+    setOpen((prev) => ({
+      ...prev,
+      [news_ID]: !prev[news_ID],
+    }));
   };
-
-  React.useEffect(() => {
-    axios.get("/api/news").then((res) => setNews(res.data));
-  }, []);
 
   const handleListItemClick = (item) => {
     setSelectedNews(item);
@@ -31,37 +32,48 @@ export default function NewsList() {
   return (
     <div>
       <List
-        sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
+        sx={{ width: "100%", maxWidth: "100%", bgcolor: "background.paper" }}
         component="nav"
         aria-labelledby="nested-list-subheader"
         subheader={
-          <ListSubheader component="div" id="nested-list-subheader">
-            รายการแจ้งเตือน
-          </ListSubheader>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <ListSubheader component="div" id="nested-list-subheader">
+              รายการแจ้งเตือน
+            </ListSubheader>
+            <ListSubheader component="div" id="nested-list-subheader">
+              รายละเอียดทั้งหมด
+            </ListSubheader>
+          </Box>
         }
       >
         {news.map((item) => (
           <React.Fragment key={item.news_ID}>
-            <ListItemButton onClick={handleClick2}>
+            <ListItemButton onClick={handleClick(item.news_ID)}>
               <ListItemIcon>
-                <InboxIcon />
+                <StarIcon sx={{ color: "#fdd835" }} />
               </ListItemIcon>
               <ListItemText primary={item.news_topic} />
-              {open ? <ExpandLess /> : <ExpandMore />}
+              {open[item.news_ID] ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
-            <Collapse in={open} timeout="auto" unmountOnExit>
+            <Collapse in={open[item.news_ID]} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 <ListItemButton
                   sx={{ pl: 4 }}
                   onClick={() => handleListItemClick(item)}
                 >
-                  <ListItemIcon>
-                    <StarBorder />
-                  </ListItemIcon>
                   <ListItemText
                     primary={item.news_topic}
                     secondary={item.news_desc}
                   />
+                  <ListItemIcon>
+                    <ArticleIcon color="primary" />
+                  </ListItemIcon>
                 </ListItemButton>
               </List>
             </Collapse>

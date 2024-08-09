@@ -4,7 +4,7 @@ import Logo from "../../images/IT_logo_Standard.png";
 import Logout from "../../components/Logout";
 import axios from "axios";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
-import SlideBar from "../../components/SlideBar";
+import SlideBar from "../../components/news/SlideBar";
 
 const NavBar = () => {
   const ID = localStorage.getItem("staff_ID");

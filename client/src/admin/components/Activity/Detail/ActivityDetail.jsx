@@ -10,7 +10,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { formatDate } from "./Fx.jsx";
 import { formatISO, parseISO } from "date-fns";
 
-function ActivityDetail({ activity, teacher, act_ID }) {
+function ActivityDetail({ activity, teacher, act_ID, id }) {
   const [isReadOnly, setIsReadOnly] = useState(true);
   const [editData, setEditData] = useState(activity);
   const [showButtons, setShowButtons] = useState(false);
@@ -35,8 +35,16 @@ function ActivityDetail({ activity, teacher, act_ID }) {
 
     if (result.isConfirmed) {
       try {
+        const deleteNews = {
+          news_topic: `แจ้งข่าวการลบกิจกรรม ${activity.act_title} `,
+          news_desc: `จึงเรียนมาเพื่อทราบ`,
+          news_date: new Date(),
+          news_create: id,
+          act_title: activity.act_title,
+          key: activity.act_title,
+        };
         await axios.delete(`/api/activitys/${act_ID}`);
-        navigate(-1);
+        await axios.put("/api/news", deleteNews);
         Swal.fire("Deleted!", "Your file has been deleted.", "success");
       } catch (error) {
         console.error("Error deleting activity:", error);
@@ -66,8 +74,18 @@ function ActivityDetail({ activity, teacher, act_ID }) {
   const editActivity = async () => {
     try {
       await axios.put(`/api/activitys/${act_ID}`, editData);
+      const newsData = {
+        news_topic: `แจ้งข่าวการเปลี่ยนแปลงจาก ${activity.act_title} แก้ไขเป็น ${editData.act_title}`,
+        news_desc: `แจ้งข่าวการเปลี่ยนแปลงจาก ${activity.act_desc} แก้ไขเป็น ${editData.act_desc}`,
+        news_date: new Date(),
+        news_create: id,
+        act_title: editData.act_title,
+        key: activity.act_title,
+      };
+
+      await axios.put("/api/news", newsData);
       Swal.fire("แกไขสำเร็จ", "แก้ไขข้อมูลกิจกรรมเรียบร้อย.", "success").then(
-        () => {
+        async () => {
           setIsReadOnly(true);
           setShowButtons(false);
         }
