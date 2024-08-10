@@ -10,7 +10,7 @@ import {
 
 const router = express.Router()
 
-router.get('/reserve', readManage)
+router.get('/manages', readManage)
 router.get('/reserve/:id', readManageOne)
 router.get('/upload', upload)
 

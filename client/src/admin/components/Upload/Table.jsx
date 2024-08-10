@@ -34,7 +34,7 @@ function Table() {
 
     const fetchDataAndContract = async () => {
       await Promise.all([fetchData(), fetchSmartContract()]);
-      setLoading(false); // Set loading to false once both fetches are complete
+      setLoading(false);
     };
 
     fetchDataAndContract();
@@ -62,7 +62,7 @@ function Table() {
   }, [activity]);
 
   if (loading) {
-    return <div>Loading...</div>; // Display loading indicator
+    return <div>Loading...</div>;
   }
 
   return (
