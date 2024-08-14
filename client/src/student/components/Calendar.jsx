@@ -58,7 +58,7 @@ function CalendarFull() {
 
     const fetchReservations = async () => {
       try {
-        const response = await axios.get("/api/reserve");
+        const response = await axios.get("/api/manage/reserve");
         setReservations(response.data);
       } catch (error) {
         console.error("Error fetching reservations: ", error);
@@ -110,7 +110,7 @@ function CalendarFull() {
       };
 
       try {
-        const checkResponse = await axios.get("/api/reserve");
+        const checkResponse = await axios.get("/api/manage/reserve");
         const reservations = checkResponse.data;
 
         const alreadyReserved = reservations.some(

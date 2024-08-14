@@ -81,7 +81,14 @@ function Index() {
           id={id}
         />
 
-        <Student act_ID={act_ID} day={day} data={data} join={join} />
+        <Student
+          act_ID={act_ID}
+          day={day}
+          data={data}
+          join={join}
+          id={id}
+          activity={activity}
+        />
       </div>
     </div>
   );

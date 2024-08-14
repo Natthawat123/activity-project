@@ -16,7 +16,8 @@ export const get = (req, res) => {
                     news
                 LEFT JOIN activity ON activity.act_title = news.act_title
                 WHERE
-                    news_type IN ('all', ${id});
+                    news_type = 'all'
+                OR FIND_IN_SET(${id}, news_type) > 0;
                 `
 
     } else {
@@ -153,3 +154,64 @@ export const addActivity = (req, res) => {
         return res.json(result);
     });
 };
+// Example of backend error handling
+export const newsCancelReserve = (req, res) => {
+    const {
+        news_topic,
+        news_desc,
+        news_date,
+        news_create,
+        news_type,
+        act_title
+    } = req.body;
+
+    const typeMap = news_type.join(',');
+    const sql = `
+        INSERT INTO news(news_topic, news_desc, news_date, news_create, news_type, act_title)
+        VALUES(?,?,?,?,?,?)
+    `;
+
+    db.query(sql, [news_topic, news_desc, news_date, news_create, typeMap, act_title], (err, result) => {
+        if (err) {
+            console.error("Error inserting news:", err); // Log the error
+            return res.status(500).json({
+                error: err.message
+            });
+        }
+        res.json(result);
+    });
+};
+
+
+export const upload = (req, res) => {
+    const sql = `
+        INSERT INTO news(news_topic, news_desc, news_date, news_create, news_type, act_title)
+        VALUES(?,?,?,?,?,?)
+        `
+    const {
+        news_topic,
+        news_desc,
+        news_date,
+        news_create,
+        studentIDs,
+        act_title,
+    } = req.body
+    const news_type = studentIDs.join(',');
+
+    db.query(sql, [
+        news_topic,
+        news_desc,
+        news_date,
+        news_create,
+        news_type,
+        act_title
+    ], (err, result) => {
+        if (err) {
+            return res.status(500).json({
+                error: err.message
+            });
+        }
+        return res.json(result);
+    });
+
+}
