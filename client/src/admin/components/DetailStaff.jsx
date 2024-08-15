@@ -95,7 +95,6 @@ function DetailStudent() {
     fetchStaff();
   }, [std_ID]);
 
-
   const sectionName = section.find((s) => s.sec_ID == student.sec_ID);
 
   const getStatus = (activityID) => {
@@ -138,7 +137,6 @@ function DetailStudent() {
   const handleSortChange = () => {
     setSortOrder((prevOrder) => (prevOrder === "latest" ? "oldest" : "latest"));
   };
-
 
   const lastPage = Math.ceil(filteredItems.length / itemsPerPage) - 1;
   const visibleItems = filteredItems.slice(
@@ -196,7 +194,10 @@ function DetailStudent() {
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
           <div className="flex justify-between">
             <h1 className="text-lg font-bold mb-2">ประวัติส่วนตัว</h1>
-            <div className="items-center mb-5 cursor-pointer" onClick={() => navigate(-1)}>
+            <div
+              className="items-center mb-5 cursor-pointer"
+              onClick={() => navigate(-1)}
+            >
               <ArrowBackIosNewIcon />
               ย้อนกลับ
             </div>
@@ -227,7 +228,12 @@ function DetailStudent() {
               Delete
             </button>
             <button
-              className="btn btn-primary px-6 py-4 mx-3 text-white" onClick={() => navigate(`/admin/dashboard/detail/teacher/update/${student.staff_ID}`)}
+              className="btn btn-primary px-6 py-4 mx-3 text-white"
+              onClick={() =>
+                navigate(
+                  `/admin/dashboard/detail/teacher/update/${student.staff_ID}`
+                )
+              }
             >
               แก้ไขประวัติ
             </button>
@@ -241,7 +247,9 @@ function DetailStudent() {
           <div className="text-lg font-bold mb-2">ประวัติการทำกิจกรรม</div>
           <div className="flex justify-between">
             <div className="pb-4 items-center">
-              <label htmlFor="table-search" className="sr-only">Search</label>
+              <label htmlFor="table-search" className="sr-only">
+                Search
+              </label>
               <div className="relative mt-1">
                 <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                   <svg
@@ -272,14 +280,18 @@ function DetailStudent() {
             </div>
             <div className="flex gap-3 items-center">
               <div className="flex pb-4 items-center">
-                <label htmlFor="filter-activity-type" className="sr-only">Filter</label>
+                <label htmlFor="filter-activity-type" className="sr-only">
+                  Filter
+                </label>
                 <div className="relative">
                   <select
                     value={filter}
                     onChange={handleFilterChange}
                     className="text-xs block p-1.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value="default" className="text-center">กิจกรรมทั้งหมด</option>
+                    <option value="default" className="text-center">
+                      กิจกรรมทั้งหมด
+                    </option>
                     <option value="joinEntry">เข้าร่วมกิจกรรมแล้ว</option>
                     <option value="reserveEntry">ลงทะเบียนสำเร็จ</option>
                     <option value="notjoin">ยังไม่ได้ลงทะเบียน</option>
@@ -357,50 +369,59 @@ function DetailStudent() {
           </table>
 
           <div className="flex justify-between mt-2">
-          <div className="flex gap-2 w-24"></div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
-              disabled={currentPage === 0}
-              className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
-                }`}
-            >
-              ก่อนหน้า
-            </button>
-            {pageNumbers.map((pageNumber) => (
+            <div className="flex gap-2 w-24"></div>
+            <div className="flex gap-2">
               <button
-                key={pageNumber}
-                onClick={() => setCurrentPage(pageNumber)}
-                className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${pageNumber === currentPage ? "bg-blue-200" : ""
-                  }`}
-              >
-                {pageNumber + 1}
-              </button>
-            ))}
-            <button
-              onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))}
-              disabled={currentPage === lastPage}
-              className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === lastPage ? "cursor-not-allowed" : "hover:bg-blue-200"
+                onClick={() =>
+                  setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))
+                }
+                disabled={currentPage === 0}
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                  currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
                 }`}
-            >
-              ถัดไป
-            </button></div>
-          <div className="flex gap-2">
-            <select
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(+e.target.value);
-                setCurrentPage(0);
-              }}
-              className="px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            >
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-            </select>
+              >
+                ก่อนหน้า
+              </button>
+              {pageNumbers.map((pageNumber) => (
+                <button
+                  key={pageNumber}
+                  onClick={() => setCurrentPage(pageNumber)}
+                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                    pageNumber === currentPage ? "bg-blue-200" : ""
+                  }`}
+                >
+                  {pageNumber + 1}
+                </button>
+              ))}
+              <button
+                onClick={() =>
+                  setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))
+                }
+                disabled={currentPage === lastPage}
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                  currentPage === lastPage
+                    ? "cursor-not-allowed"
+                    : "hover:bg-blue-200"
+                }`}
+              >
+                ถัดไป
+              </button>
+            </div>
+            <div className="flex gap-2">
+              <select
+                value={itemsPerPage}
+                onChange={(e) => {
+                  setItemsPerPage(+e.target.value);
+                  setCurrentPage(0);
+                }}
+                className="px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+            </div>
           </div>
-
-        </div>
         </div>
       </div>
     </div>

@@ -123,25 +123,6 @@ const ListActivity = () => {
     }
   });
 
-  const filteredData = filteredItems.filter((item) => {
-    const status = getActivityStatus(item, now);
-
-    switch (filter) {
-      case "open":
-        return status === "เปิดลงทะเบียน";
-      case "closed":
-        return status === "ปิดลงทะเบียน";
-      case "not-open":
-        return status === "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน";
-      case "full":
-        return status === "ลงทะเบียนเต็มแล้ว";
-      case "ended":
-        return status === "กิจกรรมสิ้นสุดแล้ว";
-      default:
-        return true; // แสดงข้อมูลทั้งหมดในกรณีค่าเริ่มต้น
-    }
-  });
-
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {

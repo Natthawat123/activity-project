@@ -215,3 +215,61 @@ export const upload = (req, res) => {
     });
 
 }
+
+export const test = (req, res) => {
+    const {
+        news_topic,
+        news_desc,
+        act_title,
+        news_type,
+        news_date, // Optional if you want to set a specific date
+        news_create // Optional if you want to set a specific creation date
+    } = req.body;
+
+    const newsInsertSql = `
+        INSERT INTO news (news_type, news_topic, news_desc, act_title, news_date, news_create)
+        VALUES (?, ?, ?, ?, ?, ?);
+    `;
+
+    // Start a transaction
+    db.beginTransaction((err) => {
+        if (err) throw err;
+
+        // First, insert the news
+        db.query(newsInsertSql, [news_type, news_topic, news_desc, act_title, news_date, news_create], (error, results) => {
+            if (error) {
+                return db.rollback(() => {
+                    res.status(500).send('Error inserting news: ' + error.message);
+                });
+            }
+
+            // Get the last inserted news ID
+            const newsId = results.insertId;
+
+            // Now, insert notifications for all users
+            const notifyInsertSql = `
+                INSERT INTO notify (news_ID, notify_status, user_ID)
+                SELECT ?, 'unread', login_ID
+                FROM login;
+            `;
+
+            db.query(notifyInsertSql, [newsId], (error) => {
+                if (error) {
+                    return db.rollback(() => {
+                        res.status(500).send('Error inserting notifications: ' + error.message);
+                    });
+                }
+
+                // Commit the transaction
+                db.commit((err) => {
+                    if (err) {
+                        return db.rollback(() => {
+                            res.status(500).send('Error committing transaction: ' + err.message);
+                        });
+                    }
+                    res.status(200).send('News and notifications added successfully!');
+                });
+            });
+        });
+    });
+};

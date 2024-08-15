@@ -69,8 +69,6 @@ function DetailStudent() {
     fetchSmartContract();
     fetchActivity();
   }, [id]);
-  console.log(join);
-  console.log(id);
 
   const toggleRow = (actId) => {
     setOpenRows((prev) => ({ ...prev, [actId]: !prev[actId] }));
@@ -123,12 +121,24 @@ function DetailStudent() {
 
       if (result.isConfirmed) {
         let api;
+        let user;
 
         if (student.role == "student") {
           api = `/api/students/${student.username}`;
+          user = student.username;
         } else if (student.role == "teacher") {
           api = `/api/teachers/${student.login_ID}`;
+          user = student.login_ID;
         }
+        const news = {
+          news_topic: `แจ้งข่าวการลบผู้ใช้ในระบบ`,
+          news_desc: `ลบผู้ใช้ ${user} ออกจากระบบ `,
+          news_date: new Date(),
+          news_create: id,
+          act_title: "delete",
+          news_type: "teacher",
+        };
+        await axios.post(`/api/news`, news);
 
         const response = await axios.delete(api);
 
@@ -173,12 +183,22 @@ function DetailStudent() {
         `/api/students/${student.login_ID}`,
         updatedStudent
       );
+      const news = {
+        news_topic: `แจ้งข่าวการแก้ไขประวัติส่วนตัวของคุณ`,
+        news_desc: `จาก ${student} แก้ไขเป็น ${updatedStudent}`,
+        news_date: new Date(),
+        news_create: id,
+        act_title: "none",
+        news_type: student.login_ID,
+      };
+      await axios.post(`/api/news`, news);
       if (response.status === 200) {
         Swal.fire({
-          title: "Updated!",
+          title: "Updated5555!",
           text: "The student's information has been updated.",
           icon: "success",
         });
+
         setStudent(updatedStudent);
         setEditMode(false);
       } else {

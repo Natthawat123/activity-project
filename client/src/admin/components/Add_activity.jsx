@@ -64,6 +64,7 @@ function Add_Activity({ closeModal }) {
       news_date: new Date(),
       news_create: id,
       act_title: inputTitle,
+      news_type: "all",
     };
     try {
       await axios.post("/api/news", news);

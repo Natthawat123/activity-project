@@ -41,10 +41,10 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
           news_date: new Date(),
           news_create: id,
           act_title: activity.act_title,
-          key: activity.act_title,
+          news_type: "all",
         };
         await axios.delete(`/api/activitys/${act_ID}`);
-        await axios.put("/api/news", deleteNews);
+        await axios.post("/api/news", deleteNews);
         Swal.fire("Deleted!", "Your file has been deleted.", "success");
       } catch (error) {
         console.error("Error deleting activity:", error);
@@ -80,10 +80,10 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
         news_date: new Date(),
         news_create: id,
         act_title: editData.act_title,
-        key: activity.act_title,
+        news_type: "all",
       };
 
-      await axios.put("/api/news", newsData);
+      await axios.post("/api/news", newsData);
       Swal.fire("แกไขสำเร็จ", "แก้ไขข้อมูลกิจกรรมเรียบร้อย.", "success").then(
         async () => {
           setIsReadOnly(true);

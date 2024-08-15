@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 import Swal from "sweetalert2";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
@@ -185,8 +186,15 @@ const StudentForm = () => {
       fname: `${title}${value.fname}`.trim(),
       role: value.role,
     };
-
-    console.log("Updated Value:", updatedValue); // Log the updated value
+    const news = {
+      news_topic: `แจ้งข่าวการแก้ไขประวัติส่วนตัวของคุณ`,
+      news_desc: `ดูรายละเอียดได้แล้ววันนี้`,
+      news_date: new Date(),
+      news_create: id,
+      act_title: "none",
+      news_type: id,
+    };
+    axios.post(`/api/news`, news);
 
     fetch("/api/users/" + id, {
       method: "PUT",

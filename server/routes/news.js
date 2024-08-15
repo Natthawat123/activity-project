@@ -7,18 +7,20 @@ import {
     addActivity,
     updateAct_title,
     upload,
-    newsCancelReserve
+    newsCancelReserve,
+    test
 } from '../controllers/news.js'
 
 const router = express.Router()
 
 router.get('/news', get)
 router.get('/news/:id', getOne)
-router.post('/news', addActivity)
+// router.post('/news', addActivity)
 router.post('/newsUpload', upload)
 router.post('/newsCancelReserve', newsCancelReserve)
 router.put('/news', update)
 router.put('/newsAct', updateAct_title)
 router.delete('/news', deleteNews)
+router.post('/news', test)
 
 export default router
