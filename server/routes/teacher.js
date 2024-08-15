@@ -3,7 +3,8 @@ import {
     readTeacherAll,
     readTeacherOne,
     createStudent,
-    updateTeacher
+    updateTeacher,
+    deleteTeacher
 } from '../controllers/teacher.js'
 
 const router = express.Router()
@@ -14,5 +15,6 @@ router.get('/teachers/:id', readTeacherOne)
 router.post('/teachers', createStudent)
 
 router.put('/teachers/:id', updateTeacher)
+router.delete('/teachers/:id', deleteTeacher)
 
 export default router
