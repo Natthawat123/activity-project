@@ -20,6 +20,6 @@ Router.put('/activitys/:id', updateActivity);
 
 Router.delete('/activitys/:id', deleteActivity);
 
-Router.put('/transection/:id', transection); // update transection
-Router.put('/updateStatus/:id', updateStatus); // update status when upload to blockchain
+Router.put('/updateStatus/:id', updateStatus);
+Router.put('/transection/:id', transection);
 export default Router

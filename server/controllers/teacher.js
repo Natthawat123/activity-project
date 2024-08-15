@@ -91,3 +91,34 @@ export const updateTeacher = (req, res) => {
         return res.json(result)
     })
 }
+
+export const deleteTeacher = (req, res) => {
+    const {
+        id
+    } = req.params;
+
+    const sql1 = 'DELETE FROM teacher WHERE login_ID = ?';
+    const sql2 = 'DELETE FROM login WHERE login_ID = ?';
+
+    db.query(sql1, [id], (err, result1) => {
+        if (err) {
+            return res.status(500).json({
+                error: err.message
+            });
+        }
+
+        db.query(sql2, [id], (err, result2) => {
+            if (err) {
+                return res.status(500).json({
+                    error: err.message
+                });
+            }
+
+            return res.json({
+                message: 'Records deleted successfully from both tables',
+                studentResult: result1,
+                loginResult: result2
+            });
+        });
+    });
+};
