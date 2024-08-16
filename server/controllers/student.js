@@ -76,7 +76,14 @@ left JOIN teacher t ON t.sec_ID = student.sec_ID;
 //read one
 export const getstudentOne = (req, res) => {
     const sql = `
-        select * from student 
+        select
+            student.*,
+            teacher.staff_fname,
+            teacher.staff_lname,
+            section.*,
+            login.*
+        from 
+            student 
         left join section on section.sec_ID = student.sec_ID
         left join teacher on teacher.sec_ID = student.sec_ID
         left join login on login.username = student.login_ID

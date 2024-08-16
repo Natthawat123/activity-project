@@ -111,7 +111,7 @@ const StudentForm = () => {
   });
   const [section, setSection] = useState([]);
 
-  const stdID = localStorage.getItem("std_ID");
+  const stdID = localStorage.getItem("id");
 
   useEffect(() => {
     fetch("/api/sections")
@@ -235,7 +235,7 @@ const StudentForm = () => {
   }
 
   return (
-    <div className="container mx-auto mb-10 md:px-20 pt-24">
+    <div className="container mx-auto mb-10 md:px-20 pt-10 md:pt-24">
       <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 pb-10">
         <div className="flex justify-between">
           <div className="flex gap-2">
@@ -294,10 +294,19 @@ const StudentForm = () => {
 
             <div className="flex gap-2">
               <div className="w-1/6">
-                <label htmlFor="title" className="block text-sm font-medium text-gray-600">
+                <label
+                  htmlFor="title"
+                  className="block text-sm font-medium text-gray-600"
+                >
                   คำนำหน้า
                 </label>
-                <select value={title} onChange={handleTitleChange} name="title" id="title" className="mt-1 p-2 border w-full rounded-md">
+                <select
+                  value={title}
+                  onChange={handleTitleChange}
+                  name="title"
+                  id="title"
+                  className="mt-1 p-2 border w-full rounded-md"
+                >
                   <option value="">เลือกคำนำหน้า</option>
                   <option value="นาย">นาย</option>
                   <option value="นาง">นาง</option>
@@ -305,7 +314,10 @@ const StudentForm = () => {
                 </select>
               </div>
               <div className="w-5/6">
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-600">
+                <label
+                  htmlFor="firstName"
+                  className="block text-sm font-medium text-gray-600"
+                >
                   ชื่อ
                 </label>
                 <input
@@ -318,7 +330,6 @@ const StudentForm = () => {
                 />
               </div>
             </div>
-
 
             <div>
               <label

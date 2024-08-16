@@ -10,15 +10,12 @@ export default function SlideBar() {
   const [state, setState] = React.useState({ right: false });
   const [news, setNews] = React.useState([]);
   const drawerRef = React.useRef(null);
-  const id = localStorage.getItem("std_ID");
-  const role = localStorage.getItem("role");
+  const id = localStorage.getItem("name");
 
   React.useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await axios.get("/api/news", {
-          params: { id, role },
-        });
+        const response = await axios.get(`/api/notify?id=${id}`);
         setNews(response.data);
       } catch (error) {
         console.error("Error fetching news:", error);
@@ -26,8 +23,7 @@ export default function SlideBar() {
     };
 
     fetchNews();
-  }, [id, role]);
-
+  }, [id]);
   const toggleDrawer = (open) => (event) => {
     if (
       event &&

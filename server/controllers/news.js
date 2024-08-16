@@ -16,7 +16,8 @@ export const get = (req, res) => {
                     news
                 LEFT JOIN activity ON activity.act_title = news.act_title
                 WHERE
-                    news_type IN ('all', ${id});
+                    news_type = 'all'
+                OR FIND_IN_SET(${id}, news_type) > 0;
                 `
 
     } else {
@@ -151,5 +152,187 @@ export const addActivity = (req, res) => {
             });
         }
         return res.json(result);
+    });
+};
+// Example of backend error handling
+export const newsCancelReserve = (req, res) => {
+    const {
+        news_topic,
+        news_desc,
+        news_date,
+        news_create,
+        news_type,
+        act_title
+    } = req.body;
+
+    const typeMap = news_type.join(',');
+    const sql = `
+        INSERT INTO news(news_topic, news_desc, news_date, news_create, news_type, act_title)
+        VALUES(?,?,?,?,?,?)
+    `;
+
+    db.query(sql, [news_topic, news_desc, news_date, news_create, typeMap, act_title], (err, result) => {
+        if (err) {
+            console.error("Error inserting news:", err); // Log the error
+            return res.status(500).json({
+                error: err.message
+            });
+        }
+        res.json(result);
+    });
+};
+
+
+export const upload = (req, res) => {
+    const sql = `
+        INSERT INTO news(news_topic, news_desc, news_date, news_create, news_type, act_title)
+        VALUES(?,?,?,?,?,?)
+        `
+    const {
+        news_topic,
+        news_desc,
+        news_date,
+        news_create,
+        studentIDs,
+        act_title,
+    } = req.body
+    const news_type = studentIDs.join(',');
+
+    db.query(sql, [
+        news_topic,
+        news_desc,
+        news_date,
+        news_create,
+        news_type,
+        act_title
+    ], (err, result) => {
+        if (err) {
+            return res.status(500).json({
+                error: err.message
+            });
+        }
+        return res.json(result);
+    });
+
+}
+
+export const test = (req, res) => {
+    const {
+        news_topic,
+        news_desc,
+        news_date,
+    } = req.body;
+
+    const newsInsertSql = `
+        INSERT INTO news (news_topic, news_desc,  news_date)
+        VALUES (?, ?, ?);
+    `;
+
+    // Start a transaction
+    db.beginTransaction((err) => {
+        if (err) throw err;
+
+        // First, insert the news
+        db.query(newsInsertSql, [news_topic, news_desc, news_date], (error, results) => {
+            if (error) {
+                return db.rollback(() => {
+                    res.status(500).send('Error inserting news: ' + error.message);
+                });
+            }
+
+            // Get the last inserted news ID
+            const newsId = results.insertId;
+
+            // Now, insert notifications for all users
+            const notifyInsertSql = `
+                INSERT INTO notify (news_ID, notify_status, user_ID)
+                SELECT ?, 'unread', username
+                FROM login;
+            `;
+
+            db.query(notifyInsertSql, [newsId], (error) => {
+                if (error) {
+                    return db.rollback(() => {
+                        res.status(500).send('Error inserting notifications: ' + error.message);
+                    });
+                }
+
+                // Commit the transaction
+                db.commit((err) => {
+                    if (err) {
+                        return db.rollback(() => {
+                            res.status(500).send('Error committing transaction: ' + err.message);
+                        });
+                    }
+                    res.status(200).send('News and notifications added successfully!');
+                });
+            });
+        });
+    });
+};
+export const newsOne = (req, res) => {
+    const {
+        news_topic,
+        news_desc,
+        news_date,
+        user_ID // This can be a single value or an array
+    } = req.body;
+
+    // Ensure user_ID is always an array
+    const userIds = Array.isArray(user_ID) ? user_ID : [user_ID];
+
+    const newsInsertSql = `
+        INSERT INTO news (news_topic, news_desc, news_date)
+        VALUES (?, ?, ?);
+    `;
+
+    db.beginTransaction((err) => {
+        if (err) throw err;
+
+        db.query(newsInsertSql, [news_topic, news_desc, news_date], (error, results) => {
+            if (error) {
+                return db.rollback(() => {
+                    res.status(500).send('Error inserting news: ' + error.message);
+                });
+            }
+
+            const newsId = results.insertId;
+
+            const notifyInsertSql = `
+                INSERT INTO notify (news_ID, notify_status, user_ID)
+                VALUES (?, ?, ?);
+            `;
+
+            // Prepare an array of promises for the insertions
+            const notifyPromises = userIds.map(userId => {
+                return new Promise((resolve, reject) => {
+                    db.query(notifyInsertSql, [newsId, "unread", userId], (error) => {
+                        if (error) {
+                            return reject(error);
+                        }
+                        resolve();
+                    });
+                });
+            });
+
+            // Execute all insertions
+            Promise.all(notifyPromises)
+                .then(() => {
+                    // Commit the transaction
+                    db.commit((err) => {
+                        if (err) {
+                            return db.rollback(() => {
+                                res.status(500).send('Error committing transaction: ' + err.message);
+                            });
+                        }
+                        res.status(200).send('News and notifications added successfully!');
+                    });
+                })
+                .catch((error) => {
+                    return db.rollback(() => {
+                        res.status(500).send('Error inserting notifications: ' + error.message);
+                    });
+                });
+        });
     });
 };

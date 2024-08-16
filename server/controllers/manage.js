@@ -1,25 +1,35 @@
 import db from '../db.js'
 
 // read All
+export const readReserve = (req, res) => {
+
+    const sql = ` SELECT activity.*, manage.std_ID, student.std_fname, student.std_lname
+        FROM activity 
+        JOIN manage ON activity.act_ID = manage.act_ID
+        JOIN student ON manage.std_ID = student.login_ID`
+    db.query(sql, (err, result) => {
+        if (err) {
+            return res.status(500).json({
+                error: err.message
+            });
+        }
+        if (result.length === 0) {
+            return res.status(404).json({
+                message: "Data not found"
+            });
+        }
+        return res.json(result);
+    });
+}
 export const readManage = (req, res) => {
-    const sql = `SELECT * FROM manage 
-    LEFT JOIN 
-        activity 
-    ON 
-        manage.act_ID = activity.act_ID 
-    left join 
-        teacher
-    on 
-        activity.staff_ID = teacher.login_ID
-    left join
-        student
-    on manage.std_ID = student.login_ID
-    left join
-        section
-    on student.sec_ID = section.sec_ID
-    where 
-        activity.act_status = 1 
-    `
+    const sql = `SELECT activity.*, manage.std_ID, teacher.*, student.*, section.*
+    FROM activity
+    LEFT JOIN manage ON activity.act_ID = manage.act_ID
+    LEFT JOIN teacher ON activity.staff_ID = teacher.login_ID
+    LEFT JOIN student ON manage.std_ID = student.login_ID
+    LEFT JOIN section ON student.sec_ID = section.sec_ID
+    WHERE activity.act_status = 1 AND activity.act_ID IS NOT NULL;
+        `
     db.query(sql, (err, result) => {
         if (err) {
             return res.status(500).json({
@@ -67,6 +77,72 @@ export const readManageOne = (req, res) => {
         return res.json(result);
     });
 }
+export const updateStatus = (req, res) => {
+    const {
+        std_ID,
+        act_ID
+    } = req.body;
+
+    // Convert array to comma-separated string
+    const std_IDs = std_ID.join(',');
+
+    // Generate placeholders based on number of IDs
+    const placeholders = std_ID.map(() => '?').join(',');
+
+    const sql1 = `
+        UPDATE manage 
+        SET man_status = 2 
+        WHERE act_ID = ? AND std_ID IN (${placeholders})
+    `;
+
+    db.query(sql1, [act_ID, ...std_ID], (err, result1) => {
+        if (err) {
+            console.error("SQL Error:", err);
+            return res.status(500).json({
+                error: err.message
+            });
+        }
+
+        res.status(200).json({
+            message: 'Status updated successfully'
+        });
+    });
+};
+
+
+export const updateStatusNotJoin = (req, res) => {
+    const {
+        std_IDs,
+        act_ID
+    } = req.body; // Ensure this matches your request structure
+
+    const sql = `
+        UPDATE manage 
+        SET man_status = 3 
+        WHERE act_ID = ? AND std_ID IN (?)
+    `;
+
+    db.query(sql, [act_ID, std_IDs], (err, result) => {
+        if (err) {
+            console.error("SQL Error:", err);
+            return res.status(500).json({
+                error: "An error occurred while updating the status.",
+            });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                message: "No matching data found to update.",
+            });
+        }
+        return res.json({
+            message: "Update successful"
+        });
+    });
+};
+
+
+
+
 
 // reserve
 export const reserveActivity = (req, res) => {

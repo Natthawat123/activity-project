@@ -123,7 +123,6 @@ const ListActivity = () => {
     }
   });
 
-
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {
@@ -148,7 +147,7 @@ const ListActivity = () => {
           <div className="flex justify-between">
             <div className="text-lg font-bold mb-2">รายชื่อกิจกรรม</div>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center">
             <div className="pb-4 items-center">
               <label htmlFor="table-search" className="sr-only">
                 Search
@@ -174,7 +173,7 @@ const ListActivity = () => {
                 <input
                   type="text"
                   id="table-search"
-                  className="pb-2 block pt-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="pb-2 block pt-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-52 md:w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="ค้นหากิจกรรม"
                   value={searchTerm}
                   onChange={handleSearch}

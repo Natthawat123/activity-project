@@ -8,7 +8,7 @@ const ListStudents = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [itemsPerPage, setItemsPerPage] = useState(15);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
   const [students, setStudents] = useState([]);
   const [sections, setSections] = useState([]);
@@ -75,7 +75,7 @@ const ListStudents = () => {
     return <div>Loading...</div>;
   } else {
     return (
-      <div className="container mx-auto md:px-20 pt-20 my-10">
+      <div className="container mx-auto md:px-20 pt-36 md:pt-20 my-10">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
           <div className="text-lg font-bold mb-2 gap-2 flex">
             <h1>รายชื่อนักศึกษา</h1>
@@ -258,6 +258,7 @@ const ListStudents = () => {
                 <option value={10}>10</option>
                 <option value={20}>20</option>
                 <option value={50}>50</option>
+                <option value={1000}>ทั้งหมด</option>
               </select>
             </div>
           </div>

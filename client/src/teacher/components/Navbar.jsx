@@ -4,12 +4,13 @@ import Logo from "../../images/IT_logo_Standard.png";
 import Logout from "../../components/Logout";
 import axios from "axios";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
+import SlideBar from "../../components/news/SlideBar";
 
 const NavBar = () => {
-  const id = localStorage.getItem("staff_ID");
+  const id = localStorage.getItem("id");
   const [username, setUsername] = useState([]);
 
-  const Homeurl = 'localhost:5173/teacher/calendar';
+  const Homeurl = "localhost:5173/teacher/calendar";
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -21,8 +22,8 @@ const NavBar = () => {
       }
     };
 
-    if(Homeurl){
-      setSelectedItem("Calendar");
+    if (Homeurl) {
+      setSelectedItem("ปฏิทินกิจกรรม");
       setListVisible(false);
     }
 
@@ -109,9 +110,13 @@ const NavBar = () => {
           <div className="flex items-center gap-5">
             <p className="md:flex items-center">
               <PersonPinIcon className="mx-2 text-blue-500" />
-              {username.staff_fname + " " + username.staff_lname}
+              {username.staff_fname} {username.staff_lname}
             </p>
-            <Logout className="block md:hidden" />
+            <SlideBar />
+
+            <div className="hidden md:flex">
+            <Logout />
+          </div>
           </div>
         </nav>
 
@@ -127,7 +132,7 @@ const NavBar = () => {
                   isListVisible ? "" : "hidden"
                 }`}
               >
-                Selected:{" "}
+                 {" "}
               </span>
               <p
                 id="textClicked"
@@ -166,6 +171,7 @@ const NavBar = () => {
                   ปฏิทินกิจกรรม
                 </li>
               </Link>
+           
               <Link to="/teacher/liststudent">
                 <li
                   onClick={() => handleItemClick("รายชื่อนักศึกษา")}
@@ -174,6 +180,16 @@ const NavBar = () => {
                   รายชื่อนักศึกษา
                 </li>
               </Link>
+
+              <Link to="/teacher/activity">
+              <li
+                onClick={() => handleItemClick("กิจกรรม")}
+                className={getItemClassXs("Calendar")}
+              >
+                กิจกรรม
+              </li>
+            </Link>
+              
               <Link to="/teacher/profile">
                 <li
                   onClick={() => handleItemClick("ประวัติส่วนตัว")}
@@ -187,7 +203,7 @@ const NavBar = () => {
                 onClick={() => handleItemClick("Logout")}
                 className={getItemLogoutXs("Logout")}
               >
-                Logout
+                <Logout />
               </li>
             </ul>
           </div>

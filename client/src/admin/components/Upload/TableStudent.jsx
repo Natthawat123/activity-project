@@ -12,7 +12,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 
-function TableStudent({ activity = [] }) {
+function TableStudent({ activity = [], id, username }) {
   const [checkedItems, setCheckedItems] = useState({});
   const [checkAll, setCheckAll] = useState(false);
   const [web3, setWeb3] = useState(null);
@@ -23,7 +23,11 @@ function TableStudent({ activity = [] }) {
   const handleCheckboxChange = (actID, stdID, date, checked) => {
     setCheckedItems((prev) => {
       const updated = { ...prev };
-      if (!updated[actID]) updated[actID] = {};
+      if (!updated[actID])
+        updated[actID] = {
+          act_title: activity.act_title,
+          students: {},
+        };
       if (!updated[actID][stdID]) updated[actID][stdID] = [];
 
       if (checked) {
@@ -44,7 +48,11 @@ function TableStudent({ activity = [] }) {
 
     setCheckedItems((prev) => {
       const updated = { ...prev };
-      if (!updated[activity.act_ID]) updated[activity.act_ID] = {};
+      if (!updated[activity.act_ID])
+        updated[activity.act_ID] = {
+          act_title: activity.act_title,
+          students: {},
+        };
 
       activity.students.forEach((s) => {
         if (checked) {
@@ -64,7 +72,11 @@ function TableStudent({ activity = [] }) {
   const handleCheckAllStudentChange = (stdID, checked) => {
     setCheckedItems((prev) => {
       const updated = { ...prev };
-      if (!updated[activity.act_ID]) updated[activity.act_ID] = {};
+      if (!updated[activity.act_ID])
+        updated[activity.act_ID] = {
+          act_title: activity.act_title,
+          students: {},
+        };
 
       if (checked) {
         updated[activity.act_ID][stdID] = days.map((d) => dateToUint32(d));
@@ -80,7 +92,6 @@ function TableStudent({ activity = [] }) {
   };
 
   useEffect(() => {
-    // Check if all checkboxes are checked
     const allChecked = activity.students.every((student) =>
       days.every((d) =>
         checkedItems[activity.act_ID]?.[student.ID]?.includes(dateToUint32(d))
@@ -111,31 +122,60 @@ function TableStudent({ activity = [] }) {
 
       setWeb3(web3Instance);
       setContract(contractInstance);
+      const notCheckedStudents = activity.students
+        .filter((student) => !checkedItems[activity.act_ID]?.[student.ID])
+        .map((student) => student.ID);
 
       for (const actID in checkedItems) {
-        const studentIds = Object.keys(checkedItems[actID] || {});
-        const dayJoin = studentIds.map((stdId) => checkedItems[actID][stdId]);
+        const actData = checkedItems[actID];
+
+        const studentIds = Object.keys(actData).filter(
+          (key) => key !== "act_title" && key !== "students"
+        );
+
+        const dayJoin = studentIds.map((stdId) => actData[stdId]);
+        const actIDUint32 = web3Instance.utils.numberToHex(parseInt(actID));
+        const studentIdsUint32 = studentIds.map((id) =>
+          web3Instance.utils.numberToHex(parseInt(id))
+        );
+
+        const dayJoinUint32 = dayJoin.map((days) =>
+          days.map((day) => web3Instance.utils.numberToHex(parseInt(day)))
+        );
 
         const tx = await contractInstance.methods
-          .add(actID, studentIds, dayJoin)
+          .add(actIDUint32, studentIdsUint32, dayJoinUint32)
           .send({ from: accounts[0] });
+
         await axios.put(`/api/updateStatus/${actID}`);
         await axios.put(`/api/transection/${actID}`, {
           act_transaction: tx.transactionHash,
         });
-        await axios.post("/api/news");
+        await axios.put(`/api/status/status`, {
+          act_ID: actID,
+          std_IDs: notCheckedStudents,
+        });
+        await axios.put(`/api/manage/manage`, {
+          act_ID: actID,
+          std_ID: studentIds,
+        });
+        await axios.post(`/api/new`, {
+          news_topic: `ยืนยันผลการเข้าร่วมกิจกรรม ${activity.act_title}`,
+          news_desc: "สามารถดูรายละเอียดการเข้าร่วมกิจกรรมได้ที่แล้ววันนี้",
+          news_date: new Date(),
+          user_ID: studentIds,
+        });
 
-        console.log("Upload transaction sent:", tx);
         Swal.fire({
           position: "top-end",
           icon: "success",
-          title: `Transaction: ${tx.transactionHash}`,
+          // title: `Transaction: ${tx.transactionHash}`,
           showConfirmButton: false,
           timer: 1500,
         });
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        // setTimeout(() => {
+        //   window.location.reload();
+        // }, 1000);
       }
     } catch (err) {
       console.error("Error handling upload:", err);
@@ -148,16 +188,22 @@ function TableStudent({ activity = [] }) {
   };
 
   const columns = [
-    { field: "id", headerName: "รหัสนักศึกษา", width: 90 },
-    {
-      field: "firstName",
-      headerName: "ชื่อ-นามสกุล",
-      width: 150,
-    },
     {
       field: "checkAllStudent",
-      headerName: "Check All",
-      width: 100,
+      headerName: (
+        <>
+          <Checkbox
+            checked={checkAll}
+            onChange={(e) => handleCheckAllChange(e.target.checked)}
+          />
+          <span>ทั้งหมด</span>
+        </>
+      ),
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      disableColumnMenu: true,
       renderCell: (params) => (
         <Checkbox
           checked={days.every((d) =>
@@ -171,11 +217,25 @@ function TableStudent({ activity = [] }) {
         />
       ),
     },
+    {
+      field: "id",
+      headerName: "รหัสนักศึกษา",
+      width: 200,
+      headerAlign: "center",
+    },
+    {
+      field: "firstName",
+      headerName: "ชื่อ-นามสกุล",
+      width: 250,
+      headerAlign: "center",
+    },
     ...days.map((d) => ({
       field: `day_${activity.act_ID}_${dateToUint32(d)}`,
       headerName: formatDate(d).thdm,
       width: 100,
       editable: true,
+      sortable: false,
+      disableColumnMenu: true,
       renderCell: (params) => (
         <Checkbox
           checked={
@@ -196,50 +256,63 @@ function TableStudent({ activity = [] }) {
     })),
   ];
 
-  const rows = activity.students.map((student) => {
-    return {
-      id: student.ID,
-      firstName: `${student.fname} ${student.lname}`,
-      ...days.reduce((acc, d) => {
-        acc[`day_${activity.act_ID}_${dateToUint32(d)}`] =
-          checkedItems[activity.act_ID]?.[student.ID]?.includes(
-            dateToUint32(d)
-          ) || false;
-        return acc;
-      }, {}),
-      act_ID: activity.act_ID,
-    };
-  });
-  console.log(checkedItems);
+  const rows = activity.students
+    .map((student) => {
+      if (!student.ID) {
+        return null;
+      }
+
+      return {
+        id: student.ID,
+        firstName: `${student.fname} ${student.lname}`,
+        ...days.reduce((acc, d) => {
+          acc[`day_${activity.act_ID}_${dateToUint32(d)}`] =
+            checkedItems[activity.act_ID]?.[student.ID]?.includes(
+              dateToUint32(d)
+            ) || false;
+          return acc;
+        }, {}),
+        act_ID: activity.act_ID,
+      };
+    })
+    .filter(Boolean);
 
   return (
-    <div>
-      <Box sx={{ height: 400, width: "100%" }}>
-        <Box sx={{ display: "flex", alignItems: "center", mb: 0 }}>
-          <Checkbox
-            checked={checkAll}
-            onChange={(e) => handleCheckAllChange(e.target.checked)}
+    <Box
+      sx={{
+        height: 400,
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <Box sx={{ flex: 1 }}>
+        {rows.length > 0 ? (
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            getRowId={(row) => row.id}
+            pagination={false}
+            hideFooter
+            disableSelectionOnClick
+            sx={{
+              border: "none",
+            }}
           />
-          <span>Check All</span>
-        </Box>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 5,
-              },
-            },
-          }}
-          pageSizeOptions={[5]}
-          disableSelectionOnClick
-        />
+        ) : (
+          <Box sx={{ textAlign: "center", padding: "20px" }}>
+            <p>ไม่มีนักศึกษาลงทะเบียน</p>
+          </Box>
+        )}
       </Box>
-      <Button variant="contained" color="secondary" onClick={upload}>
-        Upload
-      </Button>
-    </div>
+      {Object.keys(checkedItems).length > 0 && (
+        <Box sx={{ padding: 2, display: "flex", justifyContent: "center" }}>
+          <Button variant="contained" color="success" onClick={upload}>
+            Upload
+          </Button>
+        </Box>
+      )}
+    </Box>
   );
 }
 

@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 
-function Student({ act_ID, day = [], data = [], join = {} }) {
+function Student({ act_ID, day = [], data = [], join = {}, id, activity }) {
   const [showCheckBox, setShowCheckBox] = useState(false);
   const [selectCheckBox, setSelectCheckBox] = useState([]);
 
@@ -66,6 +66,14 @@ function Student({ act_ID, day = [], data = [], join = {} }) {
 
     if (result.isConfirmed) {
       try {
+        const studentIDs = selectCheckBox.map((student) => student.std_ID);
+        await axios.post(`/api/new`, {
+          news_topic: "ยกการลงทะเบียน",
+          news_desc: `ยกการลงทะเบียนกิจกรรม ${activity.act_title}`,
+          news_date: new Date(),
+          user_ID: studentIDs,
+        });
+
         for (const student of selectCheckBox) {
           await axios.delete(`/api/reserve`, { data: student });
         }
@@ -85,9 +93,9 @@ function Student({ act_ID, day = [], data = [], join = {} }) {
       }
     }
   };
+  console.log(activity);
 
   const joinStudents = join.actID === BigInt(act_ID) ? join.students || [] : [];
-  console.log(data);
 
   if (!data[0]?.login_ID) {
     return (

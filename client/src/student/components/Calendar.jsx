@@ -14,7 +14,7 @@ function CalendarFull() {
   const [showPopup, setShowPopup] = useState(false);
   const [reserveValue, setReservations] = useState([]);
 
-  const std_ID = localStorage.getItem("std_ID");
+  const std_ID = localStorage.getItem("id");
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -115,8 +115,8 @@ function CalendarFull() {
 
         const alreadyReserved = reservations.some(
           (reservation) =>
-            reservation.std_ID.toString() === std_ID.toString() &&
-            reservation.act_ID.toString() === selectedEvent.id.toString()
+            reservation.std_ID == std_ID &&
+            reservation.act_ID == selectedEvent.id
         );
 
         if (alreadyReserved) {
@@ -131,6 +131,13 @@ function CalendarFull() {
         }
 
         const reserveResponse = await axios.post("/api/reserve", reserve);
+        await axios.post(`/api/new`, {
+          news_topic: "ลงทะเบียนสำเร็จ",
+          news_desc: `ลงทะเบียนเข้าร่วมกิจกรรม ${selectedEvent.title}`,
+          news_date: new Date().toISOString(),
+          user_ID: std_ID,
+        });
+
         if (
           reserveResponse.data &&
           (reserveResponse.data.success || reserveResponse.status === 200)
@@ -157,8 +164,7 @@ function CalendarFull() {
   const eventStyleGetter = (event) => {
     const isRegistered = reserveValue.some(
       (reservation) =>
-        reservation.std_ID.toString() === std_ID.toString() &&
-        reservation.act_ID.toString() === event.id.toString()
+        reservation.std_ID == std_ID && reservation.act_ID == event.id
     );
 
     const backgroundColor = isRegistered ? "orange" : event.color;
@@ -187,39 +193,41 @@ function CalendarFull() {
   };
 
   return (
-    <div className="App w-3/4 mx-auto my-10 bg-slate-50 rounded-lg shadow-xl p-10">
-      <h1 className="text-center text-3xl font-bold mb-5">ปฏิทินกิจกรรม</h1>
+    <div className="App w-full max-w-4xl mx-auto my-10 bg-slate-50 rounded-lg shadow-xl p-4 sm:p-6 md:p-8 lg:p-10">
+      <h1 className="text-center text-2xl sm:text-3xl font-bold mb-5">ปฏิทินกิจกรรม</h1>
 
-      <Calendar
-        localizer={localizer}
-        defaultDate={new Date()}
-        defaultView="month"
-        events={events}
-        style={{ height: "70vh" }}
-        eventPropGetter={eventStyleGetter}
-        onSelectEvent={handleEventClick}
-      />
+      <div className="relative">
+        <Calendar
+          localizer={localizer}
+          defaultDate={new Date()}
+          defaultView="month"
+          events={events}
+          style={{ height: "70vh" }}
+          eventPropGetter={eventStyleGetter}
+          onSelectEvent={handleEventClick}
+        />
+      </div>
 
-      <div className="flex my-3 gap-5">
+      <div className="flex flex-wrap gap-4 mt-5">
         <div className="flex items-center">
-          <div className="me-1 bg-orange-400 h-[18px] w-[18px] rounded-sm"></div>
-          <p className="me-2">ลงทะเบียนแล้ว</p>
+          <div className="me-2 bg-orange-400 h-4 w-4 rounded-sm"></div>
+          <p>ลงทะเบียนแล้ว</p>
         </div>
         <div className="flex items-center">
-          <div className="me-1 bg-green-600 h-[18px] w-[18px] rounded-sm"></div>
-          <p className="me-2">เปิดลงทะเบียน</p>
+          <div className="me-2 bg-green-600 h-4 w-4 rounded-sm"></div>
+          <p>เปิดลงทะเบียน</p>
         </div>
         <div className="flex items-center">
-          <div className="me-1 bg-red-600 h-[18px] w-[18px] rounded-sm"></div>
-          <p className="me-2">ลงทะเบียนเต็มแล้ว/ปิดลงทะเบียน</p>
+          <div className="me-2 bg-red-600 h-4 w-4 rounded-sm"></div>
+          <p>ลงทะเบียนเต็มแล้ว/ปิดลงทะเบียน</p>
         </div>
         <div className="flex items-center">
-          <div className="me-1 bg-blue-600 h-[18px] w-[18px] rounded-sm"></div>
-          <p className="me-2">กิจกรรมจบลงแล้ว</p>
+          <div className="me-2 bg-blue-600 h-4 w-4 rounded-sm"></div>
+          <p>กิจกรรมจบลงแล้ว</p>
         </div>
         <div className="flex items-center">
-          <div className="me-1 bg-gray-600 h-[18px] w-[18px] rounded-sm"></div>
-          <p className="me-2">ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน</p>
+          <div className="me-2 bg-gray-600 h-4 w-4 rounded-sm"></div>
+          <p>ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน</p>
         </div>
       </div>
 
@@ -228,77 +236,78 @@ function CalendarFull() {
         (() => {
           const now = new Date();
           return (
-            <div className="fixed w-72 md:w-fit top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg z-50">
-              <div className="w-full justify-end flex ">
-                <div className="cursor-pointer flex" onClick={closePopup}>
-                  <CloseIcon />
+            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+              <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
+                <div className="flex justify-end">
+                  <div className="cursor-pointer" onClick={closePopup}>
+                    <CloseIcon />
+                  </div>
                 </div>
-              </div>
-              <div className="text-left -mt-5">
-                <h2 className="text-xl font-bold mb-4">รายละเอียดกิจกรรม</h2>
-                <p className="text-xl">ชื่อกิจกรรม : {selectedEvent.title}</p>
-                <p>สถานที่ : {selectedEvent.location}</p>
-                <p>
-                  วันที่ :{" "}
-                  {selectedEvent.start.toLocaleDateString("th-TH", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}{" "}
-                  -{" "}
-                  {selectedEvent.end.toLocaleDateString("th-TH", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </p>
-                <p>
-                  เปิดลงทะเบียน :{" "}
-                  {selectedEvent.reserveStart.toLocaleDateString("th-TH", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}{" "}
-                  -{" "}
-                  {selectedEvent.reserveEnd.toLocaleDateString("th-TH", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </p>
-                <p>
-                  สถานะการลงทะเบียน :{" "}
-                  {reserveValue.some(
-                    (reservation) =>
-                      reservation.std_ID.toString() === std_ID.toString() &&
-                      reservation.act_ID.toString() ===
-                        selectedEvent.id.toString()
-                  )
-                    ? "ลงทะเบียนแล้ว"
-                    : selectedEvent.status === 2
-                    ? "กิจกรรมสิ้นสุดแล้ว"
-                    : selectedEvent.numStd === selectedEvent.numStdReserve
-                    ? "ลงทะเบียนเต็มแล้ว"
-                    : now >= selectedEvent.reserveStart &&
-                      now <= selectedEvent.reserveEnd
-                    ? selectedEvent.status === 1
-                      ? "เปิดลงทะเบียน"
-                      : "ปิดลงทะเบียน"
-                    : "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"}
-                </p>
-                {selectedEvent.numStd !== selectedEvent.numStdReserve &&
-                  now >= selectedEvent.reserveStart &&
-                  now <= selectedEvent.reserveEnd &&
-                  selectedEvent.status === 1 && (
-                    <div className="text-end">
-                      <button
-                        className="btn px-2 py-1 bg-green-600 mt-4 text-center rounded-sm text-white"
-                        onClick={handleReserve}
-                      >
-                        ลงทะเบียนเข้าร่วมกิจกรรม
-                      </button>
-                    </div>
-                  )}
+                <div className="text-left">
+                  <h2 className="text-xl font-bold mb-4">รายละเอียดกิจกรรม</h2>
+                  <p className="text-lg mb-2">ชื่อกิจกรรม : {selectedEvent.title}</p>
+                  <p className="mb-2">สถานที่ : {selectedEvent.location}</p>
+                  <p className="mb-2">
+                    วันที่ :{" "}
+                    {selectedEvent.start.toLocaleDateString("th-TH", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}{" "}
+                    -{" "}
+                    {selectedEvent.end.toLocaleDateString("th-TH", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </p>
+                  <p className="mb-2">
+                    เปิดลงทะเบียน :{" "}
+                    {selectedEvent.reserveStart.toLocaleDateString("th-TH", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}{" "}
+                    -{" "}
+                    {selectedEvent.reserveEnd.toLocaleDateString("th-TH", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </p>
+                  <p className="mb-4">
+                    สถานะการลงทะเบียน :{" "}
+                    {reserveValue.some(
+                      (reservation) =>
+                        reservation.std_ID == std_ID &&
+                        reservation.act_ID == selectedEvent.id
+                    )
+                      ? "ลงทะเบียนแล้ว"
+                      : selectedEvent.status == 2
+                      ? "กิจกรรมสิ้นสุดแล้ว"
+                      : selectedEvent.numStd == selectedEvent.numStdReserve
+                      ? "ลงทะเบียนเต็มแล้ว"
+                      : now >= selectedEvent.reserveStart &&
+                        now <= selectedEvent.reserveEnd
+                      ? selectedEvent.status === 1
+                        ? "เปิดลงทะเบียน"
+                        : "ปิดลงทะเบียน"
+                      : "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"}
+                  </p>
+                  {selectedEvent.numStd !== selectedEvent.numStdReserve &&
+                    now >= selectedEvent.reserveStart &&
+                    now <= selectedEvent.reserveEnd &&
+                    selectedEvent.status === 1 && (
+                      <div className="text-end">
+                        <button
+                          className="btn px-4 py-2 bg-green-600 text-white rounded-sm"
+                          onClick={handleReserve}
+                        >
+                          ลงทะเบียนเข้าร่วมกิจกรรม
+                        </button>
+                      </div>
+                    )}
+                </div>
               </div>
             </div>
           );

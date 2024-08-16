@@ -75,7 +75,7 @@ export function Router() {
         </Route>
 
         <Route path="/activity" element={<Layout />}>
-          <Route path="dashboard" element={<DashUser />} />
+          <Route path="list-activity" element={<DashUser />} />
           <Route path="profile" element={<Profile />} />
 
           <Route path="calendar" element={<Calendar />} />
