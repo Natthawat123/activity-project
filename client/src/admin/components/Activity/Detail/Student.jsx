@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 
-function Student({ act_ID, day = [], data = [], join = {} }) {
+function Student({ act_ID, day = [], data = [], join = {}, id, activity }) {
   const [showCheckBox, setShowCheckBox] = useState(false);
   const [selectCheckBox, setSelectCheckBox] = useState([]);
 
@@ -22,7 +22,35 @@ function Student({ act_ID, day = [], data = [], join = {} }) {
   };
 
   const dateS = (dateString) => {
-    return dateString.replace(/-/g, "");
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + 1);
+    return date.toISOString().split("T")[0].replace(/-/g, "");
+  };
+
+  const th = (dateString) => {
+    const year = dateString.slice(0, 4);
+    const month = dateString.slice(4, 6);
+    const day = dateString.slice(6, 8);
+
+    // สร้างวันที่ในรูปแบบไทย
+    const thaiMonths = [
+      "มกราคม",
+      "กุมภาพันธ์",
+      "มีนาคม",
+      "เมษายน",
+      "พฤษภาคม",
+      "มิถุนายน",
+      "กรกฎาคม",
+      "สิงหาคม",
+      "กันยายน",
+      "ตุลาคม",
+      "พฤศจิกายน",
+      "ธันวาคม",
+    ];
+
+    return `${day} ${thaiMonths[parseInt(month, 10) - 1]} ${
+      parseInt(year, 10) + 543
+    }`;
   };
 
   const cancelReserveButton = async () => {
@@ -38,11 +66,21 @@ function Student({ act_ID, day = [], data = [], join = {} }) {
 
     if (result.isConfirmed) {
       try {
+        const studentIDs = selectCheckBox.map((student) => student.std_ID);
+        await axios.post(`/api/newsCancelReserve`, {
+          news_topic: "ยกการลงทะเบียน",
+          news_desc: `ยกการลงทะเบียนกิจกรรม ${activity.act_title}`,
+          news_date: new Date().toISOString(),
+          news_create: id,
+          news_type: studentIDs,
+          act_title: activity.act_title,
+        });
+
         for (const student of selectCheckBox) {
-          await axios.delete(`/api/reserve`, { data: student });
+          await axios.delete(`/api/manage/reserve`, { data: student });
         }
 
-        await axios.put(`/api/cancelReserve`, {
+        await axios.put(`/api/manage/cancelReserve`, {
           act_ID,
           cancelReserveNumStd: selectCheckBox.length,
         });
@@ -57,9 +95,9 @@ function Student({ act_ID, day = [], data = [], join = {} }) {
       }
     }
   };
+  console.log(activity);
 
   const joinStudents = join.actID === BigInt(act_ID) ? join.students || [] : [];
-  console.log(data);
 
   if (!data[0]?.login_ID) {
     return (
@@ -91,7 +129,7 @@ function Student({ act_ID, day = [], data = [], join = {} }) {
             <th className="px-6 py-3 w-2/12">ชื่อ-นามสกุล</th>
             {day.map((d, index) => (
               <th key={index} className="px-6 py-3 w-2/12">
-                {dateS(d)}
+                {th(dateS(d))}
               </th>
             ))}
             <th className="px-6 py-3 w-2/12">สถานะ</th>

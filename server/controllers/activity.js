@@ -120,12 +120,13 @@ export const updateActivity = (req, res) => {
           error: err.message,
         });
       }
+
       return res.json({
-        message: "Activity updated successfully",
+        message: "Activity updated successfully and news ",
         result,
       });
-    }
-  );
+
+    });
 };
 
 

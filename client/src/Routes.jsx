@@ -8,6 +8,7 @@ import Login from "./pages/Login.jsx";
 import Layoutm from "./components/Layout/Layout.jsx";
 import Calen from "./components/Calendar.jsx";
 import GetReserve from "./components/Reserve_Check.jsx";
+import GetReserveT from "./components/Reserve_Check copy.jsx";
 
 import Layout from "./student/components/Layout.jsx";
 import DashUser from "./student/pages/Dashboard.jsx";
@@ -52,6 +53,7 @@ export function Router() {
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="reserve/:act_ID" element={<GetReserve />} />
+      <Route path="reserveT/:act_ID" element={<GetReserveT />} />
       <Route path="test" element={<Test />} />
 
       <Route element={<PrivateRoutes />}>

@@ -78,7 +78,7 @@ function Dash_users() {
           <h2 className="text-xl font-bold">การจัดการกิจกรรม</h2>
           <Popup />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-3">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-3">
           <motion.div
             className="bg-blue-500 p-4 text-white h-28 rounded-md shadow-lg flex flex-col justify-center items-center transition-all hover:bg-blue-600"
             initial={{ opacity: 0, scale: 0.9 }}
@@ -158,7 +158,7 @@ function Dash_users() {
               {statusCounts["กิจกรรมสิ้นสุดแล้ว"]}
             </div>
           </motion.div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

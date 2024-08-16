@@ -26,7 +26,7 @@ function DetailStudent() {
   const [sortOrder, setSortOrder] = useState("latest");
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("default");
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(40);
   const [currentPage, setCurrentPage] = useState(0);
   const [openRows, setOpenRows] = useState({});
 
@@ -228,7 +228,7 @@ function DetailStudent() {
   }
 
   const uniqueVisibleItems = Array.from(
-    new Map(visibleItems.map(item => [item.act_ID, item])).values()
+    new Map(visibleItems.map((item) => [item.act_ID, item])).values()
   );
 
   const formatDateThai = (dateString) => {
@@ -236,7 +236,6 @@ function DetailStudent() {
     const date = new Date(dateString);
     return date.toLocaleDateString("th-TH", options);
   };
-
 
   return (
     <div>
@@ -582,7 +581,7 @@ function DetailStudent() {
                   <tr className="w-96 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 uppercase text-left">
                     <th className="px-4 py-3">ชื่อกิจกรรม</th>
                     <th className="px-4 py-3">สถานที่</th>
-                    <th className="px-4 py-3">วันที่</th>
+                    <th className="px-4 py-3">อาจารย์ผู้จัดกิจกรรม</th>
                     <th className="px-4 py-3">สถานะ</th>
                     <th className="px-4 py-3 w-2/12">รายละเอียด</th>
                   </tr>
@@ -601,7 +600,7 @@ function DetailStudent() {
                           </td>
                           <td className="px-4 py-3">{item.act_location}</td>
                           <td className="px-4 py-3">
-                            {item.act_dateStart.slice(0, 10)}
+                            {item.staff_fname} {item.staff_lname}
                           </td>
                           <td
                             className="px-4 py-3"
@@ -659,7 +658,7 @@ function DetailStudent() {
                                   <TableHead>
                                     <TableRow>
                                       <TableCell>รายละเอียด</TableCell>
-                                      <TableCell>จำนวนที่รับ</TableCell>
+                                      <TableCell>จำนวน</TableCell>
                                       <TableCell>วันที่เริ่ม</TableCell>
                                       <TableCell>วันที่สิ้นสุด</TableCell>
                                     </TableRow>
@@ -667,13 +666,18 @@ function DetailStudent() {
                                   <TableBody>
                                     <TableRow>
                                       <TableCell component="th" scope="row">
-                                        {item.act_detail}
+                                        {item.act_desc}
                                       </TableCell>
-                                      <TableCell>{item.act_amount}</TableCell>
+                                      <TableCell>
+                                        {item.act_numStdReserve}/
+                                        {item.act_numStd} คน
+                                      </TableCell>
                                       <TableCell>
                                         {formatDateThai(item.act_dateStart)}
                                       </TableCell>
-                                      <TableCell>{formatDateThai(item.act_dateEnd)}</TableCell>
+                                      <TableCell>
+                                        {formatDateThai(item.act_dateEnd)}
+                                      </TableCell>
                                     </TableRow>
                                   </TableBody>
                                 </Table>
@@ -738,8 +742,8 @@ function DetailStudent() {
                     }}
                     className="px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value={10}>10</option>
-                    <option value={20}>20</option>
+                    <option value={20}>10</option>
+                    <option value={40}>20</option>
                     <option value={50}>50</option>
                   </select>
                 </div>

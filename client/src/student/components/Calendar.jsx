@@ -110,7 +110,7 @@ function CalendarFull() {
       };
 
       try {
-        const checkResponse = await axios.get("/api/reserve");
+        const checkResponse = await axios.get("/api/manage/reserve");
         const reservations = checkResponse.data;
 
         const alreadyReserved = reservations.some(

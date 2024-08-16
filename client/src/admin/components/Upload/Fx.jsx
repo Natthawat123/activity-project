@@ -28,6 +28,8 @@ export const formatDate = (dateString) => {
 export const range = (start, end) => {
   const startDate = new Date(start);
   const endDate = new Date(end);
+  startDate.setDate(startDate.getDate() + 1);
+  endDate.setDate(endDate.getDate() + 1);
   const days = [];
   for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
     days.push(new Date(d).toISOString().split("T")[0]);

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Web3 from "web3";
 import Abi from "../../components/contract/abi2.json";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import IconButton from "@mui/material/IconButton";
@@ -15,7 +15,7 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 
-function Test() {
+function DetailStudent() {
   const [reserve, setReserve] = useState([]);
   const [join, setJoin] = useState([]);
   const [activity, setActivity] = useState([]);
@@ -23,7 +23,7 @@ function Test() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("default");
-  const [itemsPerPage, setItemsPerPage] = useState(30);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
   const [sortOrder, setSortOrder] = useState("latest");
   const [openRows, setOpenRows] = useState({});
@@ -31,7 +31,7 @@ function Test() {
   const navigate = useNavigate();
 
   const contractAddress = "0xc9811A01727735E9c9aE046b7690b2AC9021E1B7";
-  const stdID = localStorage.getItem("std_ID");
+  const { std_ID } = useParams();
 
   useEffect(() => {
     const fetchSmartContract = async () => {
@@ -58,6 +58,7 @@ function Test() {
     fetchActivity();
     setIsLoaded(true);
   }, []);
+
   const formatDateThai = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     const date = new Date(dateString);
@@ -72,13 +73,13 @@ function Test() {
     const joinEntry = join.find(
       (j) =>
         Number(j.activityId) === activityID &&
-        j.studentIds.some((id) => Number(id) === Number(stdID))
+        j.studentIds.some((id) => Number(id) === Number(std_ID))
     );
     if (joinEntry) {
       return { message: "เข้าร่วมกิจกรรมแล้ว", color: "blue" };
     }
     const reserveEntry = activity.find(
-      (r) => r.act_ID === activityID && r.login_ID === stdID
+      (r) => r.act_ID === activityID && r.login_ID === std_ID
     );
     if (reserveEntry) {
       return { message: "ลงทะเบียนสำเร็จ", color: "green" };
@@ -219,7 +220,7 @@ function Test() {
               <tr className="w-96 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 uppercase text-left">
                 <th className="px-4 py-3">ชื่อกิจกรรม</th>
                 <th className="px-4 py-3">สถานที่</th>
-                <th className="px-4 py-3">อาจารย์ผู้จัด</th>
+                <th className="px-4 py-3">อาจารย์ผู้จัดกิจกรรม</th>
                 <th className="px-4 py-3">สถานะ</th>
                 <th className="px-4 py-3 w-2/12">รายละเอียด</th>
               </tr>
@@ -384,4 +385,4 @@ function Test() {
   }
 }
 
-export default Test;
+export default DetailStudent;
