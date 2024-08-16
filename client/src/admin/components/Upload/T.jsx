@@ -5,6 +5,7 @@ import Web3 from "web3";
 import abi from "../../../components/contract/abi2.json";
 const contractAddress = "0xc9811A01727735E9c9aE046b7690b2AC9021E1B7";
 import { formatDate, range, dateToUint32 } from "./Fx";
+import axios from "axios";
 
 //mui
 import Box from "@mui/material/Box";
@@ -16,18 +17,25 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Button from "@mui/material/Button";
 
-function T({ activities = [] }) {
+function T({ activities = [], join = [] }) {
   const [checkedItems, setCheckedItems] = useState({});
   const [checkAllStates, setCheckAllStates] = useState({});
   const [selectedRows, setSelectedRows] = useState([]);
   const [web3, setWeb3] = useState(null);
   const [contract, setContract] = useState(null);
+  const [news, setNews] = useState({
+    news_topic: "",
+    news_desc: "",
+    news_date: "",
+    news_login_ID: "",
+  });
+
+  const filteredActivities = activities.filter(
+    (activity) =>
+      !join.some((j) => j.activityId.toString() === activity.act_ID.toString())
+  );
 
   const handleCheckboxChange = (actID, stdID, date, checked) => {
-    console.log(
-      `Checkbox Change - Activity ID: ${actID}, Student ID: ${stdID}, Date: ${date}, Checked: ${checked}`
-    );
-
     setCheckedItems((prev) => {
       const updated = { ...prev };
       if (!updated[actID]) updated[actID] = {};
@@ -103,6 +111,13 @@ function T({ activities = [] }) {
         const tx = await contractInstance.methods
           .add(actID, studentIds, dayJoin)
           .send({ from: accounts[0] });
+        await axios.put(`/api/updateStatus/${actID}`);
+        await axios.put(
+          `/api/transection/${actID}`,
+          { act_transaction: tx.transactionHash } // Send as JSON body
+        );
+        await axios.post("/api/news");
+
         console.log("Upload transaction sent:", tx);
         Swal.fire({
           position: "top-end",
@@ -111,6 +126,9 @@ function T({ activities = [] }) {
           showConfirmButton: false,
           timer: 1500,
         });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       }
     } catch (err) {
       console.error("Error handling upload:", err);
@@ -124,10 +142,9 @@ function T({ activities = [] }) {
 
   return (
     <div>
-      {activities.map((activity) => {
+      {filteredActivities.map((activity) => {
         const days = range(activity.act_dateStart, activity.act_dateEnd);
 
-        // Define columns specific to each activity
         const columns = [
           { field: "id", headerName: "รหัสนักศึกษา", width: 90 },
           {
@@ -197,9 +214,13 @@ function T({ activities = [] }) {
                 <h2>{`${activity.act_title} (ID: ${activity.act_ID})`}</h2>
               </AccordionSummary>
               <AccordionDetails>
-                <p>Description: {activity.act_desc}</p>
-                <p>Duration: {days.length} days</p>
-                <p>Dates: {days.map((d) => formatDate(d).th).join(", ")}</p>
+                <p>รายละเอียด: {activity.act_desc}</p>
+
+                <p>ระยะเวลา: {days.length} วัน</p>
+                <p>
+                  เริ่ม: {formatDate(activity.act_dateStart).th} -{" "}
+                  {formatDate(activity.act_dateEnd).th}
+                </p>
               </AccordionDetails>
             </Accordion>
             <Box sx={{ height: 400, width: "100%" }}>
@@ -214,7 +235,6 @@ function T({ activities = [] }) {
                   },
                 }}
                 pageSizeOptions={[5]}
-                checkboxSelection
                 disableSelectionOnClick
                 selectionModel={selectedRows}
                 onSelectionModelChange={(newSelection) => {
@@ -250,6 +270,14 @@ T.propTypes = {
           std_lname: PropTypes.string.isRequired,
         })
       ).isRequired,
+    })
+  ).isRequired,
+  join: PropTypes.arrayOf(
+    PropTypes.shape({
+      activityId: PropTypes.number.isRequired,
+      studentIds: PropTypes.arrayOf(PropTypes.number).isRequired,
+      dayJoin: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number))
+        .isRequired,
     })
   ).isRequired,
 };

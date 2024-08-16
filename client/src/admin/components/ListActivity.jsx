@@ -7,7 +7,6 @@ import ArticleIcon from "@mui/icons-material/Article";
 import Button from "@mui/material/Button";
 
 const ListActivity = () => {
-  
   const now = new Date();
 
   const [error, setError] = useState(null);
@@ -26,14 +25,12 @@ const ListActivity = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    
     fetch("/api/activitys")
       .then((res) => res.json())
       .then(
         (result) => {
           setIsLoaded(true);
           setActivity(result);
-       
         },
         (error) => {
           setIsLoaded(true);
@@ -52,14 +49,10 @@ const ListActivity = () => {
     });
   };
 
-
-
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
     setCurrentPage(0); // Reset current page to 0 on search
   };
-
-
 
   const handleSortChange = () => {
     setSortOrder((prevOrder) => (prevOrder === "latest" ? "oldest" : "latest"));
@@ -83,7 +76,6 @@ const ListActivity = () => {
     return date.toLocaleDateString("th-TH", options);
   };
 
-
   const filteredItems = activity.filter((item) => {
     return (
       item.act_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -91,11 +83,11 @@ const ListActivity = () => {
     );
   });
 
-  const getActivityStatus = (item, now) => {
+  const getActivityStatus = (item) => {
     const dateStart = moment(item.act_dateStart);
-    const twoWeeksBefore = dateStart.subtract(2, 'weeks').toDate();
-    const oneDayBefore = dateStart.subtract(1, 'day').toDate();
-  
+    const twoWeeksBefore = dateStart.clone().subtract(2, "weeks").toDate();
+    const oneDayBefore = dateStart.clone().subtract(1, "day").toDate();
+
     if (item.act_status === 2) {
       return "กิจกรรมสิ้นสุดแล้ว";
     } else if (item.act_numStd === item.act_numStdReserve) {
@@ -107,31 +99,29 @@ const ListActivity = () => {
     }
   };
 
-const handleFilterChange = (event) => {
-  setFilter(event.target.value);
-  setCurrentPage(0);
-};
+  const handleFilterChange = (event) => {
+    setFilter(event.target.value);
+    setCurrentPage(0); // Reset current page to 0 on filter change
+  };
 
-const filteredData = filteredItems.filter(item => {
-  const status = getActivityStatus(item, now);
+  const filteredData = filteredItems.filter((item) => {
+    const status = getActivityStatus(item);
 
-  switch (filter) {
-    case 'open':
-      return status === "เปิดลงทะเบียน";
-    case 'closed':
-      return status === "ปิดลงทะเบียน";
-    case 'not-open':
-      return status === "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน";
-    case 'full':
-      return status === "ลงทะเบียนเต็มแล้ว";
-    case 'ended':
-      return status === "กิจกรรมสิ้นสุดแล้ว";
-    default:
-      return true;
-  }
-});
-
-
+    switch (filter) {
+      case "open":
+        return status === "เปิดลงทะเบียน";
+      case "closed":
+        return status === "ปิดลงทะเบียน";
+      case "not-open":
+        return status === "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน";
+      case "full":
+        return status === "ลงทะเบียนเต็มแล้ว";
+      case "ended":
+        return status === "กิจกรรมสิ้นสุดแล้ว";
+      default:
+        return true; // Show all items if filter is "default"
+    }
+  });
 
 
   if (error) {
@@ -198,20 +188,23 @@ const filteredData = filteredItems.filter(item => {
                   Filter
                 </label>
                 <div className="relative">
-                <select
-                  value={filter}
-                  onChange={handleFilterChange}
-                  className="text-xs block p-1 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                >
-                  <option value="default" className="text-center">ทั้งหมด</option>
-                  <option value="open">เปิดลงทะเบียน</option>
-                  <option value="closed">ปิดลงทะเบียน</option>
-                  <option value="not-open">ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน</option>
-                  <option value="full">ลงทะเบียนเต็มแล้ว</option>
-                  <option value="ended">กิจกรรมสิ้นสุดแล้ว</option>
-                </select>
-              </div>
-                
+                  <select
+                    value={filter}
+                    onChange={handleFilterChange}
+                    className="text-xs block p-1 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  >
+                    <option value="default" className="text-center">
+                      ทั้งหมด
+                    </option>
+                    <option value="open">เปิดลงทะเบียน</option>
+                    <option value="closed">ปิดลงทะเบียน</option>
+                    <option value="not-open">
+                      ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน
+                    </option>
+                    <option value="full">ลงทะเบียนเต็มแล้ว</option>
+                    <option value="ended">กิจกรรมสิ้นสุดแล้ว</option>
+                  </select>
+                </div>
               </div>
               <div className="flex pb-4 items-center">
                 <button
@@ -223,7 +216,7 @@ const filteredData = filteredItems.filter(item => {
               </div>
             </div>
           </div>
-          
+
           <table className="text-center w-full text-sm rtl:text-center text-gray-500 dark:text-gray-400">
             <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
               <tr className="flex w-full">

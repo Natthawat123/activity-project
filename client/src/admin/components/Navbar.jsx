@@ -4,10 +4,12 @@ import Logo from "../../images/IT_logo_Standard.png";
 import Logout from "../../components/Logout";
 import axios from "axios";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
+import SlideBar from "../../components/news/SlideBar";
 
 const NavBar = () => {
   const ID = localStorage.getItem("staff_ID");
   const [username, setUsername] = useState("");
+  const Homeurl = "localhost:5173/admin/dashboard";
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -18,6 +20,11 @@ const NavBar = () => {
         console.error("Error fetching the username:", error);
       }
     };
+
+    if (Homeurl) {
+      setSelectedItem("Dashboard");
+      setListVisible(false);
+    }
 
     if (ID) {
       fetchUsername();
@@ -101,11 +108,13 @@ const NavBar = () => {
 
             {/* Add similar li elements for other menu items */}
           </ul>
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-5 ">
             <p className="md:flex items-center">
               <PersonPinIcon className="mx-2 text-blue-500" />
               {username.fname}
             </p>
+            <SlideBar />
+
             <Logout className="block md:hidden" />
           </div>
         </nav>
@@ -113,9 +122,9 @@ const NavBar = () => {
         <div className="relative block md:hidden w-full mt-5 ">
           <div
             onClick={toggleListVisibility}
-            className="cursor-pointer px-4 py-3 text-white bg-indigo-600 rounded flex justify-between items-center w-full"
+            className="cursor-pointer  px-4 py-3 text-white bg-indigo-600 rounded flex justify-between items-center w-full"
           >
-            <div className="flex space-x-2">
+            <div className="flex space-x-2 ">
               <span
                 id="s1"
                 className={`font-semibold text-sm leading-3 ${

@@ -9,6 +9,8 @@ const NavBar = () => {
   const id = localStorage.getItem("staff_ID");
   const [username, setUsername] = useState([]);
 
+  const Homeurl = 'localhost:5173/teacher/calendar';
+
   useEffect(() => {
     const fetchUsername = async () => {
       try {
@@ -18,6 +20,11 @@ const NavBar = () => {
         console.error("Error fetching the username:", error);
       }
     };
+
+    if(Homeurl){
+      setSelectedItem("Calendar");
+      setListVisible(false);
+    }
 
     fetchUsername();
   }, [id]);

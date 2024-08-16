@@ -142,7 +142,9 @@ function CalendarFull() {
             showConfirmButton: false,
             timer: 1500,
           });
-          closePopup();
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
         }
       } catch (err) {
         console.log(err);
@@ -221,115 +223,86 @@ function CalendarFull() {
         </div>
       </div>
 
-      {selectedEvent && showPopup && (
-        <div className="fixed w-72 md:w-fit top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg z-50">
-          <div className="w-full justify-end flex ">
-            <div className="cursor-pointer flex" onClick={closePopup}>
-              <CloseIcon />
-            </div>
-          </div>
-          <div className="text-left -mt-5">
-            <h2 className="text-xl font-bold mb-4">รายละเอียดกิจกรรม</h2>
-            <p className="text-xl">ชื่อกิจกรรม : {selectedEvent.title}</p>
-            <p>สถานที่ : {selectedEvent.location}</p>
-            <p>
-              วันที่ :{" "}
-              {selectedEvent.start.toLocaleDateString("th-TH", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}{" "}
-              -{" "}
-              {selectedEvent.end.toLocaleDateString("th-TH", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
-            <p>
-              เปิดลงทะเบียน :{" "}
-              {selectedEvent.reserveStart.toLocaleDateString("th-TH", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}{" "}
-              -{" "}
-              {selectedEvent.reserveEnd.toLocaleDateString("th-TH", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
-            <p>
-              <span>จำนวนที่เปิดรับ :</span>
-              <span
-                style={{
-                  color:
-                    selectedEvent.numStd === selectedEvent.numStdReserve
-                      ? "red"
-                      : "green",
-                }}
-              >
-                {selectedEvent.numStdReserve} / {selectedEvent.numStd}
-              </span>
-              <span> คน</span>
-            </p>
-
-            <p
-              style={{
-                color: reserveValue.some(
-                  (reservation) =>
-                    reservation.std_ID.toString() === std_ID.toString() &&
-                    reservation.act_ID.toString() ===
-                      selectedEvent.id.toString()
-                )
-                  ? "orange"
-                  : selectedEvent.status === 2
-                  ? "blue"
-                  : selectedEvent.numStd === selectedEvent.numStdReserve
-                  ? "red"
-                  : now >= selectedEvent.reserveStart &&
-                    now <= selectedEvent.reserveEnd
-                  ? selectedEvent.status === 1
-                    ? "green"
-                    : "red"
-                  : "gray",
-              }}
-            >
-              {reserveValue.some(
-                (reservation) =>
-                  reservation.std_ID.toString() === std_ID.toString() &&
-                  reservation.act_ID.toString() === selectedEvent.id.toString()
-              )
-                ? "ลงทะเบียนแล้ว"
-                : selectedEvent.status === 2
-                ? "กิจกรรมสิ้นสุดแล้ว"
-                : selectedEvent.numStd === selectedEvent.numStdReserve
-                ? "ลงทะเบียนเต็มแล้ว"
-                : now >= selectedEvent.reserveStart &&
-                  now <= selectedEvent.reserveEnd
-                ? selectedEvent.status === 1
-                  ? "เปิดลงทะเบียน"
-                  : "ปิดลงทะเบียน"
-                : "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"}
-            </p>
-
-            {selectedEvent.numStd !== selectedEvent.numStdReserve &&
-              now >= selectedEvent.reserveStart &&
-              now <= selectedEvent.reserveEnd &&
-              selectedEvent.status === 1 && (
-                <div className="text-end">
-                  <button
-                    className="btn px-2 py-1 bg-green-600 mt-4 text-center rounded-sm text-white"
-                    onClick={handleReserve}
-                  >
-                    ลงทะเบียนเข้าร่วมกิจกรรม
-                  </button>
+      {selectedEvent &&
+        showPopup &&
+        (() => {
+          const now = new Date();
+          return (
+            <div className="fixed w-72 md:w-fit top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg z-50">
+              <div className="w-full justify-end flex ">
+                <div className="cursor-pointer flex" onClick={closePopup}>
+                  <CloseIcon />
                 </div>
-              )}
-          </div>
-        </div>
-      )}
+              </div>
+              <div className="text-left -mt-5">
+                <h2 className="text-xl font-bold mb-4">รายละเอียดกิจกรรม</h2>
+                <p className="text-xl">ชื่อกิจกรรม : {selectedEvent.title}</p>
+                <p>สถานที่ : {selectedEvent.location}</p>
+                <p>
+                  วันที่ :{" "}
+                  {selectedEvent.start.toLocaleDateString("th-TH", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}{" "}
+                  -{" "}
+                  {selectedEvent.end.toLocaleDateString("th-TH", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+                <p>
+                  เปิดลงทะเบียน :{" "}
+                  {selectedEvent.reserveStart.toLocaleDateString("th-TH", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}{" "}
+                  -{" "}
+                  {selectedEvent.reserveEnd.toLocaleDateString("th-TH", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+                <p>
+                  สถานะการลงทะเบียน :{" "}
+                  {reserveValue.some(
+                    (reservation) =>
+                      reservation.std_ID.toString() === std_ID.toString() &&
+                      reservation.act_ID.toString() ===
+                        selectedEvent.id.toString()
+                  )
+                    ? "ลงทะเบียนแล้ว"
+                    : selectedEvent.status === 2
+                    ? "กิจกรรมสิ้นสุดแล้ว"
+                    : selectedEvent.numStd === selectedEvent.numStdReserve
+                    ? "ลงทะเบียนเต็มแล้ว"
+                    : now >= selectedEvent.reserveStart &&
+                      now <= selectedEvent.reserveEnd
+                    ? selectedEvent.status === 1
+                      ? "เปิดลงทะเบียน"
+                      : "ปิดลงทะเบียน"
+                    : "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"}
+                </p>
+                {selectedEvent.numStd !== selectedEvent.numStdReserve &&
+                  now >= selectedEvent.reserveStart &&
+                  now <= selectedEvent.reserveEnd &&
+                  selectedEvent.status === 1 && (
+                    <div className="text-end">
+                      <button
+                        className="btn px-2 py-1 bg-green-600 mt-4 text-center rounded-sm text-white"
+                        onClick={handleReserve}
+                      >
+                        ลงทะเบียนเข้าร่วมกิจกรรม
+                      </button>
+                    </div>
+                  )}
+              </div>
+            </div>
+          );
+        })()}
     </div>
   );
 }

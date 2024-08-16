@@ -4,10 +4,12 @@ import Logo from "../../images/IT_logo_Standard.png";
 import Logout from "../../components/Logout";
 import axios from "axios";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
+import SlideBar from "../../components/news/SlideBar";
 
 const Header = () => {
   const ID = localStorage.getItem("std_ID");
   const [username, setUsername] = useState("");
+  const Homeurl = "localhost:5173/activity/calendar";
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -18,6 +20,11 @@ const Header = () => {
         console.error("Error fetching the username:", error);
       }
     };
+
+    if (Homeurl) {
+      setSelectedItem("Calendar");
+      setListVisible(false);
+    }
 
     if (ID) {
       fetchUsername();
@@ -87,6 +94,8 @@ const Header = () => {
               <PersonPinIcon className="mx-2 text-blue-500" />
               {username}
             </p>
+            <SlideBar />
+
             <Logout className="block md:hidden" />
           </div>
         </nav>
@@ -132,6 +141,15 @@ const Header = () => {
                   : "opacity-0 max-h-0 hidden"
               }`}
             >
+              <Link to="/activity/calendar">
+                <li
+                  onClick={() => handleItemClick("กระดานข่าว")}
+                  className={getItemClassXs("news")}
+                >
+                  <SlideBar />
+                </li>
+              </Link>
+
               <Link to="/activity/calendar">
                 <li
                   onClick={() => handleItemClick("ปฏิทินกิจกรรม")}

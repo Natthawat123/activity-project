@@ -25,6 +25,7 @@ const ListUsers = () => {
           setTest(res.data);
         } else {
           console.error(`Error: ${res.status} ${res.statusText}`);
+          setError(error)
         }
       } catch (err) {
         console.error(`Error: ${err.message}`);
@@ -103,9 +104,20 @@ const ListUsers = () => {
   };
 
    // Pagination calculations
-   const totalPages = Math.ceil(test.length / itemsPerPage);
-   const pageNumbers = Array.from({ length: totalPages }, (_, index) => index);
-   const lastPage = totalPages - 1;
+  //  const totalPages = Math.ceil(test.length / itemsPerPage);
+  //  const pageNumbers = Array.from({ length: totalPages }, (_, index) => index);
+  //  const lastPage = totalPages - 1;
+
+   // การคำนวณการแบ่งหน้า
+const totalPages = Math.ceil(test.length / itemsPerPage);
+const pageNumbers = Array.from({ length: totalPages }, (_, index) => index);
+const lastPage = totalPages - 1;
+
+// กำหนดกลุ่มของผู้ใช้สำหรับหน้าปัจจุบัน
+const startIndex = currentPage * itemsPerPage;
+const endIndex = startIndex + itemsPerPage;
+const currentUsers = test.slice(startIndex, endIndex);
+
  
 
   if (error) {
@@ -260,18 +272,14 @@ const ListUsers = () => {
     </tr>
   </thead>
   <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
-  {test.map((item, index) => (
-    <tr
-      key={item.login_ID}
-      className="border-b-2 flex w-full items-center"
-    >
-      <td className="px-6 py-3 w-1/12 text-center">{index + 1}</td>
+  {currentUsers.map((item, index) => (
+    <tr key={item.login_ID} className="border-b-2 flex w-full items-center">
+      <td className="px-6 py-3 w-1/12 text-center">{startIndex + index + 1}</td>
       {selectedRole === "student" && (
         <td className="px-6 py-3 w-3/12 text-center">
           {item.username}
         </td>
       )}
-
       <td className="px-6 py-3 w-4/12">
         {item.fname} {item.lname}
       </td>
@@ -293,6 +301,7 @@ const ListUsers = () => {
     </tr>
   ))}
 </tbody>
+
 
 </table>
 
@@ -345,9 +354,10 @@ const ListUsers = () => {
                 }}
                 className="px-3 cursor-pointer p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
               >
-                <option value={10}>10</option>
-                <option value={20}>20</option>
+                <option value={15}>15</option>
+                <option value={30}>30</option>
                 <option value={50}>50</option>
+                <option value={1000}>ทั้งหมด</option>
               </select>
             </div>
           </div>

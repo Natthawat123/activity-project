@@ -13,18 +13,17 @@ function Add_Activity({ closeModal }) {
   const [inputEndDate, setEndDate] = useState("");
   const [inputStaffID, setstaffID] = useState("");
   const [staffName, setStaffName] = useState([]);
+  const id = localStorage.getItem("staff_ID");
   useEffect(() => {
     axios
       .get("/api/users")
       .then((response) => {
-        setStaffName(response.data.filter((staff) => staff.role != 'student'));
+        setStaffName(response.data.filter((staff) => staff.role != "student"));
       })
       .catch((error) => {
         console.error("Error fetching staff list:", error);
       });
   }, []);
-
-
 
   const handleTitle = (event) => {
     setInputTitle(event.target.value);
@@ -49,7 +48,7 @@ function Add_Activity({ closeModal }) {
     setstaffID(event.target.value);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const activity = {
       act_title: inputTitle,
       act_desc: inputDesc,
@@ -59,34 +58,45 @@ function Add_Activity({ closeModal }) {
       act_location: inputLocation,
       staff_ID: inputStaffID,
     };
-    fetch("/api/activitys", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(activity),
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        Swal.fire({
-          title: "เพิ่มกิจกรรมใหม่สำเร็จ",
-          icon: "success",
-        });
-        setTimeout(() => {
-          closeModal();
-        }, 0);
-        console.log(result);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        Swal.fire({
-          title: "เพิ่มกิจกรรมใหม่ไม่สำเร็จ",
-          icon: "error",
-        });
-        setTimeout(() => {
-          closeModal();
-        }, 1500);
+    const news = {
+      news_topic: `กิจกรรมใหม่ ${inputTitle}`,
+      news_desc: `${inputDesc} ระยะเวลา ${inputStartDate} - ${inputEndDate} สถานที่ ณ ${inputLocation} จำนวนที่เปิดรับ ${inputNumStd} คน`,
+      news_date: new Date(),
+      news_create: id,
+      act_title: inputTitle,
+    };
+    try {
+      await axios.post("/api/news", news);
+
+      // Then, post to /api/activitys
+      const response = await fetch("/api/activitys", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(activity),
       });
+
+      const result = await response.json();
+
+      Swal.fire({
+        title: "เพิ่มกิจกรรมใหม่สำเร็จ",
+        icon: "success",
+      });
+      closeModal();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.fire({
+        title: "เพิ่มกิจกรรมใหม่ไม่สำเร็จ",
+        icon: "error",
+      });
+      setTimeout(() => {
+        closeModal();
+      }, 1500);
+    }
   };
 
   return (

@@ -8,12 +8,13 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
 import { formatDate } from "./Fx.jsx";
+import { formatISO, parseISO } from "date-fns";
 
-function ActivityDetail({ activity, teacher, act_ID }) {
+function ActivityDetail({ activity, teacher, act_ID, id }) {
   const [isReadOnly, setIsReadOnly] = useState(true);
-  const [editData, setEditData] = useState(activity); // Initialize with activity data
+  const [editData, setEditData] = useState(activity);
   const [showButtons, setShowButtons] = useState(false);
-  const [status, setStatus] = useState(activity.act_status || "");
+  const [status, setStatus] = useState(activity.act_status);
   const navigate = useNavigate();
 
   const editButton = () => {
@@ -34,8 +35,16 @@ function ActivityDetail({ activity, teacher, act_ID }) {
 
     if (result.isConfirmed) {
       try {
+        const deleteNews = {
+          news_topic: `แจ้งข่าวการลบกิจกรรม ${activity.act_title} `,
+          news_desc: `จึงเรียนมาเพื่อทราบ`,
+          news_date: new Date(),
+          news_create: id,
+          act_title: activity.act_title,
+          key: activity.act_title,
+        };
         await axios.delete(`/api/activitys/${act_ID}`);
-        navigate(-1);
+        await axios.put("/api/news", deleteNews);
         Swal.fire("Deleted!", "Your file has been deleted.", "success");
       } catch (error) {
         console.error("Error deleting activity:", error);
@@ -57,44 +66,65 @@ function ActivityDetail({ activity, teacher, act_ID }) {
     setEditData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleDateChange = (field, event) => {
+    const newDate = event.target.value;
+    handleInputChange(field, newDate);
+  };
+
   const editActivity = async () => {
     try {
       await axios.put(`/api/activitys/${act_ID}`, editData);
-      Swal.fire("Success!", "Activity updated successfully.", "success").then(
-        () => {
-          setIsReadOnly(true); // Set readOnly mode after successful update
+      const newsData = {
+        news_topic: `แจ้งข่าวการเปลี่ยนแปลงจาก ${activity.act_title} แก้ไขเป็น ${editData.act_title}`,
+        news_desc: `แจ้งข่าวการเปลี่ยนแปลงจาก ${activity.act_desc} แก้ไขเป็น ${editData.act_desc}`,
+        news_date: new Date(),
+        news_create: id,
+        act_title: editData.act_title,
+        key: activity.act_title,
+      };
+
+      await axios.put("/api/news", newsData);
+      Swal.fire("แกไขสำเร็จ", "แก้ไขข้อมูลกิจกรรมเรียบร้อย.", "success").then(
+        async () => {
+          setIsReadOnly(true);
           setShowButtons(false);
         }
       );
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       console.error("Error updating activity:", error);
       Swal.fire("Error!", "Failed to update activity.", "error");
     }
   };
 
-  const { th: startTh, en: startEn } = formatDate(activity.act_dateStart);
-  const { th: endTh, en: endEn } = formatDate(activity.act_dateEnd);
+  const startDateInput = editData.act_dateStart
+    ? formatISO(parseISO(editData.act_dateStart), { representation: "date" })
+    : "";
 
-  const startDateInput = activity.act_dateStart
-    ? activity.act_dateStart.split("T")[0]
+  const endDateInput = editData.act_dateEnd
+    ? formatISO(parseISO(editData.act_dateEnd), { representation: "date" })
     : "";
-  const endDateInput = activity.act_dateEnd
-    ? activity.act_dateEnd.split("T")[0]
-    : "";
+
+  const url = `https://sepolia.etherscan.io/tx/${activity.act_transaction}`;
 
   return (
     <div>
       <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4">
         <div className="flex justify-between items-center">
-          <h1 className="text-lg font-bold mb-2">รายละเอียดกิจกรรม</h1>
-          <Button
-            onClick={editButton}
-            variant="outlined"
-            startIcon={<EditNoteIcon />}
-            color="warning"
-          >
-            แก้ไข
-          </Button>
+          <div className="flex gap-4 items-center">
+            <h1 className="text-lg font-bold mb-2">รายละเอียดกิจกรรม</h1>
+            <Button
+              onClick={editButton}
+              variant="outlined"
+              startIcon={<EditNoteIcon />}
+              color="warning"
+            >
+              แก้ไข
+            </Button>
+          </div>
+
           <div
             className="items-center mb-5 cursor-pointer"
             onClick={() => navigate(-1)}
@@ -170,9 +200,7 @@ function ActivityDetail({ activity, teacher, act_ID }) {
                     type="date"
                     value={startDateInput}
                     readOnly={isReadOnly}
-                    onChange={(e) =>
-                      handleInputChange("act_dateStart", e.target.value)
-                    }
+                    onChange={(e) => handleDateChange("act_dateStart", e)}
                   />
                 </td>
 
@@ -184,9 +212,7 @@ function ActivityDetail({ activity, teacher, act_ID }) {
                     type="date"
                     value={endDateInput}
                     readOnly={isReadOnly}
-                    onChange={(e) =>
-                      handleInputChange("act_dateEnd", e.target.value)
-                    }
+                    onChange={(e) => handleDateChange("act_dateEnd", e)}
                   />
                 </td>
               </tr>
@@ -220,12 +246,22 @@ function ActivityDetail({ activity, teacher, act_ID }) {
                   </select>
                 </td>
               </tr>
+              <tr>
+                <td className="px-6 py-4 font-medium text-gray-900">
+                  ตรวจสถานะการขึ้นบล้อกเชนจสอบ
+                </td>
+                <td className="px-6 py-4 text-gray-500 ">
+                  <a href={url} target="_blank" rel="noopener noreferrer">
+                    link
+                  </a>
+                </td>
+              </tr>
               {showButtons && (
                 <tr>
                   <td colSpan="4" className="px-6 py-4 text-center">
-                    <div className="flex justify-center items-center gap-3 mt-4">
+                    <div className="flex justify-start items-center gap-3 mt-4">
                       <Button
-                        variant="outlined"
+                        variant="contained"
                         color="error"
                         startIcon={<DeleteForeverIcon />}
                         onClick={deleteActivity}
@@ -233,7 +269,7 @@ function ActivityDetail({ activity, teacher, act_ID }) {
                         ลบ
                       </Button>
                       <Button
-                        variant="outlined"
+                        variant="contained"
                         color="primary"
                         startIcon={<EditIcon />}
                         onClick={editActivity}

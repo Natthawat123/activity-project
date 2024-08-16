@@ -2,7 +2,24 @@ import db from '../db.js'
 
 // read All
 export const readManage = (req, res) => {
-    const sql = "SELECT * FROM manage"
+    const sql = `SELECT * FROM manage 
+    LEFT JOIN 
+        activity 
+    ON 
+        manage.act_ID = activity.act_ID 
+    left join 
+        teacher
+    on 
+        activity.staff_ID = teacher.login_ID
+    left join
+        student
+    on manage.std_ID = student.login_ID
+    left join
+        section
+    on student.sec_ID = section.sec_ID
+    where 
+        activity.act_status = 1 
+    `
     db.query(sql, (err, result) => {
         if (err) {
             return res.status(500).json({
@@ -18,7 +35,9 @@ export const readManage = (req, res) => {
     });
 }
 export const readManageOne = (req, res) => {
-    const {id} = req.params;
+    const {
+        id
+    } = req.params;
     const sql = `
     SELECT 
         manage.*,
