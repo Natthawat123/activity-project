@@ -31,7 +31,7 @@ function Test() {
   const navigate = useNavigate();
 
   const contractAddress = "0xc9811A01727735E9c9aE046b7690b2AC9021E1B7";
-  const stdID = localStorage.getItem("std_ID");
+  const stdID = localStorage.getItem("id");
 
   useEffect(() => {
     const fetchSmartContract = async () => {

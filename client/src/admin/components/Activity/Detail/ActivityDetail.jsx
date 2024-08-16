@@ -36,12 +36,9 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
     if (result.isConfirmed) {
       try {
         const deleteNews = {
-          news_topic: `แจ้งข่าวการลบกิจกรรม ${activity.act_title} `,
-          news_desc: `จึงเรียนมาเพื่อทราบ`,
+          news_topic: `กิจกรรม ${activity.act_title} `,
+          news_desc: `ลบกิจกรรม ${activity.act_title} `,
           news_date: new Date(),
-          news_create: id,
-          act_title: activity.act_title,
-          news_type: "all",
         };
         await axios.delete(`/api/activitys/${act_ID}`);
         await axios.post("/api/news", deleteNews);
@@ -75,16 +72,13 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
     try {
       await axios.put(`/api/activitys/${act_ID}`, editData);
       const newsData = {
-        news_topic: `แจ้งข่าวการเปลี่ยนแปลงจาก ${activity.act_title} แก้ไขเป็น ${editData.act_title}`,
-        news_desc: `แจ้งข่าวการเปลี่ยนแปลงจาก ${activity.act_desc} แก้ไขเป็น ${editData.act_desc}`,
+        news_topic: `กิจกรรม ${activity.act_title}`,
+        news_desc: `แก้ไขรายละเอียดกิจกรรม  ${activity.act_title}`,
         news_date: new Date(),
-        news_create: id,
-        act_title: editData.act_title,
-        news_type: "all",
       };
 
       await axios.post("/api/news", newsData);
-      Swal.fire("แกไขสำเร็จ", "แก้ไขข้อมูลกิจกรรมเรียบร้อย.", "success").then(
+      Swal.fire("แก้ไขสำเร็จ", "แก้ไขข้อมูลกิจกรรมเรียบร้อย.", "success").then(
         async () => {
           setIsReadOnly(true);
           setShowButtons(false);

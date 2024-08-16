@@ -14,7 +14,7 @@ function CalendarFull() {
   const [showPopup, setShowPopup] = useState(false);
   const [reserveValue, setReservations] = useState([]);
 
-  const std_ID = localStorage.getItem("std_ID");
+  const std_ID = localStorage.getItem("id");
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -58,7 +58,7 @@ function CalendarFull() {
 
     const fetchReservations = async () => {
       try {
-        const response = await axios.get("/api/manage/reserve");
+        const response = await axios.get("/api/reserve");
         setReservations(response.data);
       } catch (error) {
         console.error("Error fetching reservations: ", error);
@@ -110,13 +110,13 @@ function CalendarFull() {
       };
 
       try {
-        const checkResponse = await axios.get("/api/manage/reserve");
+        const checkResponse = await axios.get("/api/reserve");
         const reservations = checkResponse.data;
 
         const alreadyReserved = reservations.some(
           (reservation) =>
-            reservation.std_ID.toString() === std_ID.toString() &&
-            reservation.act_ID.toString() === selectedEvent.id.toString()
+            reservation.std_ID == std_ID &&
+            reservation.act_ID == selectedEvent.id
         );
 
         if (alreadyReserved) {
@@ -131,6 +131,13 @@ function CalendarFull() {
         }
 
         const reserveResponse = await axios.post("/api/reserve", reserve);
+        await axios.post(`/api/new`, {
+          news_topic: "ลงทะเบียนสำเร็จ",
+          news_desc: `ลงทะเบียนเข้าร่วมกิจกรรม ${selectedEvent.title}`,
+          news_date: new Date().toISOString(),
+          user_ID: std_ID,
+        });
+
         if (
           reserveResponse.data &&
           (reserveResponse.data.success || reserveResponse.status === 200)
@@ -157,8 +164,7 @@ function CalendarFull() {
   const eventStyleGetter = (event) => {
     const isRegistered = reserveValue.some(
       (reservation) =>
-        reservation.std_ID.toString() === std_ID.toString() &&
-        reservation.act_ID.toString() === event.id.toString()
+        reservation.std_ID == std_ID && reservation.act_ID == event.id
     );
 
     const backgroundColor = isRegistered ? "orange" : event.color;
@@ -270,14 +276,13 @@ function CalendarFull() {
                   สถานะการลงทะเบียน :{" "}
                   {reserveValue.some(
                     (reservation) =>
-                      reservation.std_ID.toString() === std_ID.toString() &&
-                      reservation.act_ID.toString() ===
-                        selectedEvent.id.toString()
+                      reservation.std_ID == std_ID &&
+                      reservation.act_ID == selectedEvent.id
                   )
                     ? "ลงทะเบียนแล้ว"
-                    : selectedEvent.status === 2
+                    : selectedEvent.status == 2
                     ? "กิจกรรมสิ้นสุดแล้ว"
-                    : selectedEvent.numStd === selectedEvent.numStdReserve
+                    : selectedEvent.numStd == selectedEvent.numStdReserve
                     ? "ลงทะเบียนเต็มแล้ว"
                     : now >= selectedEvent.reserveStart &&
                       now <= selectedEvent.reserveEnd

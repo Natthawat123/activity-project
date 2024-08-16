@@ -20,25 +20,16 @@ function Wallet() {
         console.error("Error fetching data:", error);
       }
     };
-    const fetchData = async () => {
-      try {
-        const res = await axios.get("/api/manage/upload");
-        setActivity(res.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
 
     const fetchManage = async () => {
       try {
-        const res = await axios.get(`/api/manage/manages`);
+        const res = await axios.get(`/api/reserve`);
         setManage(res.data);
       } catch (e) {
         console.error("Error fetching manage data:", e);
       }
     };
     fetchUsername();
-    fetchData();
     fetchManage();
   }, []);
 

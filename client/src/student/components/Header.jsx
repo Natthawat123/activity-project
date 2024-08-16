@@ -7,7 +7,7 @@ import PersonPinIcon from "@mui/icons-material/PersonPin";
 import SlideBar from "../../components/news/SlideBar";
 
 const Header = () => {
-  const ID = localStorage.getItem("std_ID");
+  const ID = localStorage.getItem("id");
   const [username, setUsername] = useState("");
   const Homeurl = "localhost:5173/activity/calendar";
 

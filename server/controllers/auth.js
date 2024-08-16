@@ -4,7 +4,8 @@ import jwt from "jsonwebtoken";
 const secret = "Fullstack-Login";
 const saltRounds = 10;
 
-//login
+
+// //login
 export const login = (req, res) => {
   const {
     username,
@@ -39,7 +40,8 @@ export const login = (req, res) => {
             message: "Login Success",
             token,
             role: user[0].role,
-            staff_ID: user[0].id, // ส่งบทบาทในการตอบกลับ
+            id: user[0].id,
+            name: user[0].username
           });
         } else if (user[0].role === "student") {
           res.json({
@@ -47,7 +49,9 @@ export const login = (req, res) => {
             message: "Login Success",
             token,
             role: user[0].role,
-            std_ID: user[0].id, // ส่งบทบาทในการตอบกลับ
+            id: user[0].id,
+            name: user[0].id,
+
           });
         }
       } else {

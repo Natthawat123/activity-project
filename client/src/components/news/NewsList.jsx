@@ -13,8 +13,10 @@ import StarBorderIcon from "@mui/icons-material/StarBorder";
 import ArticleIcon from "@mui/icons-material/Article";
 import Box from "@mui/material/Box";
 import axios from "axios";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import Tooltip from "@mui/material/Tooltip";
 
-export default function NewsList({ news = [] }) {
+export default function NewsList({ news = [], id }) {
   const [open, setOpen] = React.useState({});
   const [selectedNews, setSelectedNews] = React.useState(null);
 
@@ -27,6 +29,30 @@ export default function NewsList({ news = [] }) {
 
   const handleListItemClick = (item) => {
     setSelectedNews(item);
+  };
+  const read = async (news_ID) => {
+    try {
+      const res = await axios.put(`/api/notify`, {
+        user_ID: id,
+        news_ID: news_ID,
+      });
+      if (res.status === 200) {
+        window.location.reload();
+      } else {
+        console.error("Failed to mark news as read");
+      }
+    } catch (e) {
+      console.error("Error marking news as read:", e);
+    }
+  };
+  const color = (status) => {
+    if (status === "read") return "#fdd835";
+    return "#e0e0e0";
+  };
+
+  const tootip = (status) => {
+    if (status == "read") return "อ่านแล้ว";
+    return "ทำเครื่องหมายว่าอ่านแล้ว";
   };
 
   return (
@@ -56,7 +82,17 @@ export default function NewsList({ news = [] }) {
           <React.Fragment key={item.news_ID}>
             <ListItemButton onClick={handleClick(item.news_ID)}>
               <ListItemIcon>
-                <StarIcon sx={{ color: "#fdd835" }} />
+                <Tooltip title={tootip(item.notify_status)}>
+                  <CheckCircleOutlineIcon
+                    sx={{
+                      color: color(item.notify_status),
+                      "&:hover": {
+                        color: "#fdd835",
+                      },
+                    }}
+                    onClick={() => read(item.news_ID)}
+                  />
+                </Tooltip>
               </ListItemIcon>
               <ListItemText primary={item.news_topic} />
               {open[item.news_ID] ? <ExpandLess /> : <ExpandMore />}

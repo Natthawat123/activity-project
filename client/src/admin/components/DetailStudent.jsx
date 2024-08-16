@@ -32,6 +32,7 @@ function DetailStudent() {
 
   const navigate = useNavigate();
   const { id } = useParams();
+  const role = localStorage.getItem("role");
   const contractAddress = "0xc9811A01727735E9c9aE046b7690b2AC9021E1B7";
 
   useEffect(() => {
@@ -131,14 +132,12 @@ function DetailStudent() {
           user = student.login_ID;
         }
         const news = {
-          news_topic: `แจ้งข่าวการลบผู้ใช้ในระบบ`,
-          news_desc: `ลบผู้ใช้ ${user} ออกจากระบบ `,
+          news_topic: `ลบผู้ใช้งาน `,
+          news_desc: `ลบผู้ใช้งานโดย ${role}`,
           news_date: new Date(),
-          news_create: id,
-          act_title: "delete",
-          news_type: "teacher",
+          user_ID: id,
         };
-        await axios.post(`/api/news`, news);
+        await axios.post(`/api/new`, news);
 
         const response = await axios.delete(api);
 
@@ -184,14 +183,12 @@ function DetailStudent() {
         updatedStudent
       );
       const news = {
-        news_topic: `แจ้งข่าวการแก้ไขประวัติส่วนตัวของคุณ`,
-        news_desc: `จาก ${student} แก้ไขเป็น ${updatedStudent}`,
+        news_topic: `ประวัติส่วนตัวถูกแก้ไข `,
+        news_desc: `ถูกแก้ไขโดย ${role}`,
         news_date: new Date(),
-        news_create: id,
-        act_title: "none",
-        news_type: student.login_ID,
+        user_ID: student.login_ID,
       };
-      await axios.post(`/api/news`, news);
+      await axios.post(`/api/new`, news);
       if (response.status === 200) {
         Swal.fire({
           title: "Updated5555!",

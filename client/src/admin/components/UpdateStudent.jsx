@@ -19,6 +19,7 @@ const StudentForm = () => {
   const [section, setSection] = useState([]);
   const [title, setTitle] = useState("");
   const [value, setValue] = useState({});
+  const role = localStorage.getItem("role");
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -187,14 +188,12 @@ const StudentForm = () => {
       role: value.role,
     };
     const news = {
-      news_topic: `แจ้งข่าวการแก้ไขประวัติส่วนตัวของคุณ`,
-      news_desc: `ดูรายละเอียดได้แล้ววันนี้`,
+      news_topic: `ประวัติส่วนตัวถูกแก้ไข `,
+      news_desc: `ถูกแก้ไขโดย ${role}`,
       news_date: new Date(),
-      news_create: id,
-      act_title: "none",
-      news_type: id,
+      user_ID: id,
     };
-    axios.post(`/api/news`, news);
+    axios.post(`/api/new`, news);
 
     fetch("/api/users/" + id, {
       method: "PUT",

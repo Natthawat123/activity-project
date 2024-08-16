@@ -8,7 +8,8 @@ import {
     updateAct_title,
     upload,
     newsCancelReserve,
-    test
+    test,
+    newsOne
 } from '../controllers/news.js'
 
 const router = express.Router()
@@ -22,5 +23,6 @@ router.put('/news', update)
 router.put('/newsAct', updateAct_title)
 router.delete('/news', deleteNews)
 router.post('/news', test)
+router.post('/new', newsOne)
 
 export default router
