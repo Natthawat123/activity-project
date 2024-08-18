@@ -67,20 +67,18 @@ function Student({ act_ID, day = [], data = [], join = {}, id, activity }) {
     if (result.isConfirmed) {
       try {
         const studentIDs = selectCheckBox.map((student) => student.std_ID);
-        await axios.post(`/api/newsCancelReserve`, {
+        await axios.post(`/api/new`, {
           news_topic: "ยกการลงทะเบียน",
           news_desc: `ยกการลงทะเบียนกิจกรรม ${activity.act_title}`,
-          news_date: new Date().toISOString(),
-          news_create: id,
-          news_type: studentIDs,
-          act_title: activity.act_title,
+          news_date: new Date(),
+          user_ID: studentIDs,
         });
 
         for (const student of selectCheckBox) {
-          await axios.delete(`/api/manage/reserve`, { data: student });
+          await axios.delete(`/api/reserve`, { data: student });
         }
 
-        await axios.put(`/api/manage/cancelReserve`, {
+        await axios.put(`/api/cancelReserve`, {
           act_ID,
           cancelReserveNumStd: selectCheckBox.length,
         });

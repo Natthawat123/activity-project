@@ -62,8 +62,6 @@ function Add_Activity({ closeModal }) {
       news_topic: `กิจกรรมใหม่ ${inputTitle}`,
       news_desc: `${inputDesc} ระยะเวลา ${inputStartDate} - ${inputEndDate} สถานที่ ณ ${inputLocation} จำนวนที่เปิดรับ ${inputNumStd} คน`,
       news_date: new Date(),
-      news_create: id,
-      act_title: inputTitle,
     };
     try {
       await axios.post("/api/news", news);

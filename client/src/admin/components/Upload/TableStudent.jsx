@@ -17,7 +17,6 @@ function TableStudent({ activity = [], id, username }) {
   const [checkAll, setCheckAll] = useState(false);
   const [web3, setWeb3] = useState(null);
   const [contract, setContract] = useState(null);
-  console.log(username);
 
   const days = range(activity.act_dateStart, activity.act_dateEnd);
 
@@ -135,23 +134,23 @@ function TableStudent({ activity = [], id, username }) {
         );
 
         const dayJoin = studentIds.map((stdId) => actData[stdId]);
-        // const actIDUint32 = web3Instance.utils.numberToHex(parseInt(actID));
-        // const studentIdsUint32 = studentIds.map((id) =>
-        //   web3Instance.utils.numberToHex(parseInt(id))
-        // );
+        const actIDUint32 = web3Instance.utils.numberToHex(parseInt(actID));
+        const studentIdsUint32 = studentIds.map((id) =>
+          web3Instance.utils.numberToHex(parseInt(id))
+        );
 
-        // const dayJoinUint32 = dayJoin.map((days) =>
-        //   days.map((day) => web3Instance.utils.numberToHex(parseInt(day)))
-        // );
+        const dayJoinUint32 = dayJoin.map((days) =>
+          days.map((day) => web3Instance.utils.numberToHex(parseInt(day)))
+        );
 
-        // const tx = await contractInstance.methods
-        //   .add(actIDUint32, studentIdsUint32, dayJoinUint32)
-        //   .send({ from: accounts[0] });
+        const tx = await contractInstance.methods
+          .add(actIDUint32, studentIdsUint32, dayJoinUint32)
+          .send({ from: accounts[0] });
 
-        // await axios.put(`/api/updateStatus/${actID}`);
-        // await axios.put(`/api/transection/${actID}`, {
-        //   act_transaction: tx.transactionHash,
-        // });
+        await axios.put(`/api/updateStatus/${actID}`);
+        await axios.put(`/api/transection/${actID}`, {
+          act_transaction: tx.transactionHash,
+        });
         await axios.put(`/api/status/status`, {
           act_ID: actID,
           std_IDs: notCheckedStudents,
@@ -160,12 +159,11 @@ function TableStudent({ activity = [], id, username }) {
           act_ID: actID,
           std_ID: studentIds,
         });
-        await axios.post(`/api/news`, {
-          news_topic: "ยืนยันผลการเข้าร่วม",
+        await axios.post(`/api/new`, {
+          news_topic: `ยืนยันผลการเข้าร่วมกิจกรรม ${activity.act_title}`,
           news_desc: "สามารถดูรายละเอียดการเข้าร่วมกิจกรรมได้ที่แล้ววันนี้",
-          news_date: new Date().toISOString(),
-          news_create: id,
-          act_title: activity.act_title,
+          news_date: new Date(),
+          user_ID: studentIds,
         });
 
         Swal.fire({

@@ -32,6 +32,7 @@ function DetailStudent() {
 
   const navigate = useNavigate();
   const { id } = useParams();
+  const role = localStorage.getItem("role");
   const contractAddress = "0xc9811A01727735E9c9aE046b7690b2AC9021E1B7";
 
   useEffect(() => {
@@ -69,8 +70,6 @@ function DetailStudent() {
     fetchSmartContract();
     fetchActivity();
   }, [id]);
-  console.log(join);
-  console.log(id);
 
   const toggleRow = (actId) => {
     setOpenRows((prev) => ({ ...prev, [actId]: !prev[actId] }));
@@ -123,12 +122,22 @@ function DetailStudent() {
 
       if (result.isConfirmed) {
         let api;
+        let user;
 
         if (student.role == "student") {
           api = `/api/students/${student.username}`;
+          user = student.username;
         } else if (student.role == "teacher") {
           api = `/api/teachers/${student.login_ID}`;
+          user = student.login_ID;
         }
+        const news = {
+          news_topic: `ลบผู้ใช้งาน `,
+          news_desc: `ลบผู้ใช้งานโดย ${role}`,
+          news_date: new Date(),
+          user_ID: id,
+        };
+        await axios.post(`/api/new`, news);
 
         const response = await axios.delete(api);
 
@@ -173,12 +182,20 @@ function DetailStudent() {
         `/api/students/${student.login_ID}`,
         updatedStudent
       );
+      const news = {
+        news_topic: `ประวัติส่วนตัวถูกแก้ไข `,
+        news_desc: `ถูกแก้ไขโดย ${role}`,
+        news_date: new Date(),
+        user_ID: student.login_ID,
+      };
+      await axios.post(`/api/new`, news);
       if (response.status === 200) {
         Swal.fire({
-          title: "Updated!",
+          title: "Updated5555!",
           text: "The student's information has been updated.",
           icon: "success",
         });
+
         setStudent(updatedStudent);
         setEditMode(false);
       } else {

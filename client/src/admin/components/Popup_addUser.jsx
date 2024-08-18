@@ -49,8 +49,8 @@ class Popup extends Component {
         </button>
         <Modal
           visible={this.state.visible}
-          width="840"
-          height="130"
+          width="640"
+          height="100"
           effect="fadeInUp"
           onClickAway={this.closeModal}
         >
@@ -64,4 +64,4 @@ class Popup extends Component {
   }
 }
 
-export default Popup;
+export default Popup; 

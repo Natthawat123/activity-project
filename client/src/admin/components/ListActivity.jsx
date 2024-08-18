@@ -119,7 +119,7 @@ const ListActivity = () => {
       case "ended":
         return status === "กิจกรรมสิ้นสุดแล้ว";
       default:
-        return true; // แสดงข้อมูลทั้งหมดในกรณีค่าเริ่มต้น
+        return true;
     }
   });
 

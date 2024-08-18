@@ -5,9 +5,10 @@ import Logout from "../../components/Logout";
 import axios from "axios";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
 import SlideBar from "../../components/news/SlideBar";
+import KeyIcon from '@mui/icons-material/Key';
 
 const Header = () => {
-  const ID = localStorage.getItem("std_ID");
+  const ID = localStorage.getItem("id");
   const [username, setUsername] = useState("");
   const Homeurl = "localhost:5173/activity/calendar";
 
@@ -93,6 +94,7 @@ const Header = () => {
             <p className="md:flex items-center">
               <PersonPinIcon className="mx-2 text-blue-500" />
               {username}
+              <Link to={`/activity/change-password/${ID}`}><KeyIcon/></Link>
             </p>
             <SlideBar />
 

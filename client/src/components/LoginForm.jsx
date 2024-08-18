@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Logo from "../images/logoit.png";
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 export default function SignInSide() {
   const [errorMessage, setErrorMessage] = useState("");
@@ -34,15 +34,14 @@ export default function SignInSide() {
       if (response.ok && result.status === "ok") {
         localStorage.setItem("token", result.token);
         localStorage.setItem("role", result.role);
+        localStorage.setItem("id", result.id);
+        localStorage.setItem("name", result.name);
         if (result.role === "admin") {
           window.location = "/admin/dashboard";
-          localStorage.setItem("staff_ID", result.staff_ID); // Redirect to admin dashboard
         } else if (result.role === "teacher") {
-          window.location = "/teacher/calendar"; // Redirect to teacher dashboard
-          localStorage.setItem("staff_ID", result.staff_ID);
+          window.location = "/teacher/calendar";
         } else {
-          window.location = "/activity/calendar"; // Redirect to user dashboard
-          localStorage.setItem("std_ID", result.std_ID);
+          window.location = "/activity/calendar";
         }
       } else {
         setErrorMessage(
@@ -62,7 +61,7 @@ export default function SignInSide() {
   const handleForgotPasswordSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch("/api/forgotPassword", {
+      const response = await fetch("/api/forgot-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -74,15 +73,15 @@ export default function SignInSide() {
         setResetMessage("Password reset link sent to your email address.");
         setResetEmail("");
       } else {
-        setResetMessage("Failed to send password reset link. Please try again.");
+        setResetMessage(
+          "Failed to send password reset link. Please try again."
+        );
       }
     } catch (error) {
       console.error("Error during password reset request:", error);
       setResetMessage("An error occurred. Please try again later.");
     }
   };
-
-  
 
   return (
     <>
@@ -118,7 +117,9 @@ export default function SignInSide() {
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          onSubmit={showForgotPassword ? handleForgotPasswordSubmit : handleSubmit}
+          onSubmit={
+            showForgotPassword ? handleForgotPasswordSubmit : handleSubmit
+          }
           className="w-full lg:w-1/2 bg-gray-900 flex flex-col items-center justify-center relative"
         >
           <div className="grid grid-cols-1 w-11/12 sm:w-3/4 lg:w-2/3">
@@ -169,7 +170,7 @@ export default function SignInSide() {
                 <motion.button
                   initial={{ opacity: 0, y: 50 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: .5 }}
+                  transition={{ duration: 0.5, delay: 0.5 }}
                   type="button"
                   onClick={() => setShowForgotPassword(false)}
                   className="text-sm font-semibold text-purple-600 hover:text-white mt-2"

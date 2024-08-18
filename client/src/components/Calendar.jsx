@@ -8,6 +8,7 @@ import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import Tooltip from "@mui/material/Tooltip";
 import { useNavigate } from "react-router";
 
+
 const localizer = momentLocalizer(moment);
 
 function CalendarFull() {
@@ -16,6 +17,7 @@ function CalendarFull() {
   const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
   const now = new Date();
+  const role = localStorage.getItem('role')
 
   useEffect(() => {
     fetch("/api/activitys")
@@ -179,6 +181,25 @@ function CalendarFull() {
                     onClick={() => navigate(`/reserve/${selectedEvent.id}`)}
                   />
                 </Tooltip>
+
+                {role ? (
+                 <Tooltip title="ดาวน์โหลดใบลงชื่อกิจกรรม" placement="bottom-start"> ||
+                  <LibraryBooksIcon
+                    sx={{
+                      color: "teal",
+                      transition: "0.3s ease",
+                      marginLeft: 0.5,
+                      "&:hover": {
+                        color: "indigo",
+                        transform: "scale(1.5) translateX(5px)",
+                      },
+                    }}
+                    onClick={() => navigate(`/entry/${selectedEvent.id}`)}
+                  />
+                </Tooltip>
+                ): null}
+
+                
               </h2>
               <p className="text-xl">ชื่อกิจกรรม : {selectedEvent.title}</p>
               <p>สถานที่ : {selectedEvent.location}</p>

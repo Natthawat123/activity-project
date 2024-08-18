@@ -4,12 +4,14 @@ import Logo from "../../images/IT_logo_Standard.png";
 import Logout from "../../components/Logout";
 import axios from "axios";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
+import SlideBar from "../../components/news/SlideBar";
+import KeyIcon from '@mui/icons-material/Key';
 
 const NavBar = () => {
-  const id = localStorage.getItem("staff_ID");
+  const id = localStorage.getItem("id");
   const [username, setUsername] = useState([]);
 
-  const Homeurl = 'localhost:5173/teacher/calendar';
+  const Homeurl = "localhost:5173/teacher/calendar";
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -21,7 +23,7 @@ const NavBar = () => {
       }
     };
 
-    if(Homeurl){
+    if (Homeurl) {
       setSelectedItem("Calendar");
       setListVisible(false);
     }
@@ -109,8 +111,11 @@ const NavBar = () => {
           <div className="flex items-center gap-5">
             <p className="md:flex items-center">
               <PersonPinIcon className="mx-2 text-blue-500" />
-              {username.staff_fname + " " + username.staff_lname}
+              {username.staff_fname} {username.staff_lname}
+              <Link to={`/teacher/change-password/${id}`}><KeyIcon/></Link>
             </p>
+            <SlideBar />
+
             <Logout className="block md:hidden" />
           </div>
         </nav>
