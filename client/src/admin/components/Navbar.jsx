@@ -114,6 +114,7 @@ const NavBar = () => {
               <PersonPinIcon className="mx-2 text-blue-500" />
               {username.fname}
             </p>
+
             <SlideBar />
             <div className="hidden md:flex">
               <Logout />
@@ -159,8 +160,8 @@ const NavBar = () => {
             <ul
               id="list"
               className={`relative font-normal text-base leading-4 top-2 w-full rounded shadow-md transition-all duration-700 ${isListVisible
-                  ? "opacity-100 max-h-40"
-                  : "opacity-0 max-h-0 hidden"
+                ? "opacity-100 max-h-40"
+                : "opacity-0 max-h-0 hidden"
                 }`}
             >
               <Link to="/admin/dashboard">
@@ -193,7 +194,7 @@ const NavBar = () => {
                   onClick={() => handleItemClick("บันทึกข้อมูลกิจกรรมขึ้น Blockchain")}
                   className={getItemClassXs("บันทึกข้อมูลกิจกรรมขึ้น Blockchain")}
                 >
-                บันทึกข้อมูลกิจกรรมขึ้น Blockchain
+                  บันทึกข้อมูลกิจกรรมขึ้น Blockchain
                 </li>
               </Link>
 
