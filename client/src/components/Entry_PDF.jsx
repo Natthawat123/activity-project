@@ -126,7 +126,9 @@ function PDFReserve() {
     axios.get(`/api/reserve/${act_ID}`).then((res) => {
       const sortedReserves = res.data.sort((a, b) => a.login_ID - b.login_ID); // Sort by login_ID ascending
       setReserve(sortedReserves);
-      setDateRange(range(sortedReserves[0].act_dateStart, sortedReserves[0].act_dateEnd));
+      setDateRange(
+        range(sortedReserves[0].act_dateStart, sortedReserves[0].act_dateEnd)
+      );
       setActivity({ title: sortedReserves[0].act_title });
     });
   }, [act_ID]);
@@ -163,14 +165,14 @@ function PDFReserve() {
               {reserves[0].act_desc}
             </Text>
             <Text style={styles.title} fixed>
-              ระหว่างวันที่ {th(dateS(reserves[0].act_dateStart))} - {th(dateS(reserves[0].act_dateEnd))}
+              ระหว่างวันที่ {th(dateS(reserves[0].act_dateStart))} -{" "}
+              {th(dateS(reserves[0].act_dateEnd))}
             </Text>
             <Text style={styles.title} fixed>
               ณ {reserves[0].act_location}
             </Text>
-            <Text style={[styles.title, {marginBottom: 10}]} fixed>
-              โดย{" "}
-              {reserves[0].staff_fname} {reserves[0].staff_lname}
+            <Text style={[styles.title, { marginBottom: 10 }]} fixed>
+              โดย {reserves[0].staff_fname} {reserves[0].staff_lname}
             </Text>
 
             <View style={styles.table}>

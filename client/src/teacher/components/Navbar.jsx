@@ -24,7 +24,7 @@ const NavBar = () => {
     };
 
     if (Homeurl) {
-      setSelectedItem("Calendar");
+      setSelectedItem("ปฏิทินกิจกรรม");
       setListVisible(false);
     }
 
@@ -116,7 +116,9 @@ const NavBar = () => {
             </p>
             <SlideBar />
 
-            <Logout className="block md:hidden" />
+            <div className="hidden md:flex">
+            <Logout />
+          </div>
           </div>
         </nav>
 
@@ -132,7 +134,7 @@ const NavBar = () => {
                   isListVisible ? "" : "hidden"
                 }`}
               >
-                Selected:{" "}
+                 {" "}
               </span>
               <p
                 id="textClicked"
@@ -171,6 +173,7 @@ const NavBar = () => {
                   ปฏิทินกิจกรรม
                 </li>
               </Link>
+           
               <Link to="/teacher/liststudent">
                 <li
                   onClick={() => handleItemClick("รายชื่อนักศึกษา")}
@@ -179,6 +182,16 @@ const NavBar = () => {
                   รายชื่อนักศึกษา
                 </li>
               </Link>
+
+              <Link to="/teacher/activity">
+              <li
+                onClick={() => handleItemClick("กิจกรรม")}
+                className={getItemClassXs("Calendar")}
+              >
+                กิจกรรม
+              </li>
+            </Link>
+              
               <Link to="/teacher/profile">
                 <li
                   onClick={() => handleItemClick("ประวัติส่วนตัว")}
@@ -192,7 +205,7 @@ const NavBar = () => {
                 onClick={() => handleItemClick("Logout")}
                 className={getItemLogoutXs("Logout")}
               >
-                Logout
+                <Logout />
               </li>
             </ul>
           </div>

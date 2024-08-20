@@ -235,7 +235,7 @@ const StudentForm = () => {
   }
 
   return (
-    <div className="container mx-auto mb-10 md:px-20 pt-24">
+    <div className="container mx-auto mb-10 md:px-20 pt-10 md:pt-24">
       <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 pb-10">
         <div className="flex justify-between">
           <div className="flex gap-2">

@@ -23,7 +23,7 @@ const Header = () => {
     };
 
     if (Homeurl) {
-      setSelectedItem("Calendar");
+      setSelectedItem("ปฏิทินกิจกรรม");
       setListVisible(false);
     }
 
@@ -54,6 +54,12 @@ const Header = () => {
   const getItemClassXs = () =>
     `px-4 py-3 text-gray-600 bg-gray-50 border border-gray-50 focus:outline-none focus:bg-gray-100 hover:bg-gray-100 duration-100 cursor-pointer text-xs leading-3 font-normal`;
 
+
+  const getItemLogoutXs = (itemName) =>
+    `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 font-bold text-red-500 border border-white bg-grey-500 cursor-pointer px-3 py-2.5 text-xs leading-3 shadow-md rounded ${selectedItem === itemName
+      ? "bg-red-600 text-white"
+      : "bg-gray-50 text-gray-600 border border-white"
+    }`;
   return (
     <div className="3xl:container 3xl:mx-auto top-0 fixed z-50 w-full">
       <div className="bg-white rounded shadow-lg py-5 px-7 md:pl-28 md:pr-28">
@@ -81,10 +87,10 @@ const Header = () => {
                 ประวัติส่วนตัว
               </li>
             </Link>
-            <Link to="/activity/dashboard">
+            <Link to="/activity/list-activity">
               <li
-                onClick={() => handleItemClick("listStudent")}
-                className={getItemClass("listStudent")}
+                onClick={() => handleItemClick("กิจกรรม")}
+                className={getItemClass("กิจกรรม")}
               >
                 กิจกรรม
               </li>
@@ -98,7 +104,9 @@ const Header = () => {
             </p>
             <SlideBar />
 
-            <Logout className="block md:hidden" />
+            <div className="hidden md:flex">
+            <Logout />
+          </div>
           </div>
         </nav>
         <div className="relative block md:hidden w-full mt-5">
@@ -113,7 +121,7 @@ const Header = () => {
                   isListVisible ? "" : "hidden"
                 }`}
               >
-                Selected:{" "}
+                {" "}
               </span>
               <p
                 id="textClicked"
@@ -143,39 +151,39 @@ const Header = () => {
                   : "opacity-0 max-h-0 hidden"
               }`}
             >
-              <Link to="/activity/calendar">
-                <li
-                  onClick={() => handleItemClick("กระดานข่าว")}
-                  className={getItemClassXs("news")}
-                >
-                  <SlideBar />
-                </li>
-              </Link>
+        
 
               <Link to="/activity/calendar">
                 <li
                   onClick={() => handleItemClick("ปฏิทินกิจกรรม")}
-                  className={getItemClassXs("Calendar")}
+                  className={getItemClassXs("ปฏิทินกิจกรรม")}
                 >
                   ปฏิทินกิจกรรม
-                </li>
-              </Link>
-              <Link to="/activity/liststudent">
-                <li
-                  onClick={() => handleItemClick("รายชื่อนักศึกษา")}
-                  className={getItemClassXs("listStudent")}
-                >
-                  รายชื่อนักศึกษา
                 </li>
               </Link>
               <Link to="/activity/profile">
                 <li
                   onClick={() => handleItemClick("ประวัติส่วนตัว")}
-                  className={getItemClassXs("Profile")}
+                  className={getItemClassXs("listStudent")}
                 >
-                  ประวัติส่วนตัว
+                ประวัติส่วนตัว
                 </li>
               </Link>
+              <Link to="/activity/list-activity">
+                <li
+                  onClick={() => handleItemClick("กิจกรรม")}
+                  className={getItemClassXs("Profile")}
+                >
+                กิจกรรม
+                </li>
+              </Link>
+
+              <li
+              onClick={() => handleItemClick("Logout")}
+              className={getItemLogoutXs("Logout")}
+            >
+              <Logout />
+            </li>
             </ul>
           </div>
         </div>

@@ -2,6 +2,7 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import Divider from "@mui/material/Divider";
+import Button from "@mui/material/Button"; // Import Button from MUI
 import NewsList from "./NewsList.jsx";
 import MailBox from "./MailBox.jsx";
 import axios from "axios";
@@ -24,6 +25,7 @@ export default function SlideBar() {
 
     fetchNews();
   }, [id]);
+
   const toggleDrawer = (open) => (event) => {
     if (
       event &&
@@ -32,11 +34,7 @@ export default function SlideBar() {
     ) {
       return;
     }
-    if (open) {
-      setState({ right: open });
-    } else {
-      setState({ right: open });
-    }
+    setState({ right: open });
   };
 
   const handleDrawerClick = (event) => {
@@ -44,7 +42,11 @@ export default function SlideBar() {
   };
 
   const list = () => (
-    <Box sx={{ width: 400 }} role="presentation" onClick={handleDrawerClick}>
+    <Box sx={{ width: 350 }} role="presentation" onClick={handleDrawerClick}>
+      <Button className="right-0" onClick={toggleDrawer(false)}>
+        Close
+      </Button>{" "}
+      {/* Close button */}
       <NewsList news={news} id={id} />
       <Divider />
     </Box>

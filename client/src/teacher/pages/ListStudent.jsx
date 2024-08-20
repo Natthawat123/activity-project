@@ -8,10 +8,10 @@ const ListStudents = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [itemsPerPage, setItemsPerPage] = useState(15);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
   const [students, setStudents] = useState([]);
-  const [sections, setSections] = useState([]);
+  const [section, setSection] = useState([]);
   const [selectedSection, setSelectedSection] = useState("all");
   const [sortOrder, setSortOrder] = useState("asc");
 
@@ -27,8 +27,17 @@ const ListStudents = () => {
         setError(error);
       }
     };
+    const fetchSection = async () => {
+      try {
+        const response = await axios.get("/api/sections");
+        setSection(response.data);
+      } catch (err) {
+        console.error(`Error: ${err.message}`);
+      }
+    };
 
     fetchData();
+    fetchSection();
   }, []);
 
   const handleSearch = (event) => {
@@ -44,14 +53,19 @@ const ListStudents = () => {
     const fname = student.std_fname ? student.std_fname.toLowerCase() : "";
     const lname = student.std_lname ? student.std_lname.toLowerCase() : "";
     const secID = student.sec_ID ? student.sec_ID.toString().toLowerCase() : "";
-
+  
     const matchesSearchTerm =
       fname.includes(searchTerm.toLowerCase()) ||
       lname.includes(searchTerm.toLowerCase()) ||
       secID.includes(searchTerm.toLowerCase());
-
-    return matchesSearchTerm;
+  
+    const matchesSection =
+      selectedSection === "all" || student.sec_ID === parseInt(selectedSection);
+  
+    return matchesSearchTerm && matchesSection;
   });
+  
+
 
   const sortedStudents = filteredStudents.sort((a, b) => {
     const idA = String(a.std_ID || "");
@@ -61,6 +75,11 @@ const ListStudents = () => {
       ? idA.localeCompare(idB)
       : idB.localeCompare(idA);
   });
+
+  const handleSectionFilterChange = (e) => {
+    setSelectedSection(e.target.value);
+  };
+
 
   const lastPage = Math.ceil(filteredStudents.length / itemsPerPage) - 1;
   const visibleStudents = sortedStudents.slice(
@@ -75,7 +94,7 @@ const ListStudents = () => {
     return <div>Loading...</div>;
   } else {
     return (
-      <div className="container mx-auto md:px-20 pt-20 my-10">
+      <div className="container mx-auto md:px-20 pt-36 md:pt-20 my-10">
         <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
           <div className="text-lg font-bold mb-2 gap-2 flex">
             <h1>รายชื่อนักศึกษา</h1>
@@ -134,17 +153,17 @@ const ListStudents = () => {
 
               <div className="items-center justify-center text-center">
                 <label htmlFor="filter-section" className="text-xs">
-                  หมู่เรียน
+                  แยกตามหมู่เรียน
                 </label>
                 <div className="relative justify-center flex">
                   <select
                     id="filter-section"
                     value={selectedSection}
-                    onChange={(e) => setSelectedSection(e.target.value)}
-                    className="text-xs block p-1 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    onChange={handleSectionFilterChange}
+                    className="text-xs cursor-pointer block p-1 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
                     <option value="all">ทั้งหมด</option>
-                    {sections.map((sec) => (
+                    {section.map((sec) => (
                       <option key={sec.sec_ID} value={sec.sec_ID}>
                         {sec.sec_name}
                       </option>
@@ -152,6 +171,29 @@ const ListStudents = () => {
                   </select>
                 </div>
               </div>
+
+              <div className="items-center justify-center text-center">
+                <label htmlFor="filter-section" className="text-xs">
+                  แยกตามผู้จัดกิจกรรม
+                </label>
+                <div className="relative justify-center flex">
+                  <select
+                    id="filter-section"
+                    value={selectedStaft}
+                    onChange={handleStaftFilterChange}
+                    className="text-xs cursor-pointer block p-1 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  >
+                    <option value="all">ทั้งหมด</option>
+                    {staft.map((staft) => (
+                      <option key={staft.staft_ID} value={staft.staft_ID}>
+                        {staft.staft_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+
             </div>
           </div>
 
@@ -215,9 +257,8 @@ const ListStudents = () => {
                   setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))
                 }
                 disabled={currentPage === 0}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
-                  currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
-                }`}
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
+                  }`}
               >
                 ก่อนหน้า
               </button>
@@ -225,9 +266,8 @@ const ListStudents = () => {
                 <button
                   key={pageNumber}
                   onClick={() => setCurrentPage(pageNumber)}
-                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
-                    pageNumber === currentPage ? "bg-blue-200" : ""
-                  }`}
+                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${pageNumber === currentPage ? "bg-blue-200" : ""
+                    }`}
                 >
                   {pageNumber + 1}
                 </button>
@@ -237,11 +277,10 @@ const ListStudents = () => {
                   setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))
                 }
                 disabled={currentPage === lastPage}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
-                  currentPage === lastPage
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === lastPage
                     ? "cursor-not-allowed"
                     : "hover:bg-blue-200"
-                }`}
+                  }`}
               >
                 ถัดไป
               </button>
@@ -258,6 +297,7 @@ const ListStudents = () => {
                 <option value={10}>10</option>
                 <option value={20}>20</option>
                 <option value={50}>50</option>
+                <option value={1000}>ทั้งหมด</option>
               </select>
             </div>
           </div>

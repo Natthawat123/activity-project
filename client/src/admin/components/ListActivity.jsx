@@ -83,10 +83,10 @@ const ListActivity = () => {
     );
   });
 
-  const getActivityStatus = (item, now) => {
+  const getActivityStatus = (item) => {
     const dateStart = moment(item.act_dateStart);
-    const twoWeeksBefore = dateStart.subtract(2, "weeks").toDate();
-    const oneDayBefore = dateStart.subtract(1, "day").toDate();
+    const twoWeeksBefore = dateStart.clone().subtract(2, "weeks").toDate();
+    const oneDayBefore = dateStart.clone().subtract(1, "day").toDate();
 
     if (item.act_status === 2) {
       return "กิจกรรมสิ้นสุดแล้ว";
@@ -101,11 +101,11 @@ const ListActivity = () => {
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
-    setCurrentPage(0);
+    setCurrentPage(0); // Reset current page to 0 on filter change
   };
 
   const filteredData = filteredItems.filter((item) => {
-    const status = getActivityStatus(item, now);
+    const status = getActivityStatus(item);
 
     switch (filter) {
       case "open":
@@ -119,7 +119,7 @@ const ListActivity = () => {
       case "ended":
         return status === "กิจกรรมสิ้นสุดแล้ว";
       default:
-        return true;
+        return true; // Show all items if filter is "default"
     }
   });
 
@@ -147,7 +147,7 @@ const ListActivity = () => {
           <div className="flex justify-between">
             <div className="text-lg font-bold mb-2">รายชื่อกิจกรรม</div>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center">
             <div className="pb-4 items-center">
               <label htmlFor="table-search" className="sr-only">
                 Search
@@ -173,7 +173,7 @@ const ListActivity = () => {
                 <input
                   type="text"
                   id="table-search"
-                  className="pb-2 block pt-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="pb-2 block pt-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-52 md:w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="ค้นหากิจกรรม"
                   value={searchTerm}
                   onChange={handleSearch}

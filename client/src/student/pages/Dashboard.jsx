@@ -5,7 +5,7 @@ import List_Activity from "../components/List_Activity";
 
 function Dashboard() {
   return (
-    <div className="mt-10 pt-14">
+    <div className="mt-10 pt-10 md:pt-24">
       {/* <DashCountAc /> */}
       <List_Activity />
     </div>

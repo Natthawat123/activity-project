@@ -12,6 +12,7 @@ const NavBar = () => {
   const [username, setUsername] = useState("");
   const Homeurl = "localhost:5173/admin/dashboard";
 
+
   useEffect(() => {
     const fetchUsername = async () => {
       try {
@@ -23,7 +24,7 @@ const NavBar = () => {
     };
 
     if (Homeurl) {
-      setSelectedItem("Dashboard");
+      setSelectedItem("จัดการผู้ใช้");
       setListVisible(false);
     }
 
@@ -45,21 +46,21 @@ const NavBar = () => {
   };
 
   const getItemClass = (itemName) =>
-    `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 text-gray-600 border border-white bg-gray-50 cursor-pointer px-3 py-2.5 font-normal text-xs leading-3 shadow-md rounded ${
-      selectedItem === itemName
-        ? "bg-indigo-600 text-white"
-        : "bg-gray-50 text-gray-600 border border-white"
+    `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 text-gray-600 border border-white bg-gray-50 cursor-pointer px-3 py-2.5 font-normal text-xs leading-3 shadow-md rounded ${selectedItem === itemName
+      ? "bg-indigo-600 text-white"
+      : "bg-gray-50 text-gray-600 border border-white"
     }`;
   // const getItemLogout = (itemName) => `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 text-red-600 border border-white bg-grey-500 cursor-pointer px-3 py-2.5 font-normal text-xs leading-3 shadow-md rounded ${selectedItem === itemName ? 'bg-red-600 text-white' : 'bg-gray-50 text-gray-600 border border-white'}`;
 
   const getItemClassXs = () =>
     `px-4 py-3 text-gray-600 bg-gray-50 border border-gray-50 focus:outline-none focus:bg-gray-100 hover:bg-gray-100 duration-100 cursor-pointer text-xs leading-3 font-normal`;
   const getItemLogoutXs = (itemName) =>
-    `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 font-bold text-red-500 border border-white bg-grey-500 cursor-pointer px-3 py-2.5 text-xs leading-3 shadow-md rounded ${
-      selectedItem === itemName
-        ? "bg-red-600 text-white"
-        : "bg-gray-50 text-gray-600 border border-white"
+    `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 font-bold text-red-500 border border-white bg-grey-500 cursor-pointer px-3 py-2.5 text-xs leading-3 shadow-md rounded ${selectedItem === itemName
+      ? "bg-red-600 text-white"
+      : "bg-gray-50 text-gray-600 border border-white"
     }`;
+
+
 
   return (
     <div className="3xl:container 3xl:mx-auto top-0 fixed w-full z-10">
@@ -115,25 +116,27 @@ const NavBar = () => {
               {username.fname}
               <Link to={`/admin/change-password/${ID}`}><KeyIcon/></Link>
             </p>
-            <SlideBar />
 
-            <Logout className="block md:hidden" />
+            <SlideBar />
+            <div className="hidden md:flex">
+              <Logout />
+            </div>
+
           </div>
         </nav>
 
         <div className="relative block md:hidden w-full mt-5 ">
           <div
             onClick={toggleListVisibility}
-            className="cursor-pointer px-4 py-3 text-white bg-indigo-600 rounded flex justify-between items-center w-full"
+            className="cursor-pointer  px-4 py-3 text-white bg-indigo-600 rounded flex justify-between items-center w-full"
           >
-            <div className="flex space-x-2">
+            <div className="flex space-x-2 ">
               <span
                 id="s1"
-                className={`font-semibold text-sm leading-3 ${
-                  isListVisible ? "" : "hidden"
-                }`}
+                className={`font-semibold text-sm leading-3 ${isListVisible ? "" : "hidden"
+                  }`}
               >
-                Selected:{" "}
+                {" "}
               </span>
               <p
                 id="textClicked"
@@ -158,24 +161,23 @@ const NavBar = () => {
           <div className="relative">
             <ul
               id="list"
-              className={`relative font-normal text-base leading-4 top-2 w-full rounded shadow-md transition-all duration-700 ${
-                isListVisible
-                  ? "opacity-100 max-h-40"
-                  : "opacity-0 max-h-0 hidden"
-              }`}
+              className={`relative font-normal text-base leading-4 top-2 w-full rounded shadow-md transition-all duration-700 ${isListVisible
+                ? "opacity-100 max-h-40"
+                : "opacity-0 max-h-0 hidden"
+                }`}
             >
               <Link to="/admin/dashboard">
                 <li
-                  onClick={() => handleItemClick("Dashboard")}
-                  className={getItemClassXs("Dashboard")}
+                  onClick={() => handleItemClick("จัดการผู้ใช้")}
+                  className={getItemClassXs("จัดการผู้ใช้")}
                 >
                   จัดการผู้ใช้
                 </li>
               </Link>
               <Link to="/admin/activity">
                 <li
-                  onClick={() => handleItemClick("Dashboard")}
-                  className={getItemClassXs("Dashboard")}
+                  onClick={() => handleItemClick("กิจกรรม")}
+                  className={getItemClassXs("กิจกรรม")}
                 >
                   กิจกรรม
                 </li>
@@ -183,7 +185,7 @@ const NavBar = () => {
               <Link to="/admin/calendar">
                 <li
                   onClick={() => handleItemClick("ปฏิทินกิจกรรม")}
-                  className={getItemClassXs("Calendar")}
+                  className={getItemClassXs("ปฏิทินกิจกรรม")}
                 >
                   ปฏิทินกิจกรรม
                 </li>
@@ -191,10 +193,10 @@ const NavBar = () => {
 
               <Link to="/admin/wallet">
                 <li
-                  onClick={() => handleItemClick("ประวัติส่วนตัว")}
-                  className={getItemClassXs("Profile")}
+                  onClick={() => handleItemClick("บันทึกข้อมูลกิจกรรมขึ้น Blockchain")}
+                  className={getItemClassXs("บันทึกข้อมูลกิจกรรมขึ้น Blockchain")}
                 >
-                  บล็อกเชน
+                  บันทึกข้อมูลกิจกรรมขึ้น Blockchain
                 </li>
               </Link>
 
@@ -202,7 +204,7 @@ const NavBar = () => {
                 onClick={() => handleItemClick("Logout")}
                 className={getItemLogoutXs("Logout")}
               >
-                Logout
+                <Logout />
               </li>
             </ul>
           </div>

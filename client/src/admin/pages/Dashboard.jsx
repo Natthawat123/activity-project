@@ -3,7 +3,7 @@ import ListUsers from "../components/ListUsers";
 
 function Dashboard() {
   return (
-    <div className="pt-20">
+    <div className="pt-10 md:pt-20">
       {/* <Test/> */}
       <Dash_users />
       <ListUsers />

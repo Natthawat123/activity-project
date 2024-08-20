@@ -98,12 +98,12 @@ function CalendarFull() {
   };
 
   return (
-    <div className="App w-3/4 mx-auto my-10 bg-slate-50 rounded-lg shadow-xl p-10 z-50">
+    <div className="App w-full max-w-7xl mx-auto my-10 bg-slate-50 rounded-lg shadow-xl p-4 sm:p-6 lg:p-8 z-50">
       <motion.h1
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="text-center text-3xl font-bold mb-5"
+        className="text-center text-2xl sm:text-3xl font-bold mb-5"
       >
         ปฏิทินกิจกรรม
       </motion.h1>
@@ -118,7 +118,7 @@ function CalendarFull() {
           defaultDate={new Date()}
           defaultView="month"
           events={events}
-          style={{ height: "70vh" }}
+          style={{ height: "60vh", width: "100%" }}
           eventPropGetter={eventStyleGetter}
           onSelectEvent={handleEventClick}
           className="z-50"
@@ -158,14 +158,14 @@ function CalendarFull() {
           transition={{ duration: 0.3 }}
           className="fixed inset-0 flex items-center justify-center p-4 z-50"
         >
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md md:max-w-lg lg:max-w-xl">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-md md:max-w-lg lg:max-w-xl">
             <div className="w-full flex justify-end">
               <div className="cursor-pointer" onClick={closePopup}>
                 <CloseIcon />
               </div>
             </div>
             <div className="text-left">
-              <h2 className="text-xl font-bold mb-4">
+              <h2 className="text-lg sm:text-xl font-bold mb-4">
                 รายละเอียดกิจกรรม{" "}
                 <Tooltip title="รายชื่อผู้ลงทะเบียน" placement="bottom-start">
                   <LibraryBooksIcon
@@ -201,9 +201,9 @@ function CalendarFull() {
 
                 
               </h2>
-              <p className="text-xl">ชื่อกิจกรรม : {selectedEvent.title}</p>
-              <p>สถานที่ : {selectedEvent.location}</p>
-              <p>
+              <p className="text-base sm:text-lg">ชื่อกิจกรรม : {selectedEvent.title}</p>
+              <p className="text-base sm:text-lg">สถานที่ : {selectedEvent.location}</p>
+              <p className="text-base sm:text-lg">
                 วันที่ :{" "}
                 {selectedEvent.start.toLocaleDateString("th-TH", {
                   year: "numeric",
@@ -217,7 +217,7 @@ function CalendarFull() {
                   day: "numeric",
                 })}
               </p>
-              <p>
+              <p className="text-base sm:text-lg">
                 เปิดลงทะเบียน :{" "}
                 {selectedEvent.reserveStart.toLocaleDateString("th-TH", {
                   year: "numeric",
@@ -232,7 +232,7 @@ function CalendarFull() {
                 })}
               </p>
 
-              <p>
+              <p className="text-base sm:text-lg">
                 <span>จำนวนที่เปิดรับ :</span>
                 <span
                   style={{
@@ -263,6 +263,7 @@ function CalendarFull() {
                         : "red"
                       : "gray",
                 }}
+                className="text-base sm:text-lg"
               >
                 {selectedEvent.status === 2
                   ? "กิจกรรมสิ้นสุดแล้ว"

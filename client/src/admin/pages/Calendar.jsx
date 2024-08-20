@@ -2,7 +2,7 @@
 import CS from '../../components/Calendar'
 function Calendar() {
   return (
-    <div className="pt-16">
+    <div className="pt-10 md:pt-16">
       <CS />
     </div>
   )

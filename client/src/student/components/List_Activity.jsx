@@ -23,7 +23,7 @@ function Test() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("default");
-  const [itemsPerPage, setItemsPerPage] = useState(30);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
   const [sortOrder, setSortOrder] = useState("latest");
   const [openRows, setOpenRows] = useState({});
@@ -124,11 +124,12 @@ function Test() {
   });
 
   const sortedItems = sortItems(filteredItems);
-  const lastPage = Math.ceil(sortedItems.length / itemsPerPage) - 1;
+  const lastPage = Math.max(0, Math.ceil(sortedItems.length / itemsPerPage) - 1);
   const visibleItems = sortedItems.slice(
     currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
+    Math.min((currentPage + 1) * itemsPerPage, sortedItems.length)
   );
+  
 
   const pageNumbers = [];
   for (let i = 0; i <= lastPage; i++) {

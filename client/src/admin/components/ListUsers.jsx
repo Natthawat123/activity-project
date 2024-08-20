@@ -7,7 +7,7 @@ const ListUsers = () => {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(15);
   const [currentPage, setCurrentPage] = useState(0);
   const [users, setUsers] = useState([]);
   const [section, setSection] = useState([]);
@@ -25,6 +25,7 @@ const ListUsers = () => {
           setTest(res.data);
         } else {
           console.error(`Error: ${res.status} ${res.statusText}`);
+          setError(error)
         }
       } catch (err) {
         console.error(`Error: ${err.message}`);
@@ -114,10 +115,17 @@ const ListUsers = () => {
     setCurrentPage(0);
   };
 
-  // Pagination calculations
-  const totalPages = Math.ceil(test.length / itemsPerPage);
-  const pageNumbers = Array.from({ length: totalPages }, (_, index) => index);
-  const lastPage = totalPages - 1;
+   // การคำนวณการแบ่งหน้า
+const totalPages = Math.ceil(test.length / itemsPerPage);
+const pageNumbers = Array.from({ length: totalPages }, (_, index) => index);
+const lastPage = totalPages - 1;
+
+// กำหนดกลุ่มของผู้ใช้สำหรับหน้าปัจจุบัน
+const startIndex = currentPage * itemsPerPage;
+const endIndex = startIndex + itemsPerPage;
+const currentUsers = test.slice(startIndex, endIndex);
+
+ 
 
   if (error) {
     return <div>Error: {error.message}</div>;
@@ -131,7 +139,7 @@ const ListUsers = () => {
             <h1>รายชื่อผู้ใช้งานระบบ</h1>
             <GroupIcon />
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center">
             <div className="pb-4 items-center">
               <label htmlFor="table-search" className="sr-only">
                 Search
@@ -157,7 +165,7 @@ const ListUsers = () => {
                 <input
                   type="text"
                   id="table-search"
-                  className="pb-2 block pt-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="pb-2 block pt-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-52 md:w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="ค้นหาผู้ใช้งาน"
                   value={searchTerm}
                   onChange={handleSearch}
@@ -233,79 +241,71 @@ const ListUsers = () => {
             </div>
           </div>
 
-          <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 flex w-full">
-              <tr className="flex w-full">
-                <th scope="col" className="px-6 py-3 w-1/12 text-center">
-                  ลำดับ
+          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+          <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+              <th scope="col" className="px-6 py-3 w-1/12 text-center">
+                ลำดับ
+              </th>
+              {selectedRole === "student" && (
+                <th scope="col" className="px-6 py-3 w-3/12 text-center">
+                  รหัสนักศึกษา
                 </th>
-                {selectedRole === "student" && (
-                  <th scope="col" className="px-6 py-3 w-3/12 text-center">
-                    รหัสนักศึกษา
-                  </th>
-                )}
-
+              )}
+              <th scope="col" className="px-6 py-3 w-4/12 text-center">
+                ชื่อ-นามสกุล
+              </th>
+              <th scope="col" className="px-6 py-3 w-2/12 text-center">
+                บทบาท
+              </th>
+              {selectedRole === "student" && (
                 <th scope="col" className="px-6 py-3 w-4/12 text-center">
-                  ชื่อ-นามสกุล
+                  หมู่เรียน
                 </th>
-                <th scope="col" className="px-6 py-3 w-2/12 text-center">
-                  บทบาท
+              )}
+              {selectedRole === "teacher" && (
+                <th scope="col" className="px-6 py-3 w-4/12 text-center">
+                  อาจารย์ที่ปรึกษาหมู่เรียน
                 </th>
+              )}
+              <th scope="col" className="px-6 py-3 w-2/12 text-center">
+                รายละเอียด
+              </th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-600 divide-y divide-gray-200 dark:divide-gray-600">
+            {currentUsers.map((item, index) => (
+              <tr key={item.login_ID} className="hover:bg-gray-100 dark:hover:bg-gray-600">
+                <td className="px-6 py-3 text-center">
+                  {startIndex + index + 1}
+                </td>
                 {selectedRole === "student" && (
-                  <th scope="col" className="px-6 py-3 w-4/12 text-center">
-                    หมู่เรียน
-                  </th>
+                  <td className="px-6 py-3 text-center">
+                    {item.username}
+                  </td>
                 )}
-                {selectedRole === "teacher" && (
-                  <th scope="col" className="px-6 py-3 w-4/12 text-center">
-                    อาจารย์ที่ปรึกษาหมู่เรียน
-                  </th>
+                <td className="px-6 py-3">
+                  {item.fname} {item.lname}
+                </td>
+                <td className="px-6 py-3 text-center">
+                  {item.role === "student" ? "นักศึกษา" : item.role === "teacher" ? "อาจารย์" : "ผู้ดูแลระบบ"}
+                </td>
+                {(selectedRole === "student" || selectedRole === "teacher") && (
+                  <td className="px-6 py-3 text-center">
+                    {item.sec_name || "N/A"}
+                  </td>
                 )}
-                <th scope="col" className="px-6 py-3 w-2/12 text-center">
-                  รายละเอียด
-                </th>
+                <td className="px-6 py-3 text-center">
+                  <Link to={`user/${item.ID}`}>
+                    <button className="bg-cyan-400 hover:bg-cyan-500 px-2 py-1 text-white rounded">
+                      เรียกดู
+                    </button>
+                  </Link>
+                </td>
               </tr>
-            </thead>
-            <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between">
-              {test.map((item, index) => (
-                <tr
-                  key={item.login_ID}
-                  className="border-b-2 flex w-full items-center"
-                >
-                  <td className="px-6 py-3 w-1/12 text-center">{index + 1}</td>
-                  {selectedRole === "student" && (
-                    <td className="px-6 py-3 w-3/12 text-center">
-                      {item.username}
-                    </td>
-                  )}
-
-                  <td className="px-6 py-3 w-4/12">
-                    {item.fname} {item.lname}
-                  </td>
-                  <td className="px-6 py-3 w-2/12 text-center">
-                    {item.role === "student"
-                      ? "นักศึกษา"
-                      : item.role === "teacher"
-                      ? "อาจารย์"
-                      : "ผู้ดูแลระบบ"}
-                  </td>
-                  {(selectedRole === "student" ||
-                    selectedRole === "teacher") && (
-                    <td className="px-6 py-3 w-4/12 text-center">
-                      {item.sec_name || "N/A"}
-                    </td>
-                  )}
-                  <td className="px-6 py-3 w-2/12 text-center">
-                    <Link to={`user/${item.ID}`}>
-                      <button className="bg-cyan-400 hover:bg-cyan-500 px-2 py-1 text-white rounded">
-                        เรียกดู
-                      </button>
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            ))}
+          </tbody>
+        </table>
 
           <div className="flex justify-between mt-2">
             <div className="flex gap-2 w-24"></div>
@@ -355,9 +355,10 @@ const ListUsers = () => {
                 }}
                 className="px-3 cursor-pointer p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
               >
-                <option value={10}>10</option>
-                <option value={20}>20</option>
+                <option value={15}>15</option>
+                <option value={30}>30</option>
                 <option value={50}>50</option>
+                <option value={1000}>ทั้งหมด</option>
               </select>
             </div>
           </div>
