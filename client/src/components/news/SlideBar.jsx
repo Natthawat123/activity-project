@@ -10,7 +10,7 @@ export default function SlideBar() {
   const [state, setState] = React.useState({ right: false });
   const [news, setNews] = React.useState([]);
   const drawerRef = React.useRef(null);
-  const id = localStorage.getItem("name");
+  const id = localStorage.getItem("id");
 
   React.useEffect(() => {
     const fetchNews = async () => {

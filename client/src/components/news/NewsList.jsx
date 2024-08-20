@@ -37,7 +37,7 @@ export default function NewsList({ news = [], id }) {
         news_ID: news_ID,
       });
       if (res.status === 200) {
-        window.location.reload();
+        // window.location.reload();
       } else {
         console.error("Failed to mark news as read");
       }
