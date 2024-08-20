@@ -5,6 +5,9 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import CloseIcon from "@mui/icons-material/Close";
 import Swal from "sweetalert2";
 import axios from "axios";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import Tooltip from "@mui/material/Tooltip";
+import { useNavigate } from "react-router";
 
 const localizer = momentLocalizer(moment);
 
@@ -13,6 +16,7 @@ function CalendarFull() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [reserveValue, setReservations] = useState([]);
+  const navigate = useNavigate();
 
   const std_ID = localStorage.getItem("id");
 
@@ -241,7 +245,22 @@ function CalendarFull() {
                 </div>
               </div>
               <div className="text-left -mt-5">
-                <h2 className="text-xl font-bold mb-4">รายละเอียดกิจกรรม</h2>
+                <h2 className="text-xl font-bold mb-4">รายละเอียดกิจกรรม 
+                <Tooltip title="รายชื่อผู้ลงทะเบียน" placement="bottom-start">
+                  <LibraryBooksIcon
+                    sx={{
+                      color: "teal",
+                      transition: "0.3s ease",
+                      marginLeft: 0.5,
+                      "&:hover": {
+                        color: "indigo",
+                        transform: "scale(1.5) translateX(5px)",
+                      },
+                    }}
+                    onClick={() => navigate(`/reserve/${selectedEvent.id}`)}
+                  />
+                </Tooltip>
+                </h2>
                 <p className="text-xl">ชื่อกิจกรรม : {selectedEvent.title}</p>
                 <p>สถานที่ : {selectedEvent.location}</p>
                 <p>

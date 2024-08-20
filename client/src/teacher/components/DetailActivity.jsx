@@ -175,7 +175,13 @@ function DetailActivity() {
       </div>
 
       {/* Student Detail */}
-      <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 mt-8">
+
+      {!data[0].login_ID ? (
+        <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 mt-8">
+        <h1 className="text-lg font-bold">ยังไม่มีนักศึกษาลงทะเบียนเข้าร่วม</h1>
+      </div>
+      ) : (
+        <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 mt-8">
         <div className="flex gap-2 mb-4">
           <h1 className="text-lg font-bold">รายชื่อนักศึกษา</h1>
         </div>
@@ -228,6 +234,10 @@ function DetailActivity() {
           </tbody>
         </table>
       </div>
+      )}
+
+
+      
     </div>
   );
 }

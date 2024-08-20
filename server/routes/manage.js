@@ -9,9 +9,9 @@ import {
 
 
 } from '../controllers/manage.js'
-import {
-    updateStatusNotJoin
-} from '../controllers/manage.js';
+// import {
+//     updateStatusNotJoin
+// } from '../controllers/manage.js';
 import {
     updateStatus
 } from '../controllers/manage.js'; // Adjust the path as needed
