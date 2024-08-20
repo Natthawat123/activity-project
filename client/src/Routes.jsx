@@ -4,10 +4,13 @@ import { Route, Routes } from "react-router-dom";
 import PrivateRoutes from "./utils/PrivateRoutes";
 
 import Login from "./pages/Login.jsx";
+import ResetPassword from "./components/ResetPassword.jsx";
+import ChangePassword from "./components/ChangePassword.jsx";
 
 import Layoutm from "./components/Layout/Layout.jsx";
 import Calen from "./components/Calendar.jsx";
 import GetReserve from "./components/Reserve_Check.jsx";
+import GetEntryPDF from "./components/Entry_PDF.jsx";
 
 import Layout from "./student/components/Layout.jsx";
 import DashUser from "./student/pages/Dashboard.jsx";
@@ -51,7 +54,9 @@ export function Router() {
         <Route path="/" element={<Calen />} />
       </Route>
       <Route path="/login" element={<Login />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route path="reserve/:act_ID" element={<GetReserve />} />
+      <Route path="entry/:act_ID" element={<GetEntryPDF />} />
       <Route path="test" element={<Test />} />
 
       <Route element={<PrivateRoutes />}>
@@ -68,6 +73,7 @@ export function Router() {
           <Route path="update" element={<UpdateUser />} />
           <Route path="wallet" element={<Wallet />} />
           <Route path="dashboard/user/update/:id" element={<UpdateStudent />} />
+          <Route path="change-password/:id" element={<ChangePassword />} />
           <Route
             path="dashboard/detail/teacher/update/:staff_ID"
             element={<UpdateStaff />}
@@ -80,6 +86,7 @@ export function Router() {
 
           <Route path="calendar" element={<Calendar />} />
           <Route path="detail2/:act_ID" element={<DetailActivity />} />
+          <Route path="change-password/:id" element={<ChangePassword />} />
         </Route>
 
         <Route path="/teacher" element={<LayoutT />}>
@@ -88,6 +95,7 @@ export function Router() {
           <Route path="profile" element={<ProfileT />} />
           <Route path="activity" element={<ActivityT />} />
           <Route path="activity/detail/:act_ID" element={<DetailActivityT />} />
+          <Route path="change-password/:id" element={<ChangePassword />} />
 
           <Route
             path="/teacher/liststudent/detail/student/:std_ID"

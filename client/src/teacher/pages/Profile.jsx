@@ -112,7 +112,7 @@ const StudentForm = () => {
 
   const [section, setSection] = useState([]);
 
-  const staff_ID = localStorage.getItem("staff_ID");
+  const staff_ID = localStorage.getItem("id");
 
   useEffect(() => {
     fetch("/api/sections")

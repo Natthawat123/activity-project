@@ -5,9 +5,10 @@ import Logout from "../../components/Logout";
 import axios from "axios";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
 import SlideBar from "../../components/news/SlideBar";
+import KeyIcon from '@mui/icons-material/Key';
 
 const NavBar = () => {
-  const ID = localStorage.getItem("staff_ID");
+  const ID = localStorage.getItem("id");
   const [username, setUsername] = useState("");
   const Homeurl = "localhost:5173/admin/dashboard";
 
@@ -113,6 +114,7 @@ const NavBar = () => {
             <p className="md:flex items-center">
               <PersonPinIcon className="mx-2 text-blue-500" />
               {username.fname}
+              <Link to={`/admin/change-password/${ID}`}><KeyIcon/></Link>
             </p>
 
             <SlideBar />

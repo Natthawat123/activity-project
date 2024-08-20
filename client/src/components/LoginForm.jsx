@@ -35,7 +35,6 @@ export default function SignInSide() {
         localStorage.setItem("token", result.token);
         localStorage.setItem("role", result.role);
         localStorage.setItem("id", result.id);
-        localStorage.setItem("name", result.name);
         if (result.role === "admin") {
           window.location = "/admin/dashboard";
         } else if (result.role === "teacher") {
@@ -61,7 +60,7 @@ export default function SignInSide() {
   const handleForgotPasswordSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch("/api/forgotPassword", {
+      const response = await fetch("/api/forgot-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

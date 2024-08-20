@@ -9,4 +9,6 @@
       font-weight: bold;  /* Adjust as needed */
     }
   }
-  
+  .custom-header {
+  font-size: 20px;
+}

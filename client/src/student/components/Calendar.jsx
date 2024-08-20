@@ -5,6 +5,9 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import CloseIcon from "@mui/icons-material/Close";
 import Swal from "sweetalert2";
 import axios from "axios";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import Tooltip from "@mui/material/Tooltip";
+import { useNavigate } from "react-router";
 
 const localizer = momentLocalizer(moment);
 
@@ -13,6 +16,7 @@ function CalendarFull() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [reserveValue, setReservations] = useState([]);
+  const navigate = useNavigate();
 
   const std_ID = localStorage.getItem("id");
 
@@ -194,7 +198,9 @@ function CalendarFull() {
 
   return (
     <div className="App w-full max-w-4xl mx-auto my-10 bg-slate-50 rounded-lg shadow-xl p-4 sm:p-6 md:p-8 lg:p-10">
-      <h1 className="text-center text-2xl sm:text-3xl font-bold mb-5">ปฏิทินกิจกรรม</h1>
+      <h1 className="text-center text-2xl sm:text-3xl font-bold mb-5">
+        ปฏิทินกิจกรรม
+      </h1>
 
       <div className="relative">
         <Calendar
@@ -245,7 +251,9 @@ function CalendarFull() {
                 </div>
                 <div className="text-left">
                   <h2 className="text-xl font-bold mb-4">รายละเอียดกิจกรรม</h2>
-                  <p className="text-lg mb-2">ชื่อกิจกรรม : {selectedEvent.title}</p>
+                  <p className="text-lg mb-2">
+                    ชื่อกิจกรรม : {selectedEvent.title}
+                  </p>
                   <p className="mb-2">สถานที่ : {selectedEvent.location}</p>
                   <p className="mb-2">
                     วันที่ :{" "}

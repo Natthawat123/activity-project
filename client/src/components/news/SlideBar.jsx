@@ -11,7 +11,7 @@ export default function SlideBar() {
   const [state, setState] = React.useState({ right: false });
   const [news, setNews] = React.useState([]);
   const drawerRef = React.useRef(null);
-  const id = localStorage.getItem("name");
+  const id = localStorage.getItem("id");
 
   React.useEffect(() => {
     const fetchNews = async () => {
@@ -43,8 +43,11 @@ export default function SlideBar() {
 
   const list = () => (
     <Box sx={{ width: 350 }} role="presentation" onClick={handleDrawerClick}>
-      <Button className="right-0" onClick={toggleDrawer(false)}>Close</Button> {/* Close button */}
-      <NewsList news={news} />
+      <Button className="right-0" onClick={toggleDrawer(false)}>
+        Close
+      </Button>{" "}
+      {/* Close button */}
+      <NewsList news={news} id={id} />
       <Divider />
     </Box>
   );
