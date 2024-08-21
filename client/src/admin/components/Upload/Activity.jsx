@@ -8,7 +8,7 @@ function Activity({ activity = {} }) {
     <>
       <div className="flex flex-col items-center mb-4">
         <h1 className="text-xl font-medium">
-          รายชื่อผู้ลงทะเบียนเข้าร่วมกิจกรรม
+          รายชื่อผู้ลงทะเบียนเข้าร่วมกิจกรรม555
         </h1>
         <h1 className="text-3xl font-bold pt-4">{activity.act_title}</h1>
       </div>

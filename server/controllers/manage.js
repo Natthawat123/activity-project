@@ -3,10 +3,11 @@ import db from '../db.js'
 // read All
 export const readReserve = (req, res) => {
 
-    const sql = ` SELECT activity.*, manage.std_ID, student.std_fname, student.std_lname
+    const sql = ` SELECT activity.*, manage.std_ID, student.std_fname, student.std_lname,login.login_ID as ids
         FROM activity 
         JOIN manage ON activity.act_ID = manage.act_ID
-        JOIN student ON manage.std_ID = student.login_ID`
+        JOIN student ON manage.std_ID = student.login_ID
+         JOIN login ON manage.std_ID = login.username`
     db.query(sql, (err, result) => {
         if (err) {
             return res.status(500).json({
@@ -22,12 +23,13 @@ export const readReserve = (req, res) => {
     });
 }
 export const readManage = (req, res) => {
-    const sql = `SELECT activity.*, manage.std_ID, teacher.*, student.*, section.*
+    const sql = `SELECT activity.*, manage.std_ID, teacher.*, student.*, section.*,login.login_ID as ids
     FROM activity
     LEFT JOIN manage ON activity.act_ID = manage.act_ID
     LEFT JOIN teacher ON activity.staff_ID = teacher.login_ID
     LEFT JOIN student ON manage.std_ID = student.login_ID
     LEFT JOIN section ON student.sec_ID = section.sec_ID
+    left join login on student.login_ID = login.username
     WHERE activity.act_status = 1 AND activity.act_ID IS NOT NULL;
         `
     db.query(sql, (err, result) => {
@@ -139,9 +141,6 @@ export const updateStatusNotJoin = (req, res) => {
         });
     });
 };
-
-
-
 
 
 // reserve

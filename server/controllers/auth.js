@@ -41,7 +41,7 @@ export const login = (req, res) => {
             token,
             role: user[0].role,
             id: user[0].id,
-            name: user[0].username
+            username: user[0].username,
           });
         } else if (user[0].role === "student") {
           res.json({
@@ -50,7 +50,62 @@ export const login = (req, res) => {
             token,
             role: user[0].role,
             id: user[0].id,
-            name: user[0].id,
+            username: user[0].username,
+
+
+          });
+        }
+      } else {
+        res.json({
+          status: "error",
+          message: "Login Failed",
+        });
+      }
+    });
+  });
+};
+
+// login 2 
+export const login2 = (req, res) => {
+  const {
+    username,
+    password
+  } = req.body;
+  const q = `
+        SELECT * from login 
+        WHERE login.username = ?
+`;
+
+  db.query(q, username, (err, user) => {
+    if (err) return res.status(500).json(err);
+    if (user.length === 0) return res.status(404).json("user not found");
+
+    bcrypt.compare(password, user[0].password, function (err, isLogin) {
+      if (isLogin) {
+        var token = jwt.sign({
+            username: user[0].username,
+            role: user[0].role, // เพิ่มบทบาทใน token
+          },
+          secret, {
+            expiresIn: "1h",
+          }
+        );
+        if (user[0].role === "teacher" || user[0].role === "admin") {
+          res.json({
+            status: "ok",
+            message: "Login Success",
+            token,
+            role: user[0].role,
+            id: user[0].username,
+          });
+        } else if (user[0].role === "student") {
+          res.json({
+            status: "ok",
+            message: "Login Success",
+            token,
+            role: user[0].role,
+            id: user[0].username,
+
 
           });
         }

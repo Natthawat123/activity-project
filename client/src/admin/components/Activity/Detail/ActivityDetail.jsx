@@ -16,6 +16,7 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
   const [showButtons, setShowButtons] = useState(false);
   const [status, setStatus] = useState(activity.act_status);
   const navigate = useNavigate();
+  console.log(activity);
 
   const editButton = () => {
     setIsReadOnly(!isReadOnly);
@@ -65,12 +66,19 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
 
   const handleDateChange = (field, event) => {
     const newDate = event.target.value;
-    handleInputChange(field, newDate);
+    const utcDate = new Date(newDate).toISOString(); // Convert to UTC
+    handleInputChange(field, utcDate);
   };
 
   const editActivity = async () => {
     try {
-      await axios.put(`/api/activitys/${act_ID}`, editData);
+      const updatedData = {
+        ...editData,
+        act_dateStart: new Date(editData.act_dateStart).toISOString(),
+        act_dateEnd: new Date(editData.act_dateEnd).toISOString(),
+      };
+      await axios.put(`/api/activitys/${act_ID}`, updatedData);
+
       const newsData = {
         news_topic: `กิจกรรม ${activity.act_title}`,
         news_desc: `แก้ไขรายละเอียดกิจกรรม  ${activity.act_title}`,
@@ -94,11 +102,11 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
   };
 
   const startDateInput = editData.act_dateStart
-    ? formatISO(parseISO(editData.act_dateStart), { representation: "date" })
+    ? new Date(editData.act_dateStart).toISOString().split("T")[0] // YYYY-MM-DD
     : "";
 
   const endDateInput = editData.act_dateEnd
-    ? formatISO(parseISO(editData.act_dateEnd), { representation: "date" })
+    ? new Date(editData.act_dateEnd).toISOString().split("T")[0] // YYYY-MM-DD
     : "";
 
   const url = `https://sepolia.etherscan.io/tx/${activity.act_transaction}`;
@@ -246,7 +254,9 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
                 </td>
                 <td className="px-6 py-4 text-gray-500 ">
                   <a href={url} target="_blank" rel="noopener noreferrer">
-                    link
+                    {activity.act_transaction.length > 0
+                      ? "ขึ้นแล้ว"
+                      : "ยังไม่ขึ้น"}
                   </a>
                 </td>
               </tr>

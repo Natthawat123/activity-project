@@ -240,10 +240,8 @@ export const test = (req, res) => {
                 });
             }
 
-            // Get the last inserted news ID
             const newsId = results.insertId;
 
-            // Now, insert notifications for all users
             const notifyInsertSql = `
                 INSERT INTO notify (news_ID, notify_status, user_ID)
                 SELECT ?, 'unread', username
@@ -275,10 +273,9 @@ export const newsOne = (req, res) => {
         news_topic,
         news_desc,
         news_date,
-        user_ID // This can be a single value or an array
+        user_ID
     } = req.body;
 
-    // Ensure user_ID is always an array
     const userIds = Array.isArray(user_ID) ? user_ID : [user_ID];
 
     const newsInsertSql = `
