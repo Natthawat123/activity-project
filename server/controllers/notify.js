@@ -4,7 +4,7 @@ export const get = (req, res) => {
     const sql = `
         SELECT * FROM notify
         inner join news on news.news_ID = notify.news_ID
-        where notify.user_ID = ?
+        where notify.login_ID = ?
         `
     const {
         id

@@ -18,7 +18,7 @@ export const createStudent = (req, res) => {
 
     const sql = `
         INSERT INTO student
-            (login_ID, std_fname, std_lname, sec_ID, std_email, std_mobile, std_address, province, district, subdistrict, zipcode) 
+            (std_ID, std_fname, std_lname, sec_ID, std_email, std_mobile, std_address, province, district, subdistrict, zipcode) 
         VALUES 
             (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `
@@ -86,8 +86,8 @@ export const getstudentOne = (req, res) => {
             student 
         left join section on section.sec_ID = student.sec_ID
         left join teacher on teacher.sec_ID = student.sec_ID
-        left join login on login.username = student.login_ID
-         where student.login_ID = ?
+        left join login on login.username = student.std_ID
+         where student.std_ID = ?
     `
     const {
         id
@@ -123,7 +123,7 @@ export const updateStudent = (req, res) => {
             district = ?, 
             subdistrict = ?, 
             zipcode = ? 
-        WHERE login_ID = ?
+        WHERE std_ID = ?
     `
     const {
         id
@@ -153,7 +153,7 @@ export const updateStudent = (req, res) => {
 
 // delete
 export const deleteStudent2 = (req, res) => {
-    const sql = `delete from student  where login_ID = ? `
+    const sql = `delete from student  where std_ID = ? `
     const {
         id
     } = req.params
@@ -173,7 +173,7 @@ export const deleteStudent = (req, res) => {
         id
     } = req.params;
 
-    const sql1 = 'DELETE FROM student WHERE login_ID = ?';
+    const sql1 = 'DELETE FROM student WHERE std_ID = ?';
     const sql2 = 'DELETE FROM login WHERE username = ?';
 
     db.query(sql1, [id], (err, result1) => {

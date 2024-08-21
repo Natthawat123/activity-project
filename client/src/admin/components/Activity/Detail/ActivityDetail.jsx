@@ -69,6 +69,7 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
   };
 
   const editActivity = async () => {
+    console.log("EditData: ", editData)
     try {
       await axios.put(`/api/activitys/${act_ID}`, editData);
       const newsData = {
