@@ -284,7 +284,7 @@ const StudentForm = () => {
               <input
                 type="text"
                 id="fname"
-                name="std_fname"
+                name="staff_fname"
                 onChange={handlechange}
                 value={value.staff_fname}
                 className="mt-1 p-2 border w-full rounded-md"

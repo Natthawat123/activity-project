@@ -71,6 +71,7 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
   };
 
   const editActivity = async () => {
+    console.log("EditData: ", editData)
     try {
       const updatedData = {
         ...editData,

@@ -70,6 +70,7 @@ function DetailStudent() {
     fetchSmartContract();
     fetchActivity();
   }, [id]);
+  console.log(student);
 
   const toggleRow = (actId) => {
     setOpenRows((prev) => ({ ...prev, [actId]: !prev[actId] }));

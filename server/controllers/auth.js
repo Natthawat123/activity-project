@@ -4,16 +4,16 @@ import jwt from "jsonwebtoken";
 const secret = "Fullstack-Login";
 const saltRounds = 10;
 
-// //login
+// //login //clear
 export const login = (req, res) => {
   const {
     username,
     password
   } = req.body;
   const q = `SELECT login.*, 
-        COALESCE(st.login_ID, t.login_ID, a.login_ID) AS id
+        COALESCE(st.std_ID, t.login_ID, a.login_ID) AS id
         FROM login
-        LEFT JOIN student st ON login.username = st.login_ID
+        LEFT JOIN student st ON login.username = st.std_ID
         LEFT JOIN teacher t ON login.login_ID = t.login_ID
         LEFT JOIN admin a ON login.login_ID = a.login_ID
         WHERE login.username = ?
@@ -192,8 +192,8 @@ export const register = async (req, res) => {
           values = [fname, lname, mobile, email, loginID, sec_ID];
         } else if (role === "student") {
           sql2 =
-            "INSERT INTO student (std_fname, std_lname, std_mobile, std_email, login_ID, sec_ID) VALUES (?, ?, ?, ?, ?, ?)";
-          values = [fname, lname, mobile, email, username, sec_ID];
+            "INSERT INTO student (std_fname, std_lname, std_mobile, std_email, login_ID, std_ID, sec_ID) VALUES (?, ?, ?, ?, ?, ?, ?)";
+          values = [fname, lname, mobile, email, loginID, username, sec_ID];
         } else {
           sql2 =
             "INSERT INTO admin (fname, lname, mobile, email, login_ID) VALUES (?, ?, ?, ?, ?)";
@@ -293,8 +293,8 @@ export const arrayregister = async (req, res) => {
               });
             } else if (role === "student") {
               sql2 =
-                "INSERT INTO student (std_fname, std_lname, std_mobile, std_email, login_ID, sec_ID) VALUES (?, ?, ?, ?, ?, ?)";
-              values = [fname, lname, mobile, email, username, sec_ID];
+                "INSERT INTO student (std_fname, std_lname, std_mobile, std_email, login_ID, std_ID, sec_ID) VALUES (?, ?, ?, ?, ?, ?, ?)";
+              values = [fname, lname, mobile, email, loginID, username, sec_ID];
 
               db.query(sql2, values, (err, results) => {
                 if (err) {

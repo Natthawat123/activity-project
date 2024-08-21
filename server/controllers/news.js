@@ -243,8 +243,8 @@ export const test = (req, res) => {
             const newsId = results.insertId;
 
             const notifyInsertSql = `
-                INSERT INTO notify (news_ID, notify_status, user_ID)
-                SELECT ?, 'unread', username
+                INSERT INTO notify (news_ID, notify_status, login_ID)
+                SELECT ?, 'unread', login_ID
                 FROM login;
             `;
 
@@ -273,10 +273,10 @@ export const newsOne = (req, res) => {
         news_topic,
         news_desc,
         news_date,
-        user_ID
+        login_ID
     } = req.body;
 
-    const userIds = Array.isArray(user_ID) ? user_ID : [user_ID];
+    const userIds = Array.isArray(login_ID) ? login_ID : [login_ID];
 
     const newsInsertSql = `
         INSERT INTO news (news_topic, news_desc, news_date)
@@ -296,7 +296,7 @@ export const newsOne = (req, res) => {
             const newsId = results.insertId;
 
             const notifyInsertSql = `
-                INSERT INTO notify (news_ID, notify_status, user_ID)
+                INSERT INTO notify (news_ID, notify_status, login_ID)
                 VALUES (?, ?, ?);
             `;
 

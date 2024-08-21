@@ -129,8 +129,6 @@ export const updateActivity = (req, res) => {
     });
 };
 
-
-
 // getAll
 export const readActivity = (req, res) => {
   const sql = `
@@ -152,7 +150,7 @@ export const readActivity = (req, res) => {
   t.staff_email,
   t.staff_mobile,
   t.staff_address,
-  st.login_ID,
+  st.std_ID,
   st.std_fname,
   st.std_lname,
   st.std_email,
@@ -166,7 +164,7 @@ FROM
   activity a
   LEFT JOIN teacher t ON t.login_ID = a.staff_ID
   LEFT JOIN manage m ON m.act_ID = a.act_ID
-  LEFT JOIN student st ON st.login_ID = m.std_ID
+  LEFT JOIN student st ON st.std_ID = m.std_ID
 `;
   db.query(sql, (err, result) => {
     if (err) {
@@ -202,21 +200,17 @@ export const readActivityOne = (req, res) => {
   a.act_transaction,
   t.staff_fname,
   t.staff_lname,
-  st.login_ID,
+  st.std_ID,
   st.std_fname,
   st.std_lname,
   st.sec_ID,
-  s.sec_name,
-  l.login_ID as ids,
   m.man_status
 
 
 FROM activity a 
 LEFT JOIN teacher t ON t.login_ID = a.staff_ID 
 LEFT JOIN manage m ON m.act_ID = a.act_ID 
-LEFT JOIN student st ON st.login_ID = m.std_ID
-LEFT JOIN section s  ON st.sec_ID = s.sec_ID
-LEFT JOIN login l ON l.username = st.login_ID
+LEFT JOIN student st ON st.std_ID = m.std_ID
 WHERE 
   a.act_ID = ?;
 

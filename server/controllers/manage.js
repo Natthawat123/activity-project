@@ -6,8 +6,7 @@ export const readReserve = (req, res) => {
     const sql = ` SELECT activity.*, manage.std_ID, student.std_fname, student.std_lname,login.login_ID as ids
         FROM activity 
         JOIN manage ON activity.act_ID = manage.act_ID
-        JOIN student ON manage.std_ID = student.login_ID
-         JOIN login ON manage.std_ID = login.username`
+        JOIN student ON manage.std_ID = student.std_ID`
     db.query(sql, (err, result) => {
         if (err) {
             return res.status(500).json({
@@ -27,7 +26,7 @@ export const readManage = (req, res) => {
     FROM activity
     LEFT JOIN manage ON activity.act_ID = manage.act_ID
     LEFT JOIN teacher ON activity.staff_ID = teacher.login_ID
-    LEFT JOIN student ON manage.std_ID = student.login_ID
+    LEFT JOIN student ON manage.std_ID = student.std_ID
     LEFT JOIN section ON student.sec_ID = section.sec_ID
     left join login on student.login_ID = login.username
     WHERE activity.act_status = 1 AND activity.act_ID IS NOT NULL;
@@ -60,7 +59,7 @@ export const readManageOne = (req, res) => {
         section.sec_name
     FROM manage 
         LEFT JOIN activity ON activity.act_ID = manage.act_ID 
-        LEFT JOIN student ON student.login_ID = manage.std_ID
+        LEFT JOIN student ON student.std_ID = manage.std_ID
         LEFT JOIN teacher ON teacher.login_ID = activity.staff_ID
         LEFT JOIN section ON section.sec_ID = student.sec_ID
     WHERE 
@@ -200,7 +199,7 @@ export const upload = (req, res) => {
         SELECT activity.*, manage.std_ID, student.std_fname, student.std_lname
         FROM activity 
         JOIN manage ON activity.act_ID = manage.act_ID
-        JOIN student ON manage.std_ID = student.login_ID
+        JOIN student ON manage.std_ID = student.std_ID
     `;
 
     db.query(q, (err, result) => {

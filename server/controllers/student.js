@@ -18,7 +18,7 @@ export const createStudent = (req, res) => {
 
     const sql = `
         INSERT INTO student
-            (login_ID, std_fname, std_lname, sec_ID, std_email, std_mobile, std_address, province, district, subdistrict, zipcode) 
+            (std_ID, std_fname, std_lname, sec_ID, std_email, std_mobile, std_address, province, district, subdistrict, zipcode) 
         VALUES 
             (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `
@@ -74,24 +74,20 @@ left JOIN teacher t ON t.sec_ID = student.sec_ID;
 }
 
 //read one
-export const getstudentOne = (req, res) => {
+
+export const getStudentOne = (req, res) => {
     const sql = `
-        select
-            student.*,
-            teacher.staff_fname,
-            teacher.staff_lname,
-            section.*,
-            login.*
-        from 
-            student 
-        left join section on section.sec_ID = student.sec_ID
-        left join teacher on teacher.sec_ID = student.sec_ID
-        left join login on login.username = student.login_ID
-         where student.login_ID = ?
-    `
+      SELECT student.*, teacher.staff_fname, teacher.staff_lname, section.*, login.*
+      FROM student
+      LEFT JOIN section ON section.sec_ID = student.sec_ID
+      LEFT JOIN teacher ON teacher.sec_ID = student.sec_ID
+      LEFT JOIN login ON login.username = student.std_ID
+      WHERE student.std_ID = ?
+    `;
+
     const {
         id
-    } = req.params
+    } = req.params;
 
     db.query(sql, [id], (err, result) => {
         if (err) {
@@ -99,14 +95,17 @@ export const getstudentOne = (req, res) => {
                 error: err.message
             });
         }
+
         if (result.length === 0) {
             return res.status(404).json({
                 message: 'Student not found'
             });
         }
-        return res.json(result[0]);
-    })
-}
+
+        // Check if the result array has at least one element before returning it
+        return res.json(result[0] || {});
+    });
+};
 
 // update
 export const updateStudent = (req, res) => {
@@ -123,7 +122,7 @@ export const updateStudent = (req, res) => {
             district = ?, 
             subdistrict = ?, 
             zipcode = ? 
-        WHERE login_ID = ?
+        WHERE std_ID = ?
     `
     const {
         id
@@ -153,7 +152,7 @@ export const updateStudent = (req, res) => {
 
 // delete
 export const deleteStudent2 = (req, res) => {
-    const sql = `delete from student  where login_ID = ? `
+    const sql = `delete from student  where std_ID = ? `
     const {
         id
     } = req.params
@@ -173,7 +172,7 @@ export const deleteStudent = (req, res) => {
         id
     } = req.params;
 
-    const sql1 = 'DELETE FROM student WHERE login_ID = ?';
+    const sql1 = 'DELETE FROM student WHERE std_ID = ?';
     const sql2 = 'DELETE FROM login WHERE username = ?';
 
     db.query(sql1, [id], (err, result1) => {

@@ -26,7 +26,7 @@ export default function SlideBar() {
   const [unreadCount, setUnreadCount] = React.useState(0);
   const [isHovered, setIsHovered] = React.useState(false);
   const drawerRef = React.useRef(null);
-  const id = localStorage.getItem("username");
+  const id = localStorage.getItem("id");
 
   React.useEffect(() => {
     const fetchNews = async () => {
@@ -64,7 +64,7 @@ export default function SlideBar() {
   const read = async (news_ID) => {
     try {
       const res = await axios.put(`/api/notify`, {
-        user_ID: id,
+        login_ID: id,
         news_ID: news_ID,
       });
       if (res.status === 200) {
