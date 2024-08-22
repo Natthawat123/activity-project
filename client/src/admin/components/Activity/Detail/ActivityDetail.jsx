@@ -65,25 +65,37 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
 
   const handleDateChange = (field, event) => {
     const newDate = event.target.value;
-    handleInputChange(field, newDate);
+    setEditData((prev) => ({ ...prev, [field]: formatISO(parseISO(newDate), { representation: 'date' }) }));
   };
 
   const editActivity = async () => {
     try {
-      await axios.put(`/api/activitys/${act_ID}`, editData);
+      // จัดการวันที่ก่อนบันทึก
+      const updatedData = {
+        ...editData,
+        act_dateStart: formatISO(parseISO(editData.act_dateStart), { representation: 'date' }),
+        act_dateEnd: formatISO(parseISO(editData.act_dateEnd), { representation: 'date' }),
+      };
+  
+      // อัปเดตข้อมูลกิจกรรม
+      await axios.put(`/api/activitys/${act_ID}`, updatedData);
+  
+      // สร้างข่าวใหม่สำหรับการแก้ไขกิจกรรม
       const newsData = {
         news_topic: `กิจกรรม ${activity.act_title}`,
-        news_desc: `แก้ไขรายละเอียดกิจกรรม  ${activity.act_title}`,
+        news_desc: `แก้ไขรายละเอียดกิจกรรม ${activity.act_title}`,
         news_date: new Date(),
       };
-
+  
+      // ส่งข่าวไปยัง API
       await axios.post("/api/news", newsData);
-      Swal.fire("แก้ไขสำเร็จ", "แก้ไขข้อมูลกิจกรรมเรียบร้อย.", "success").then(
-        async () => {
-          setIsReadOnly(true);
-          setShowButtons(false);
-        }
-      );
+  
+      Swal.fire("แก้ไขสำเร็จ", "แก้ไขข้อมูลกิจกรรมเรียบร้อย.", "success").then(() => {
+        setIsReadOnly(true);
+        setShowButtons(false);
+      });
+  
+      // รีโหลดหน้าเว็บ
       setTimeout(() => {
         window.location.reload();
       }, 1000);

@@ -172,7 +172,7 @@ const ListStudents = () => {
                 </div>
               </div>
 
-              <div className="items-center justify-center text-center">
+              {/*<div className="items-center justify-center text-center">
                 <label htmlFor="filter-section" className="text-xs">
                   แยกตามผู้จัดกิจกรรม
                 </label>
@@ -191,7 +191,7 @@ const ListStudents = () => {
                     ))}
                   </select>
                 </div>
-              </div>
+              </div>*/}
 
 
             </div>
