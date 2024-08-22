@@ -61,7 +61,7 @@ export const userOne = (req, res) => {
         LEFT JOIN student st ON l.username = st.std_ID
         LEFT JOIN admin a ON l.login_ID = a.login_ID
         LEFT JOIN section s ON COALESCE(t.sec_ID, st.sec_ID) = s.sec_ID 
-        WHERE COALESCE(t.login_ID, st.login_ID, a.login_ID) = ?
+        WHERE COALESCE(t.login_ID, st.std_ID, a.login_ID) = ?
     `
 
     db.query(sql, [id], (err, result) => {

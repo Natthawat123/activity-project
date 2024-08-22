@@ -103,7 +103,7 @@ function CalendarFull() {
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="text-center text-2xl sm:text-3xl font-bold mb-5"
+        className="text-center sm:text-xl font-bold mb-5"
       >
         ปฏิทินกิจกรรม
       </motion.h1>
@@ -133,19 +133,19 @@ function CalendarFull() {
       >
         <div className="flex items-center space-x-2">
           <div className="bg-green-600 h-4 w-4 rounded-sm"></div>
-          <p className="text-sm sm:text-base">เปิดลงทะเบียน</p>
+          <p>เปิดลงทะเบียน</p>
         </div>
         <div className="flex items-center space-x-2">
           <div className="bg-red-600 h-4 w-4 rounded-sm"></div>
-          <p className="text-sm sm:text-base">ลงทะเบียนเต็มแล้ว/ปิดลงทะเบียน</p>
+          <p>ลงทะเบียนเต็มแล้ว/ปิดลงทะเบียน</p>
         </div>
         <div className="flex items-center space-x-2">
           <div className="bg-blue-600 h-4 w-4 rounded-sm"></div>
-          <p className="text-sm sm:text-base">กิจกรรมจบลงแล้ว</p>
+          <p>กิจกรรมจบลงแล้ว</p>
         </div>
         <div className="flex items-center space-x-2">
           <div className="bg-gray-600 h-4 w-4 rounded-sm"></div>
-          <p className="text-sm sm:text-base">
+          <p>
             ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน
           </p>
         </div>
