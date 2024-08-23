@@ -4,7 +4,7 @@ const db = mysql.createConnection({
     // host: "localhost",
     // user: "root",
     // password: "",
-    // database: "activitydb"
+    // database: "activitydb"dddd
     host: process.env.DB_HOST,
     user: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
