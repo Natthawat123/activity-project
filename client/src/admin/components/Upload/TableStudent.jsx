@@ -90,6 +90,7 @@ function TableStudent({ activity = [], id, username }) {
       return updated;
     });
   };
+  console.log(checkedItems);
 
   useEffect(() => {
     const allChecked = activity.students.every((student) =>
@@ -151,14 +152,17 @@ function TableStudent({ activity = [], id, username }) {
         await axios.put(`/api/transection/${actID}`, {
           act_transaction: tx.transactionHash,
         });
+        console.log(notCheckedStudents);
+        console.log(studentIds);
         await axios.put(`/api/status/status`, {
           act_ID: actID,
           std_IDs: notCheckedStudents,
         });
-        await axios.put(`/api/manage/manage`, {
+        await axios.put(`/api/manage`, {
           act_ID: actID,
           std_ID: studentIds,
         });
+
         await axios.post(`/api/new`, {
           news_topic: `ยืนยันผลการเข้าร่วมกิจกรรม ${activity.act_title}`,
           news_desc: "สามารถดูรายละเอียดการเข้าร่วมกิจกรรมได้ที่แล้ววันนี้",
@@ -169,13 +173,13 @@ function TableStudent({ activity = [], id, username }) {
         Swal.fire({
           position: "top-end",
           icon: "success",
-          // title: `Transaction: ${tx.transactionHash}`,
+          title: `Transaction: ${tx.transactionHash}`,
           showConfirmButton: false,
           timer: 1500,
         });
-        // setTimeout(() => {
-        //   window.location.reload();
-        // }, 1000);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       }
     } catch (err) {
       console.error("Error handling upload:", err);

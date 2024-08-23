@@ -13,7 +13,7 @@ function Add_Activity({ closeModal }) {
   const [inputEndDate, setEndDate] = useState("");
   const [inputStaffID, setstaffID] = useState("");
   const [staffName, setStaffName] = useState([]);
-  const id = localStorage.getItem("staff_ID");
+  const id = localStorage.getItem("id");
   useEffect(() => {
     axios
       .get("/api/users")

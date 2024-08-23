@@ -1,6 +1,10 @@
-import { MailerSend, Recipient, EmailParams } from "mailersend";
+import {
+  MailerSend,
+  Recipient,
+  EmailParams
+} from "mailersend";
 import crypto from "crypto";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import dbPromise from "../dbPromise.js";
 import db from "../db.js"
 
@@ -9,12 +13,13 @@ const baseURL = "localhost:5173";
 // Request Password Reset
 export const forgotPassword = async (req, res) => {
   const mailerSend = new MailerSend({
-    apiKey:
-      "mlsn.eb1abc9f46a58b00db1f2e031a2056559856a427a0fcfce7f51a4de1211cd861",
+    apiKey: "mlsn.eb1abc9f46a58b00db1f2e031a2056559856a427a0fcfce7f51a4de1211cd861",
   });
 
   try {
-    const { email } = req.body;
+    const {
+      email
+    } = req.body;
 
     // Search email in all related tables
     const [studentResult] = await dbPromise.query(
@@ -93,8 +98,12 @@ export const forgotPassword = async (req, res) => {
 // Reset Password
 export const resetPassword = async (req, res) => {
   try {
-    const { token } = req.params;
-    const { password } = req.body;
+    const {
+      token
+    } = req.params;
+    const {
+      password
+    } = req.body;
 
     // ตรวจสอบ token ว่ายังไม่หมดอายุ
     const [user] = await dbPromise.query(
@@ -122,15 +131,23 @@ export const resetPassword = async (req, res) => {
     res.status(500).send("Server error.");
   }
 };
- 
+
 export const changePassword = async (req, res) => {
   try {
-    const { oldPassword, newPassword, role } = req.body;
-    const { id } = req.params;
+    const {
+      oldPassword,
+      newPassword,
+      role
+    } = req.body;
+    const {
+      id
+    } = req.params;
 
     // Validate input
     if (!oldPassword || !newPassword || !id) {
-      return res.status(400).json({ message: 'Missing required fields' });
+      return res.status(400).json({
+        message: 'Missing required fields'
+      });
     }
 
     // Fetch the user based on role
@@ -152,7 +169,9 @@ export const changePassword = async (req, res) => {
     }
 
     if (userQuery.length === 0) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({
+        message: 'User not found'
+      });
     }
 
     const user = userQuery[0];
@@ -160,7 +179,9 @@ export const changePassword = async (req, res) => {
     // Verify old password
     const isOldPasswordCorrect = await bcrypt.compare(oldPassword, user.password);
     if (!isOldPasswordCorrect) {
-      return res.status(400).json({ message: 'Old password is incorrect' });
+      return res.status(400).json({
+        message: 'Old password is incorrect'
+      });
     }
 
     // Hash the new password
@@ -182,13 +203,19 @@ export const changePassword = async (req, res) => {
     });
 
     if (updateResult.affectedRows === 0) {
-      return res.status(400).json({ message: 'Password change failed. Old password might be incorrect or update did not succeed.' });
+      return res.status(400).json({
+        message: 'Password change failed. Old password might be incorrect or update did not succeed.'
+      });
     }
 
-    res.status(200).json({ message: 'Password changed successfully' });
+    res.status(200).json({
+      message: 'Password changed successfully'
+    });
 
   } catch (error) {
     console.error('Error in changePassword function:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({
+      message: 'Internal server error'
+    });
   }
 };

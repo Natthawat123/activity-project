@@ -7,7 +7,7 @@ export const user = (req, res) => {
             l.*, 
             s.*,
 
-            COALESCE(t.login_ID, st.login_ID, a.login_ID) AS ID,
+            COALESCE(t.login_ID, st.std_ID, a.login_ID) AS ID,
             COALESCE(t.staff_fname, st.std_fname, a.fname) AS fname,
             COALESCE(t.staff_lname, st.std_lname, a.lname) AS lname,
             COALESCE(t.staff_email, st.std_email, a.email) AS email,
@@ -22,7 +22,7 @@ export const user = (req, res) => {
             login l
 
         LEFT JOIN teacher t ON l.login_ID = t.login_ID
-        LEFT JOIN student st ON l.username = st.login_ID
+        LEFT JOIN student st ON l.username = st.std_ID
         LEFT JOIN admin a ON l.login_ID = a.login_ID
         LEFT JOIN section s ON COALESCE(t.sec_ID, st.sec_ID) = s.sec_ID 
     `
@@ -43,7 +43,7 @@ export const userOne = (req, res) => {
             l.*, 
             s.*,
 
-            COALESCE(t.login_ID, st.login_ID, a.login_ID) AS ID,
+            COALESCE(t.login_ID, st.std_ID, a.login_ID) AS ID,
             COALESCE(t.staff_fname, st.std_fname, a.fname) AS fname,
             COALESCE(t.staff_lname, st.std_lname, a.lname) AS lname,
             COALESCE(t.staff_email, st.std_email, a.email) AS email,
@@ -58,7 +58,7 @@ export const userOne = (req, res) => {
             login l
 
         LEFT JOIN teacher t ON l.login_ID = t.login_ID
-        LEFT JOIN student st ON l.username = st.login_ID
+        LEFT JOIN student st ON l.username = st.std_ID
         LEFT JOIN admin a ON l.login_ID = a.login_ID
         LEFT JOIN section s ON COALESCE(t.sec_ID, st.sec_ID) = s.sec_ID 
         WHERE COALESCE(t.login_ID, st.login_ID, a.login_ID) = ?
@@ -111,7 +111,7 @@ export const updateUser = (req, res) => {
                 subdistrict = ?,               
                 zipcode = ?      
             WHERE 
-                login_ID = ?
+                std_ID = ?
         `;
     } else {
         return res.status(400).json({

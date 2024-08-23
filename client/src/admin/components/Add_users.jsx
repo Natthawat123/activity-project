@@ -10,7 +10,7 @@ const Add_Users = ({ closeModal }) => {
   const [activeTab, setActiveTab] = useState("single");
   const [title, setTitle] = useState("");
   const [section, setSection] = useState([]);
-  const [selectedSection, setSelectedSection] = useState("");
+  const [selectedSection, setSelectedSection] = useState(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newSection, setNewSection] = useState("");
 
@@ -83,7 +83,8 @@ const Add_Users = ({ closeModal }) => {
       lname: data.get("lastName") || "กรุณาเปลี่ยนนามสกุลของท่าน",
       email: data.get("email") || `${username}@webmail.npru.ac.th`,
       mobile: data.get("phoneNumber"),
-      sec_ID: selectedSection,
+      sec_ID: data.get("newSection") ? null : selectedSection,
+      sec_name: data.get("newSection")
     };
 
     console.log("jsonData:", jsonData);

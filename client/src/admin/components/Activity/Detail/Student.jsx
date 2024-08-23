@@ -13,10 +13,10 @@ function Student({ act_ID, day = [], data = [], join = {}, id, activity }) {
     setShowCheckBox(!showCheckBox);
   };
 
-  const selectCancelReserveStudent = (checked, studentID) => {
+  const selectCancelReserveStudent = (checked, studentID, ids) => {
     setSelectCheckBox((prev) =>
       checked
-        ? [...prev, { std_ID: studentID, act_ID }]
+        ? [...prev, { std_ID: studentID, act_ID, ids }]
         : prev.filter((item) => item.std_ID !== studentID)
     );
   };
@@ -93,7 +93,6 @@ function Student({ act_ID, day = [], data = [], join = {}, id, activity }) {
       }
     }
   };
-  console.log(activity);
 
   const joinStudents = join.actID === BigInt(act_ID) ? join.students || [] : [];
 
@@ -173,7 +172,11 @@ function Student({ act_ID, day = [], data = [], join = {}, id, activity }) {
                         (item) => item.std_ID === i.login_ID
                       )}
                       onChange={(e) =>
-                        selectCancelReserveStudent(e.target.checked, i.login_ID)
+                        selectCancelReserveStudent(
+                          e.target.checked,
+                          i.login_ID,
+                          i.ids
+                        )
                       }
                     />
                   </td>

@@ -19,6 +19,7 @@ import Tooltip from "@mui/material/Tooltip";
 export default function NewsList({ news = [], id }) {
   const [open, setOpen] = React.useState({});
   const [selectedNews, setSelectedNews] = React.useState(null);
+  const [readStatus, setReadStatus] = React.useState({}); // State to track read status
 
   const handleClick = (news_ID) => () => {
     setOpen((prev) => ({
@@ -30,29 +31,31 @@ export default function NewsList({ news = [], id }) {
   const handleListItemClick = (item) => {
     setSelectedNews(item);
   };
+
   const read = async (news_ID) => {
-    try {
-      const res = await axios.put(`/api/notify`, {
-        user_ID: id,
-        news_ID: news_ID,
-      });
-      if (res.status === 200) {
-        window.location.reload();
-      } else {
-        console.error("Failed to mark news as read");
-      }
-    } catch (e) {
-      console.error("Error marking news as read:", e);
-    }
+    // Uncomment and adjust the API call as needed
+    // try {
+    //   const res = await axios.put(`/api/notify`, {
+    //     user_ID: id,
+    //     news_ID: news_ID,
+    //   });
+    //   if (res.status === 200) {
+    //     setReadStatus((prev) => ({ ...prev, [news_ID]: 'read' })); // Update read status
+    //   } else {
+    //     console.error("Failed to mark news as read");
+    //   }
+    // } catch (e) {
+    //   console.error("Error marking news as read:", e);
+    // }
+    setReadStatus((prev) => ({ ...prev, [news_ID]: "read" })); // Update read status locally
   };
-  const color = (status) => {
-    if (status === "read") return "#fdd835";
-    return "#e0e0e0";
+
+  const color = (news_ID) => {
+    return readStatus[news_ID] === "read" ? "#fdd835" : "#e0e0e0"; // Check read status
   };
 
   const tootip = (status) => {
-    if (status == "read") return "อ่านแล้ว";
-    return "ทำเครื่องหมายว่าอ่านแล้ว";
+    return status === "read" ? "อ่านแล้ว" : "ทำเครื่องหมายว่าอ่านแล้ว";
   };
 
   return (
@@ -82,10 +85,10 @@ export default function NewsList({ news = [], id }) {
           <React.Fragment key={item.news_ID}>
             <ListItemButton onClick={handleClick(item.news_ID)}>
               <ListItemIcon>
-                <Tooltip title={tootip(item.notify_status)}>
+                <Tooltip title={tootip(readStatus[item.news_ID])}>
                   <CheckCircleOutlineIcon
                     sx={{
-                      color: color(item.notify_status),
+                      color: color(item.news_ID), // Use the updated color function
                       "&:hover": {
                         color: "#fdd835",
                       },
