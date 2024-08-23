@@ -8,7 +8,7 @@ import teacher from './routes/teacher.js'
 import activity from './routes/activity.js'
 import manage from './routes/manage.js'
 import section from './routes/section.js'
-// import forgotPassword from './routes/forgotPassword.js'
+import forgotPassword from './routes/forgotPassword.js'
 import news from './routes/news.js'
 import status from './routes/status.js'
 import notify from './routes/notify.js'
@@ -25,7 +25,7 @@ app.use('/', teacher)
 app.use('/', activity)
 app.use('/', manage)
 app.use('/', section)
-// app.use('/', forgotPassword)
+app.use('/', forgotPassword)
 app.use('/', news)
 app.use('/status', status)
 app.use('/', notify)
