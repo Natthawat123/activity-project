@@ -1,12 +1,14 @@
+import { Suspense, lazy } from "react";
+const CS = lazy(() => import("../../components/Calendar"));
 
-import CS from '../../components/Calendar'
 function Calendar() {
   return (
     <div className="pt-10 md:pt-16">
-      <CS />
+      <Suspense fallback={<div>Loading...</div>}>
+        <CS />
+      </Suspense>
     </div>
-  )
+  );
 }
 
-
-export default Calendar
+export default Calendar;
