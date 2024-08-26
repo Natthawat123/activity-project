@@ -19,7 +19,7 @@ function CalendarFull() {
   const role = localStorage.getItem("role");
 
   useEffect(() => {
-    fetch("/api/activitys")
+    fetch("/https://activity-project-l9oq.onrender.com/activitys")
       .then((response) => {
         if (!response.ok) {
           throw new Error("เกิดข้อผิดพลาดในการดึงข้อมูล");
