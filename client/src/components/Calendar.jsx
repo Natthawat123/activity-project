@@ -8,10 +8,6 @@ import Tooltip from "@mui/material/Tooltip";
 import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
 
-<<<<<<< HEAD
-// Optimize moment.js and react-big-calendar imports
-=======
->>>>>>> 0e9818f63025a634d0f620fa6b408e82454d25fd
 const localizer = momentLocalizer(moment);
 
 const EventPopup = memo(({ selectedEvent, closePopup }) => {
@@ -150,58 +146,6 @@ function CalendarFull() {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
-<<<<<<< HEAD
-
-  const fetchEvents = useCallback(async () => {
-    try {
-      const response = await fetch("/api/activitys");
-      if (!response.ok) throw new Error("เกิดข้อผิดพลาดในการดึงข้อมูล");
-      const data = await response.json();
-      const seenTitles = new Set();
-      const eventList = data
-        .filter((item) => {
-          if (seenTitles.has(item.act_title)) {
-            return false;
-          } else {
-            seenTitles.add(item.act_title);
-            return true;
-          }
-        })
-        .map((item) => ({
-          start: moment(item.act_dateStart).toDate(),
-          end: moment(item.act_dateEnd).toDate(),
-          reserveStart: moment(item.act_dateStart)
-            .subtract(2, "weeks")
-            .toDate(),
-          reserveEnd: moment(item.act_dateStart).subtract(1, "day").toDate(),
-          title: item.act_title,
-          status: item.act_status,
-          location: item.act_location,
-          numStd: item.act_numStd,
-          numStdReserve: item.act_numStdReserve,
-          id: item.act_ID,
-          color:
-            item.act_status === 2
-              ? "blue"
-              : item.act_numStd === item.act_numStdReserve
-              ? "red"
-              : new Date() >= moment(item.act_dateStart).subtract(2, "weeks").toDate() &&
-                new Date() <= moment(item.act_dateStart).subtract(1, "day").toDate()
-              ? item.act_status === 1
-                ? "green"
-                : "red"
-              : "gray",
-        }));
-      setEvents(eventList);
-    } catch (error) {
-      console.error("เกิดข้อผิดพลาด: ", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchEvents();
-  }, [fetchEvents]);
-=======
   const navigate = useNavigate();
   const now = new Date();
   const role = localStorage.getItem("role");
@@ -259,7 +203,6 @@ function CalendarFull() {
         console.error("เกิดข้อผิดพลาด: ", error);
       });
   }, []);
->>>>>>> 0e9818f63025a634d0f620fa6b408e82454d25fd
 
   const eventStyleGetter = (event) => {
     const backgroundColor = event.color;
@@ -337,11 +280,6 @@ function CalendarFull() {
       </motion.div>
 
       {selectedEvent && showPopup && (
-<<<<<<< HEAD
-        <Suspense fallback={<div>Loading...</div>}>
-          <EventPopup selectedEvent={selectedEvent} closePopup={closePopup} />
-        </Suspense>
-=======
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -475,7 +413,6 @@ function CalendarFull() {
             </div>
           </div>
         </motion.div>
->>>>>>> 0e9818f63025a634d0f620fa6b408e82454d25fd
       )}
     </div>
   );
