@@ -1,19 +1,20 @@
 {
     "version": 2,
     "builds": [
-        {
-            "src": "vite.config.js",
-            "use": "@vercel/static-build"
-        }
+      {
+        "src": "vite.config.js",
+        "use": "@vercel/static-build"
+      }
     ],
     "routes": [
-        {
-            "src": "/api/(.*)",
-            "dest": "https://activity-project-mioo.onrender.com/api/$1"
-          },
-        {
-            "src": "/api/[^.]+",
-            "dest": "/api/$1"
-        }
+      {
+        "src": "/api/(.*)",
+        "dest": "https://activity-project-mioo.onrender.com/api/$1"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/index.html"
+      }
     ]
-}
+  }
+  
