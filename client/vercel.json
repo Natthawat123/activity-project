@@ -6,7 +6,7 @@
         },
         {
             "src": "^/api/(.*)$",
-            "dest": "/api/$1"
+            "dest": "https://activity-project-mioo.onrender.com/$1"
         }
     ]
 }
