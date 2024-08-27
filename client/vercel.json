@@ -9,7 +9,7 @@
     "routes": [
         {
             "src": "/api/(.*)",
-            "dest": "https://activity-project-mioo.onrender.com/"
+            "dest": "https://activity-project-mioo.onrender.com/api/$1"
           },
         {
             "src": "/api/[^.]+",
