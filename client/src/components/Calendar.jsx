@@ -19,7 +19,7 @@ function CalendarFull() {
   const role = localStorage.getItem("role");
 
   useEffect(() => {
-    fetch("/https://activity-project-mioo.onrender.com/activitys")
+    fetch("/api/activitys")
       .then((response) => {
         if (!response.ok) {
           throw new Error("เกิดข้อผิดพลาดในการดึงข้อมูล");
