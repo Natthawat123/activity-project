@@ -6,7 +6,7 @@
         },
         {
             "src": "^/api/(.*)$",
-            "dest": "https://activity-project-mioo.onrender.com/$1"
+            "dest": "https://adorable-achievement-production.up.railway.app/$1"
         }
     ]
 }
