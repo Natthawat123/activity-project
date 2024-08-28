@@ -8,5 +8,16 @@
             "src": "^/api/(.*)$",
             "dest": "https://adorable-achievement-production.up.railway.app/$1"
         }
+    ],
+    "header": [
+        {
+            "source": "^/api/(.*)$",
+            "header": [
+                {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                }
+            ]
+        }
     ]
 }
