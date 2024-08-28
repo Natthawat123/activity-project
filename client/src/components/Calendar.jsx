@@ -7,7 +7,6 @@ import { motion } from "framer-motion";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import Tooltip from "@mui/material/Tooltip";
 import { useNavigate } from "react-router";
-import axios from 'axios'
 
 const localizer = momentLocalizer(moment);
 
@@ -20,7 +19,7 @@ function CalendarFull() {
   const role = localStorage.getItem("role");
 
   useEffect(() => {
-    axios.get("/api/activitys")
+    fetch("/api/activitys")
       .then((response) => {
         if (!response.ok) {
           throw new Error("เกิดข้อผิดพลาดในการดึงข้อมูล");
