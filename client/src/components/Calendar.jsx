@@ -20,54 +20,48 @@ function CalendarFull() {
 
   useEffect(() => {
     fetch("/api/activitys")
-      .then((response) => {
+      .then(response => {
         if (!response.ok) {
           throw new Error("เกิดข้อผิดพลาดในการดึงข้อมูล");
         }
-        return response.json();
+        return response.text(); // Get the response as text
       })
-      .then((data) => {
-        const seenTitles = new Set(); // Create a set to track seen titles
-        console.log("Received data:", data);
-        const eventList = data
-          .filter((item) => {
-            // Filter out items with duplicate titles
-            if (seenTitles.has(item.act_title)) {
-              return false;
-            } else {
-              seenTitles.add(item.act_title);
-              return true;
-            }
-          })
-          .map((item) => ({
-            start: moment(item.act_dateStart).toDate(),
-            end: moment(item.act_dateEnd).toDate(),
-            reserveStart: moment(item.act_dateStart)
-              .subtract(2, "weeks")
-              .toDate(),
-            reserveEnd: moment(item.act_dateStart).subtract(1, "day").toDate(),
-            title: item.act_title,
-            status: item.act_status,
-            location: item.act_location,
-            numStd: item.act_numStd,
-            numStdReserve: item.act_numStdReserve,
-            id: item.act_ID,
-            color:
-              item.act_status === 2
+      .then(text => {
+        try {
+          const data = JSON.parse(text); // Attempt to parse JSON
+          const seenTitles = new Set();
+          console.log("Received data:", data);
+          const eventList = data
+            .filter(item => !seenTitles.has(item.act_title) && seenTitles.add(item.act_title))
+            .map(item => ({
+              start: moment(item.act_dateStart).toDate(),
+              end: moment(item.act_dateEnd).toDate(),
+              reserveStart: moment(item.act_dateStart).subtract(2, "weeks").toDate(),
+              reserveEnd: moment(item.act_dateStart).subtract(1, "day").toDate(),
+              title: item.act_title,
+              status: item.act_status,
+              location: item.act_location,
+              numStd: item.act_numStd,
+              numStdReserve: item.act_numStdReserve,
+              id: item.act_ID,
+              color: item.act_status === 2
                 ? "blue"
                 : item.act_numStd === item.act_numStdReserve
-                ? "red"
-                : now >=
-                    moment(item.act_dateStart).subtract(2, "weeks").toDate() &&
-                  now <= moment(item.act_dateStart).subtract(1, "day").toDate()
-                ? item.act_status === 1
-                  ? "green"
-                  : "red"
-                : "gray",
-          }));
-        setEvents(eventList);
+                  ? "red"
+                  : now >= moment(item.act_dateStart).subtract(2, "weeks").toDate() &&
+                    now <= moment(item.act_dateStart).subtract(1, "day").toDate()
+                    ? item.act_status === 1
+                      ? "green"
+                      : "red"
+                    : "gray",
+            }));
+          setEvents(eventList);
+        } catch (error) {
+          console.error("Error parsing JSON:", error);
+          console.error("Response text:", text);
+        }
       })
-      .catch((error) => {
+      .catch(error => {
         console.error("เกิดข้อผิดพลาด: ", error);
       });
   }, []);
