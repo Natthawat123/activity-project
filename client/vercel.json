@@ -6,9 +6,13 @@
       },
       {
         "src": "^/api/(.*)$",
-        "dest": "https://adorable-achievement-production.up.railway.app/$1"
+        "dest": "https://adorable-achievement-production.up.railway.app/$1",
+        "headers": {
+            "Access-Control-Allow-Headers": "Content-Type"
+          }
       }
     ]
+
     
   }
   
