@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import Tooltip from "@mui/material/Tooltip";
 import { useNavigate } from "react-router";
+import axios from 'axios';
 
 const localizer = momentLocalizer(moment);
 
@@ -19,20 +20,14 @@ function CalendarFull() {
   const role = localStorage.getItem("role");
 
   useEffect(() => {
-    fetch("/api/activitys", {
-      headers: {  
-        Accept: "application/json"  
-      } 
-    })
+    axios
+      .get("/api/activitys")
       .then((response) => {
-        if (!response.ok) {
-          throw new Error("เกิดข้อผิดพลาดในการดึงข้อมูล");
-        }
-        return response.json();
-      })
-      .then((data) => {
+        const data = response.data;
+  
         const seenTitles = new Set(); // Create a set to track seen titles
         console.log("Received data:", data);
+  
         const eventList = data
           .filter((item) => {
             // Filter out items with duplicate titles
@@ -69,6 +64,7 @@ function CalendarFull() {
                   : "red"
                 : "gray",
           }));
+  
         setEvents(eventList);
       })
       .catch((error) => {
