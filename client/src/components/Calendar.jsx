@@ -19,7 +19,11 @@ function CalendarFull() {
   const role = localStorage.getItem("role");
 
   useEffect(() => {
-    fetch("/api/activitys")
+    fetch("/api/activitys", {
+      headers: {  
+        Accept: "application/json"  
+      } 
+    })
       .then((response) => {
         if (!response.ok) {
           throw new Error("เกิดข้อผิดพลาดในการดึงข้อมูล");

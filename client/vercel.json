@@ -1,12 +1,18 @@
 {
     "routes": [
-        {
-            "src": "/[^.]+",
-            "dest": "/"
-        },
-        {
-            "src": "^/api/(.*)$",
-            "dest": "https://activity-project-mioo.onrender.com/$1"
-        }
+      {
+        "src": "/[^.]+",
+        "dest": "/"
+      },
+      {
+        "src": "^/api/(.*)$",
+        "dest": "https://adorable-achievement-production.up.railway.app/$1",
+        "headers": {
+            "Access-Control-Allow-Headers": "Content-Type"
+          }
+      }
     ]
-}
+
+    
+  }
+  
