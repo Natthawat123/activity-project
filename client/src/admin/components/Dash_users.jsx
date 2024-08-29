@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Popup from "./Popup_addUser";
-import { BarChart } from "@mui/x-charts/BarChart";
-import { green } from "@mui/material/colors";
+//import { BarChart } from "@mui/x-charts/BarChart";
+//import { green } from "@mui/material/colors";
 
 function Dash_users() {
   const [items, setItems] = useState([]);

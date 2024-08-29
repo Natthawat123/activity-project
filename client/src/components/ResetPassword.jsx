@@ -38,36 +38,38 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="bg-[#1a1c23] text-white p-8 rounded-lg w-80 mx-auto">
-      <div className="text-4xl font-bold text-center mb-4">
-        <span className="text-[#ff7700]">I</span>
-        <span className="text-[#00a8ff]">T</span>
-      </div>
-      <h2 className="text-center text-2xl mb-6">RESET PASSWORD</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col">
-        <div className="mb-4">
-          <label htmlFor="password" className="block mb-2">New Password</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full px-3 py-2 bg-[#2a2e37] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
-          />
+    <div className='flex justify-center items-center h-screen  bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90%'>
+      <div className="bg-[#1a1c23] text-white p-8 rounded-lg w-96 mx-auto">
+        <div className="text-4xl font-bold text-center mb-4">
+          <span className="text-[#ff7700]">I</span>
+          <span className="text-[#00a8ff]">T</span>
         </div>
-        <button 
-          type="submit" 
-          className="bg-purple-600 text-white py-3 rounded-md font-bold hover:bg-purple-700 transition duration-300"
-        >
-          Reset Password
-        </button>
-      </form>
-      {message && (
-        <p className={`text-center mt-4 ${message.includes('Error') ? 'text-red-500' : 'text-green-500'}`}>
-          {message} {!message.includes('Error') && countdown > 0 && `${countdown}...`}
-        </p>
-      )}
+        <h2 className="text-center text-2xl mb-6">รีเซ็ตรหัสผ่าน</h2>
+        <form onSubmit={handleSubmit} className="flex flex-col">
+          <div className="mb-4">
+            <label htmlFor="password" className="block mb-2">รหัสผ่านใหม่</label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full px-3 py-2 bg-[#2a2e37] rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+            />
+          </div>
+          <button
+            type="submit"
+            className="bg-purple-600 text-white py-3 rounded-md font-bold hover:bg-purple-700 transition duration-300"
+          >
+            ยืนยันการเปลี่ยนรหัสผ่าน
+          </button>
+        </form>
+        {message && (
+          <p className={`text-center mt-4 ${message.includes('Error') ? 'text-red-500' : 'text-green-500'}`}>
+            {message} {!message.includes('Error') && countdown > 0 && `${countdown}...`}
+          </p>
+        )}
+      </div>
     </div>
   );
 };

@@ -236,7 +236,7 @@ const StudentForm = () => {
 
   return (
     <div className="container mx-auto mb-10 md:px-20 pt-24">
-      <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 pb-10">
+      <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 pb-5">
         <div className="flex justify-between">
           <div className="flex gap-2">
             <h1 className="text-lg font-bold mb-2">แก้ไขข้อมูลส่วนตัว</h1>
@@ -448,6 +448,7 @@ const StudentForm = () => {
               className="mt-1 p-2 border w-full rounded-md"
             />
           </div>
+          <div></div>
 
           <div className="flex justify-end items-center">
             <button
@@ -455,7 +456,7 @@ const StudentForm = () => {
               className="flex justify-center items-center p-5 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-1/8 h-1/2"
               onClick={updateClick}
             >
-              แก้ไข
+              ยืนยันการแก้ไข
             </button>
           </div>
         </form>
