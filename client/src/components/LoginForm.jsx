@@ -15,8 +15,8 @@ export default function SignInSide() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const jsonData = {
-      username: credentials && credentials.data.get("username"),
-      password: credentials && credentials.data.get("password"),
+      username: data.get("username"),
+      password: data.get("password"),
     };
 
     try {
