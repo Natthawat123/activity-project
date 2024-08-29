@@ -24,6 +24,7 @@ export default function SignInSide() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
         body: JSON.stringify(jsonData),
       });
