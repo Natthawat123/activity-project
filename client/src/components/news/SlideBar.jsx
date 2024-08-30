@@ -177,11 +177,11 @@ export default function SlideBar() {
           onMouseLeave={() => setIsHovered(false)}
         >
           <Badge
-            className={unreadCount > 0 ? "rgb" : "text-[#94a3b8] gap-3 flex gap-3 items-center px-4 py-2 text-sm  data-[focus]:bg-gray-100 data-[focus]:text-gray-900"}
+            className={unreadCount > 0 ? "rgb" : "text-[#94a3b8] gap-3 flex  items-center px-4 py-2 text-xs  data-[focus]:bg-gray-100 data-[focus]:text-gray-900"}
             badgeContent={unreadCount}
           >
             {isHovered ? <DraftsIcon /> : <MailIcon />}{" "}
-            <p className="text-gray-700 ">การแจ้งเตือน</p>
+            {/*<p className="text-gray-700 ">การแจ้งเตือน</p>*/}
             
           </Badge>
         </div>

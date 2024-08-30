@@ -110,8 +110,8 @@ const NavBar = () => {
 
             {/* Add similar li elements for other menu items */}
           </ul>
-          <div className="flex items-center gap-5">
-          
+          <div className="flex items-center gap-1">
+          <SlideBar />
 
             <Menu as="div" className="relative inline-block text-left">
               <div>
@@ -123,7 +123,7 @@ const NavBar = () => {
 
               <MenuItems
                 transition
-                className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                className="absolute right-0 z-10 mt-2 w-60 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
               >
                 <div className="py-1">
                   <MenuItem>
@@ -152,7 +152,7 @@ const NavBar = () => {
                   </MenuItem>
 
                   <MenuItem>
-                    <SlideBar />
+                    <Logout />
                   </MenuItem>
 
                 </div>
@@ -161,9 +161,7 @@ const NavBar = () => {
             </Menu>
 
 
-            <div className="hidden md:flex">
-            <Logout />
-          </div>
+            
           </div>
         </nav>
 
@@ -246,12 +244,7 @@ const NavBar = () => {
                 </li>
               </Link>
 
-              <li
-                onClick={() => handleItemClick("Logout")}
-                className={getItemLogoutXs("Logout")}
-              >
-                <Logout />
-              </li>
+            
             </ul>
           </div>
         </div>

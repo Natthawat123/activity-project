@@ -48,10 +48,9 @@ const Header = () => {
   };
 
   const getItemClass = (itemName) =>
-    `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 text-gray-600 border border-white bg-gray-50 cursor-pointer px-3 py-2.5 font-normal text-xs leading-3 shadow-md rounded ${
-      selectedItem === itemName
-        ? "bg-indigo-600 text-white"
-        : "bg-gray-50 text-gray-600 border border-white"
+    `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 text-gray-600 border border-white bg-gray-50 cursor-pointer px-3 py-2.5 font-normal text-xs leading-3 shadow-md rounded ${selectedItem === itemName
+      ? "bg-indigo-600 text-white"
+      : "bg-gray-50 text-gray-600 border border-white"
     }`;
 
   const getItemClassXs = () =>
@@ -99,59 +98,55 @@ const Header = () => {
               </li>
             </Link>
           </ul>
-          <div className="flex items-center gap-5">
-         
+          <div className="flex items-center">
+            <SlideBar />
 
             <Menu as="div" className="relative inline-block text-left">
-            <div>
-              <MenuButton className=" inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-xs md:text-sm font-semibold text-gray-900  ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-              {username.std_fname}{"  "}{username.std_lname}
-                <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
-              </MenuButton>
-            </div>
-
-            <MenuItems
-              transition
-              className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-            >
-              <div className="py-1">
-                <MenuItem>
-                  <a
-                    href="#"
-                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
-                  >
-                    <PersonPinIcon className="text-blue-500" />
-                    <div className="">
-                      <div className="">{username.std_fname} {username.std_lname}</div>
-                      <div className="text-xs text-gray-400">{username.std_email}</div>
-                    </div>
-                  </a>
-                </MenuItem>
-
-              </div>
-              <div className="py-1">
-                <MenuItem>
-                  <Link
-                    to={`/activity/change-password/${ID}`}
-                    className="flex gap-3 items-center px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
-                  >
-                    <KeyIcon />
-                    <p>เปลี่ยนรหัสผ่าน</p>
-                  </Link>
-                </MenuItem>
-
-                <MenuItem>
-                  <SlideBar />
-                </MenuItem>
-
+              <div>
+                <MenuButton className=" inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-xs md:text-sm font-semibold text-gray-900  ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                  {username.std_fname}{"  "}{username.std_lname}
+                  <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
+                </MenuButton>
               </div>
 
-            </MenuItems>
-          </Menu>
+              <MenuItems
+                transition
+                className="absolute right-0 z-10 mt-2 w-60 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+              >
+                <div className="py-1">
+                  <MenuItem>
+                    <a
+                      href="#"
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
+                    >
+                      <PersonPinIcon className="text-blue-500" />
+                      <div className="">
+                        <div className="">{username.std_fname} {username.std_lname}</div>
+                        <div className="text-xs text-gray-400">{username.std_email}</div>
+                      </div>
+                    </a>
+                  </MenuItem>
 
-            <div className="hidden md:flex">
-            <Logout />
-          </div>
+                </div>
+                <div className="py-1">
+                  <MenuItem>
+                    <Link
+                      to={`/activity/change-password/${ID}`}
+                      className="flex gap-3 items-center px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
+                    >
+                      <KeyIcon />
+                      <p>เปลี่ยนรหัสผ่าน</p>
+                    </Link>
+                  </MenuItem>
+                  <MenuItem>
+                    <Logout />
+                  </MenuItem>
+
+                </div>
+
+              </MenuItems>
+            </Menu>
+
           </div>
         </nav>
         <div className="relative block md:hidden w-full mt-5">
@@ -162,9 +157,8 @@ const Header = () => {
             <div className="flex space-x-2">
               <span
                 id="s1"
-                className={`font-semibold text-sm leading-3 ${
-                  isListVisible ? "" : "hidden"
-                }`}
+                className={`font-semibold text-sm leading-3 ${isListVisible ? "" : "hidden"
+                  }`}
               >
                 {" "}
               </span>
@@ -190,13 +184,12 @@ const Header = () => {
           <div className="relative">
             <ul
               id="list"
-              className={`relative font-normal text-base leading-4 top-2 w-full rounded shadow-md transition-all duration-700 ${
-                isListVisible
+              className={`relative font-normal text-base leading-4 top-2 w-full rounded shadow-md transition-all duration-700 ${isListVisible
                   ? "opacity-100 max-h-40"
                   : "opacity-0 max-h-0 hidden"
-              }`}
+                }`}
             >
-        
+
 
               <Link to="/activity/calendar">
                 <li
@@ -211,7 +204,7 @@ const Header = () => {
                   onClick={() => handleItemClick("ประวัติส่วนตัว")}
                   className={getItemClassXs("listStudent")}
                 >
-                ประวัติส่วนตัว
+                  ประวัติส่วนตัว
                 </li>
               </Link>
               <Link to="/activity/list-activity">
@@ -219,16 +212,11 @@ const Header = () => {
                   onClick={() => handleItemClick("กิจกรรม")}
                   className={getItemClassXs("Profile")}
                 >
-                กิจกรรม
+                  กิจกรรม
                 </li>
               </Link>
 
-              <li
-              onClick={() => handleItemClick("Logout")}
-              className={getItemLogoutXs("Logout")}
-            >
-              <Logout />
-            </li>
+
             </ul>
           </div>
         </div>
