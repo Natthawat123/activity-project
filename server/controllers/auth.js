@@ -4,119 +4,113 @@ import jwt from "jsonwebtoken";
 const secret = "Fullstack-Login";
 const saltRounds = 10;
 
-// //login //clear
+//login 
 export const login = (req, res) => {
   const {
     username,
     password
   } = req.body;
-  const q = `SELECT login.*, 
-        COALESCE(st.std_ID, t.login_ID, a.login_ID) AS id
-        FROM login
-        LEFT JOIN student st ON login.username = st.std_ID
-        LEFT JOIN teacher t ON login.login_ID = t.login_ID
-        LEFT JOIN admin a ON login.login_ID = a.login_ID
-        WHERE login.username = ?
-`;
 
-  db.query(q, username, (err, user) => {
-    if (err) return res.status(500).json(err);
-    if (user.length === 0) return res.status(404).json("user not found");
-
-    bcrypt.compare(password, user[0].password, function (err, isLogin) {
-      if (isLogin) {
-        var token = jwt.sign({
-            username: user[0].username,
-            role: user[0].role, // เพิ่มบทบาทใน token
-          },
-          secret, {
-            expiresIn: "1h",
-          }
-        );
-        if (user[0].role === "teacher" || user[0].role === "admin") {
-          res.json({
-            status: "ok",
-            message: "Login Success",
-            token,
-            role: user[0].role,
-            id: user[0].id,
-            username: user[0].username,
-          });
-        } else if (user[0].role === "student") {
-          res.json({
-            status: "ok",
-            message: "Login Success",
-            token,
-            role: user[0].role,
-            id: user[0].id,
-            username: user[0].username,
-
-
-          });
-        }
-      } else {
-        res.json({
-          status: "error",
-          message: "Login Failed",
-        });
-      }
-    });
-  });
-};
-
-// login 2 
-export const login2 = (req, res) => {
-  const {
-    username,
-    password
-  } = req.body;
   const q = `
-        SELECT * from login 
-        WHERE login.username = ?
-`;
+    SELECT
+      *
+    FROM
+      login
+    WHERE 
+      login.username = ?
+    `;
 
-  db.query(q, username, (err, user) => {
+  db.query(q, username, async(err, result) => {
     if (err) return res.status(500).json(err);
-    if (user.length === 0) return res.status(404).json("user not found");
+    if (result.length === 0) return res.status(404).json("user not found");
 
-    bcrypt.compare(password, user[0].password, function (err, isLogin) {
-      if (isLogin) {
-        var token = jwt.sign({
-            username: user[0].username,
-            role: user[0].role, // เพิ่มบทบาทใน token
-          },
-          secret, {
-            expiresIn: "1h",
-          }
-        );
-        if (user[0].role === "teacher" || user[0].role === "admin") {
-          res.json({
-            status: "ok",
-            message: "Login Success",
-            token,
-            role: user[0].role,
-            id: user[0].username,
-          });
-        } else if (user[0].role === "student") {
-          res.json({
-            status: "ok",
-            message: "Login Success",
-            token,
-            role: user[0].role,
-            id: user[0].username,
+    const user = result[0]
+    const passwordMatch = await bcrypt.compare(password,user.password)
 
+    if(!passwordMatch){
+       return res.status(400).json({ message: 'Invalid username or password' });
+    }
 
-          });
-        }
-      } else {
-        res.json({
-          status: "error",
-          message: "Login Failed",
-        });
-      }
-    });
+    const token = jwt.sign({
+      login_ID:user.login_ID,
+      role:user.role
+    },
+    secret,{
+      expiresIn: "1h"
+    })
+
+    let role
+    if(user.role === "student") role = "student"
+    else if (user.role == "admin") role = "admin"
+    else if (user.role == "teacher") role = "teacher"
+
+    const sql2 = `
+      SELECT 
+        *
+      FROM 
+        ${role}
+      WHERE 
+        login_ID = ?
+    `
+    db.query(sql2,[user.login_ID],(err,result)=>{
+      if(err) return res.status(500).json({message:"Database error"})
+      if(result.length === 0) return res.status(404).json({message:`${role} not found`})
+      
+      const results = result[0]
+      res.json({
+        message:"Login successfully",
+        token:token,
+        role:user.role,
+        results
+      })
+
+    })
+
+    
   });
 };
+
+
+export const register2 = async (req, res) => {
+  const { username, password, role } = req.body;
+
+  if (!username || !password || !role) {
+    return res.status(400).json({ message: "All fields are required." });
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const sql = `
+      INSERT INTO 
+        login 
+        (username, password, role) 
+      VALUES 
+        (?, ?, ?)
+    `;
+
+    db.query(sql, [username, hashedPassword, role], (err, results) => {
+      if (err) {
+        console.error("Error inserting user:", err);
+        return res.status(500).json({
+          message: "Failed to register user",
+          error: err,
+        });
+      }
+
+      return res.status(201).json({ message: "User registered successfully!" });
+    });
+  } catch (error) {
+    console.error("Error during registration:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+
+
 
 // create user  table login
 export const register = async (req, res) => {

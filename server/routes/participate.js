@@ -6,18 +6,19 @@ import {
     cancelReserve,
     decreaseNumStd,
     upload,
+    getAll
 
 
-} from '../controllers/manage.js'
+} from '../controllers/participate.js'
 // import {
 //     updateStatusNotJoin
 // } from '../controllers/manage.js';
 import {
     updateStatus
-} from '../controllers/manage.js'; // Adjust the path as needed
+} from '../controllers/participate.js'; // Adjust the path as needed
 const router = express.Router()
 
-router.get('/reserve', readManage)
+router.get('/participates', getAll)
 router.get('/reserve/:id', readManageOne)
 router.get('/upload', upload)
 

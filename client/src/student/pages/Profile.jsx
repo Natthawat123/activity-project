@@ -264,7 +264,7 @@ const StudentForm = () => {
                 type="text"
                 id="username"
                 name="login_ID"
-                value={value.username}
+                value={value.std_ID}
                 readOnly
                 className="mt-1 p-2 border w-full rounded-md"
               />

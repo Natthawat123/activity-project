@@ -24,25 +24,26 @@ export default function SignInSide() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify(jsonData),
       });
 
       const result = await response.json();
-      console.log(result);
 
-      if (response.ok && result.status === "ok") {
+      if (response.ok) {
         localStorage.setItem("token", result.token);
         localStorage.setItem("role", result.role);
-        localStorage.setItem("id", result.id);
-        localStorage.setItem("username", result.username);
+        localStorage.setItem("login_ID", result.results.login_ID);
         if (result.role === "admin") {
           window.location = "/admin/dashboard";
+          localStorage.setItem("id", result.results.a_ID);
         } else if (result.role === "teacher") {
           window.location = "/teacher/calendar";
+          localStorage.setItem("id", result.results.t_ID);
         } else {
           window.location = "/activity/calendar";
+          localStorage.setItem("id", result.results.std_ID);
         }
       } else {
         setErrorMessage(

@@ -5,9 +5,9 @@ import Logout from "../../components/Logout";
 import axios from "axios";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
 import SlideBar from "../../components/news/SlideBar";
-import KeyIcon from '@mui/icons-material/Key';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import KeyIcon from "@mui/icons-material/Key";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 const NavBar = () => {
   const id = localStorage.getItem("id");
@@ -18,7 +18,7 @@ const NavBar = () => {
   useEffect(() => {
     const fetchUsername = async () => {
       try {
-        const response = await axios.get(`/api/teachers/${id}`);
+        const response = await axios.get(`/api/teacher/${id}`);
         setUsername(response.data[0]);
       } catch (error) {
         console.error("Error fetching the username:", error);
@@ -111,13 +111,14 @@ const NavBar = () => {
             {/* Add similar li elements for other menu items */}
           </ul>
           <div className="flex items-center gap-5">
-          
-
             <Menu as="div" className="relative inline-block text-left">
               <div>
                 <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-xs md:text-sm font-semibold text-gray-900  ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                {username.staff_fname} {username.staff_lname}
-                  <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
+                  {username.t_fname} {username.t_lname}
+                  <ChevronDownIcon
+                    aria-hidden="true"
+                    className="-mr-1 h-5 w-5 text-gray-400"
+                  />
                 </MenuButton>
               </div>
 
@@ -133,12 +134,15 @@ const NavBar = () => {
                     >
                       <PersonPinIcon className="text-blue-500" />
                       <div className="">
-                        <div className="">{username.staff_fname} {username.staff_lname}</div>
-                        <div className="text-xs text-gray-400">{username.staff_email}</div>
+                        <div className="">
+                          {username.t_fname} {username.t_lname}
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {username.t_email}
+                        </div>
                       </div>
                     </a>
                   </MenuItem>
-
                 </div>
                 <div className="py-1">
                   <MenuItem>
@@ -154,16 +158,13 @@ const NavBar = () => {
                   <MenuItem>
                     <SlideBar />
                   </MenuItem>
-
                 </div>
-
               </MenuItems>
             </Menu>
 
-
             <div className="hidden md:flex">
-            <Logout />
-          </div>
+              <Logout />
+            </div>
           </div>
         </nav>
 
@@ -179,7 +180,7 @@ const NavBar = () => {
                   isListVisible ? "" : "hidden"
                 }`}
               >
-                 {" "}
+                {" "}
               </span>
               <p
                 id="textClicked"
@@ -218,7 +219,7 @@ const NavBar = () => {
                   ปฏิทินกิจกรรม
                 </li>
               </Link>
-           
+
               <Link to="/teacher/liststudent">
                 <li
                   onClick={() => handleItemClick("รายชื่อนักศึกษา")}
@@ -229,14 +230,14 @@ const NavBar = () => {
               </Link>
 
               <Link to="/teacher/activity">
-              <li
-                onClick={() => handleItemClick("กิจกรรม")}
-                className={getItemClassXs("Calendar")}
-              >
-                กิจกรรม
-              </li>
-            </Link>
-              
+                <li
+                  onClick={() => handleItemClick("กิจกรรม")}
+                  className={getItemClassXs("Calendar")}
+                >
+                  กิจกรรม
+                </li>
+              </Link>
+
               <Link to="/teacher/profile">
                 <li
                   onClick={() => handleItemClick("ประวัติส่วนตัว")}

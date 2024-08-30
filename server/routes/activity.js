@@ -2,7 +2,7 @@ import express from 'express'
 import {
     createActivity,
     updateActivity,
-    readActivity,
+    getAll,
     readActivityOne,
     deleteActivity,
     updateStatus,
@@ -13,7 +13,7 @@ const Router = express.Router()
 
 Router.post('/activitys/', createActivity);
 
-Router.get('/activitys', readActivity);
+Router.get('/activitys', getAll);
 Router.get('/activitys/:id', readActivityOne);
 
 Router.put('/activitys/:id', updateActivity);

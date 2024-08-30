@@ -43,9 +43,7 @@ export const createStudent = (req, res) => {
 // read all
 export const readTeacherAll = (req, res) => {
     const sql = `
-        select * from teacher
-        join section on section.sec_ID = teacher.sec_ID
-        
+        select * from teacher        
         `
     db.query(sql, (err, result) => {
         if (err) return res.status(500).json(err)
@@ -55,7 +53,7 @@ export const readTeacherAll = (req, res) => {
 
 //read one
 export const readTeacherOne = (req, res) => {
-    const sql = 'select * from teacher where login_ID = ?'
+    const sql = 'select * from teacher where t_ID = ?'
     const {
         id
     } = req.params

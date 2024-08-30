@@ -130,42 +130,16 @@ export const updateActivity = (req, res) => {
 };
 
 // getAll
-export const readActivity = (req, res) => {
+export const getAll = (req, res) => {
   const sql = `
-        SELECT 
-  a.act_ID,
-  a.act_title,
-  a.act_desc,
-  a.act_dateStart,
-  a.act_dateEnd,
-  a.act_numStd,
-  a.act_numStdReserve,
-  a.act_location,
-  a.staff_ID,
-  a.act_status,
-  a.act_createAt,
-  a.act_transaction,
-  t.staff_fname,
-  t.staff_lname,
-  t.staff_email,
-  t.staff_mobile,
-  t.staff_address,
-  st.std_ID,
-  st.std_fname,
-  st.std_lname,
-  st.std_email,
-  st.std_mobile,
-  st.std_address,
-  st.province,
-  st.district,
-  st.subdistrict,
-  st.zipcode
-FROM 
-  activity a
-  LEFT JOIN teacher t ON t.login_ID = a.staff_ID
-  LEFT JOIN manage m ON m.act_ID = a.act_ID
-  LEFT JOIN student st ON st.std_ID = m.std_ID
-`;
+  SELECT 
+    activity.*, teacher.t_fname, teacher.t_lname
+  FROM 
+    activity
+  JOIN 
+    teacher ON activity.t_ID = teacher.t_ID;
+  `
+        
   db.query(sql, (err, result) => {
     if (err) {
       return res.status(500).json({

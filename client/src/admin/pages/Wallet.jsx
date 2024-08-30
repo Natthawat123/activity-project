@@ -8,29 +8,17 @@ const id = localStorage.getItem("id");
 function Wallet() {
   const [activity, setActivity] = useState([]);
   const [manage, setManage] = useState([]);
-  const [username, setUsername] = useState([]);
   const [filter, setFilter] = useState("");
 
   useEffect(() => {
-    const fetchUsername = async () => {
-      try {
-        const res = await axios.get("/api/auth/login");
-        const usernames = res.data.map((item) => item.username);
-        setUsername(usernames);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
     const fetchManage = async () => {
       try {
-        const res = await axios.get(`/api/reserve`);
+        const res = await axios.get(`/api/participates`);
         setManage(res.data);
       } catch (e) {
         console.error("Error fetching manage data:", e);
       }
     };
-    fetchUsername();
     fetchManage();
   }, []);
 
@@ -131,34 +119,12 @@ function Wallet() {
               <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 w-full">
                 <Activity activity={i} />
                 <hr />
-                <TableStudent activity={i} id={id} username={username} />
+                <TableStudent activity={i} id={id} />
               </div>
             </div>
           </>
         );
       })}
-      {/* <Box sx={{ margin: 4, paddingTop: 10 }}>
-        {result.map((i) => {
-          return (
-            <>
-              <Box sx={{ marginY: 10 }}>
-                <Grid container spacing={4}>
-                  <Grid item xs={3}>
-                    <Paper elevation="24" sx={{ padding: 1 }}>
-                      <Activity activity={i} />
-                    </Paper>
-                  </Grid>
-                  <Grid item xs={9}>
-                    <Paper elevation="24">
-                      <TableStudent activity={i} />
-                    </Paper>
-                  </Grid>
-                </Grid>
-              </Box>
-            </>
-          );
-        })}
-      </Box> */}
     </div>
   );
 }

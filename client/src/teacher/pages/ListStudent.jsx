@@ -53,19 +53,17 @@ const ListStudents = () => {
     const fname = student.std_fname ? student.std_fname.toLowerCase() : "";
     const lname = student.std_lname ? student.std_lname.toLowerCase() : "";
     const secID = student.sec_ID ? student.sec_ID.toString().toLowerCase() : "";
-  
+
     const matchesSearchTerm =
       fname.includes(searchTerm.toLowerCase()) ||
       lname.includes(searchTerm.toLowerCase()) ||
       secID.includes(searchTerm.toLowerCase());
-  
+
     const matchesSection =
       selectedSection === "all" || student.sec_ID === parseInt(selectedSection);
-  
+
     return matchesSearchTerm && matchesSection;
   });
-  
-
 
   const sortedStudents = filteredStudents.sort((a, b) => {
     const idA = String(a.std_ID || "");
@@ -79,7 +77,6 @@ const ListStudents = () => {
   const handleSectionFilterChange = (e) => {
     setSelectedSection(e.target.value);
   };
-
 
   const lastPage = Math.ceil(filteredStudents.length / itemsPerPage) - 1;
   const visibleStudents = sortedStudents.slice(
@@ -192,8 +189,6 @@ const ListStudents = () => {
                   </select>
                 </div>
               </div>*/}
-
-
             </div>
           </div>
 
@@ -237,7 +232,7 @@ const ListStudents = () => {
                     <button className="bg-cyan-400 hover:bg-cyan-500 px-2 py-1 text-white rounded">
                       <a
                         onClick={() =>
-                          navigate(`detail/student/${student.login_ID}`)
+                          navigate(`detail/student/${student.std_ID}`)
                         }
                       >
                         เรียกดู
@@ -257,8 +252,9 @@ const ListStudents = () => {
                   setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))
                 }
                 disabled={currentPage === 0}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
-                  }`}
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                  currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
+                }`}
               >
                 ก่อนหน้า
               </button>
@@ -266,8 +262,9 @@ const ListStudents = () => {
                 <button
                   key={pageNumber}
                   onClick={() => setCurrentPage(pageNumber)}
-                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${pageNumber === currentPage ? "bg-blue-200" : ""
-                    }`}
+                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                    pageNumber === currentPage ? "bg-blue-200" : ""
+                  }`}
                 >
                   {pageNumber + 1}
                 </button>
@@ -277,10 +274,11 @@ const ListStudents = () => {
                   setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))
                 }
                 disabled={currentPage === lastPage}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === lastPage
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                  currentPage === lastPage
                     ? "cursor-not-allowed"
                     : "hover:bg-blue-200"
-                  }`}
+                }`}
               >
                 ถัดไป
               </button>

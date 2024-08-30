@@ -10,7 +10,7 @@ import {
 const router = express.Router()
 
 router.get('/teachers', readTeacherAll)
-router.get('/teachers/:id', readTeacherOne)
+router.get('/teacher/:id', readTeacherOne)
 
 router.post('/teachers', createStudent)
 

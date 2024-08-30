@@ -1,12 +1,32 @@
 import db from '../db.js'
 
-// read All
-export const readReserve = (req, res) => {
-
-    const sql = ` SELECT activity.*, manage.std_ID, student.std_fname, student.std_lname,login.login_ID as ids
-        FROM activity 
-        JOIN manage ON activity.act_ID = manage.act_ID
-        JOIN student ON manage.std_ID = student.std_ID`
+// getAll
+export const getAll = (req, res) => {
+    const sql = `
+    SELECT 
+        a.*,
+        std.std_fname,std.std_lname,std.std_ID,
+        t.*,
+        s.*
+    FROM
+        participate p
+    JOIN 
+        activity a ON p.act_id = a.act_id
+    JOIN
+        student std ON p.std_ID = std.std_ID
+    JOIN
+        teacher t ON a.t_ID = t.t_ID
+    JOIN
+        section s ON std.sec_ID = s.sec_ID
+    WHERE
+        a.act_status = "เปิดลงทะเบียน"
+    `
+    // const sql = ` 
+    // SELECT 
+    //     activity.*, manage.std_ID, student.std_fname, student.std_lname,login.login_ID as ids
+    //     FROM activity 
+    //     JOIN manage ON activity.act_ID = manage.act_ID
+    //     JOIN student ON manage.std_ID = student.std_ID`
     db.query(sql, (err, result) => {
         if (err) {
             return res.status(500).json({

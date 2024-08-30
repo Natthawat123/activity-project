@@ -6,7 +6,7 @@ import student from './routes/student.js'
 import admin from './routes/admin.js'
 import teacher from './routes/teacher.js'
 import activity from './routes/activity.js'
-import manage from './routes/manage.js'
+import participate from './routes/participate.js'
 import section from './routes/section.js'
 import forgotPassword from './routes/forgotPassword.js'
 import news from './routes/news.js'
@@ -25,7 +25,7 @@ app.use('/', student)
 app.use('/', admin)
 app.use('/', teacher)
 app.use('/', activity)
-app.use('/', manage)
+app.use('/', participate)
 app.use('/', section)
 app.use('/', forgotPassword)
 app.use('/', news)

@@ -129,7 +129,7 @@ const StudentForm = () => {
         console.error("Error fetching sections:", error);
       });
 
-    fetch("/api/teachers/" + staff_ID)
+    fetch("/api/teacher/" + staff_ID)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Error fetching data");
@@ -286,7 +286,7 @@ const StudentForm = () => {
                 id="fname"
                 name="staff_fname"
                 onChange={handlechange}
-                value={value.staff_fname}
+                value={value.t_fname}
                 className="mt-1 p-2 border w-full rounded-md"
               />
             </div>
@@ -304,7 +304,7 @@ const StudentForm = () => {
               id="lname"
               name="staff_lname"
               onChange={handlechange}
-              value={value.staff_lname}
+              value={value.t_lname}
               className="mt-1 p-2 border w-full rounded-md"
             />
           </div>

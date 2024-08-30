@@ -23,7 +23,6 @@ const ListActivity = () => {
   const [stdID, setStdID] = useState(null);
 
   const navigate = useNavigate();
-
   useEffect(() => {
     fetch("/api/activitys")
       .then((res) => res.json())
