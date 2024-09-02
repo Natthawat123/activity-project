@@ -31,7 +31,7 @@ function Test() {
   const navigate = useNavigate();
 
   const contractAddress = "0xc9811A01727735E9c9aE046b7690b2AC9021E1B7";
-  const stdID = localStorage.getItem("id");
+  const std_ID = localStorage.getItem("id");
 
   useEffect(() => {
     const fetchSmartContract = async () => {
@@ -48,7 +48,7 @@ function Test() {
 
     const fetchActivity = async () => {
       try {
-        const res = await axios.get("/api/activitys");
+        const res = await axios.get(`/api/participate?std_ID=${std_ID}`);
         setActivity(res.data);
       } catch (err) {
         console.log(err);
@@ -56,8 +56,10 @@ function Test() {
     };
     fetchSmartContract();
     fetchActivity();
+    console.log(join);
     setIsLoaded(true);
-  }, []);
+  }, [std_ID]);
+
   const formatDateThai = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     const date = new Date(dateString);
@@ -72,18 +74,11 @@ function Test() {
     const joinEntry = join.find(
       (j) =>
         Number(j.activityId) === activityID &&
-        j.studentIds.some((id) => Number(id) === Number(stdID))
+        j.studentIds.some((id) => Number(id) === Number(std_ID))
     );
     if (joinEntry) {
-      return { message: "เข้าร่วมกิจกรรมแล้ว", color: "blue" };
+      return "เข้าร่วมกิจกรรมแล้ว";
     }
-    const reserveEntry = activity.find(
-      (r) => r.act_ID === activityID && r.login_ID === stdID
-    );
-    if (reserveEntry) {
-      return { message: "ลงทะเบียนสำเร็จ", color: "green" };
-    }
-    return { message: "ยังไม่ได้ลงทะเบียน", color: "gray" };
   };
 
   const handleSearch = (event) => {
@@ -124,12 +119,14 @@ function Test() {
   });
 
   const sortedItems = sortItems(filteredItems);
-  const lastPage = Math.max(0, Math.ceil(sortedItems.length / itemsPerPage) - 1);
+  const lastPage = Math.max(
+    0,
+    Math.ceil(sortedItems.length / itemsPerPage) - 1
+  );
   const visibleItems = sortedItems.slice(
     currentPage * itemsPerPage,
     Math.min((currentPage + 1) * itemsPerPage, sortedItems.length)
   );
-  
 
   const pageNumbers = [];
   for (let i = 0; i <= lastPage; i++) {
@@ -221,13 +218,13 @@ function Test() {
                 <th className="px-4 py-3">ชื่อกิจกรรม</th>
                 <th className="px-4 py-3">สถานที่</th>
                 <th className="px-4 py-3">อาจารย์ผู้จัด</th>
-                <th className="px-4 py-3">สถานะ</th>
+                <th className="px-4 py-3">สถานะการกิจกรรม</th>
+                <th className="px-4 py-3">สถานะการเข้าร่วม</th>
                 <th className="px-4 py-3 w-2/12">รายละเอียด</th>
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-gray-200 dark:divide-gray-700">
               {uniqueVisibleItems.map((item) => {
-                const status = getStatus(item.act_ID);
                 return (
                   <>
                     <tr
@@ -239,21 +236,16 @@ function Test() {
                       </td>
                       <td className="px-4 py-3">{item.act_location}</td>
                       <td className="px-4 py-3">
-                        {item.staff_fname} {item.staff_lname}
+                        {item.t_fname} {item.t_lname}
                       </td>
-                      <td className="px-4 py-3" style={{ color: status.color }}>
-                        {status.message}
+                      <td className="px-4 py-3">{item.act_status}</td>
+                      <td className="px-4 py-3">
+                        {getStatus(item.act_ID)
+                          ? getStatus(item.act_ID)
+                          : item.par_status
+                          ? item.par_status
+                          : "ยังไม่ได้ลงทะเบียน"}
                       </td>
-                      {/* <td className="px-6 py-3">
-                        <button
-                          className="text-blue-600 dark:text-blue-500 hover:underline"
-                          onClick={() =>
-                            navigate(`/activity/detail2/${item.act_ID}`)
-                          }
-                        >
-                          รายละเอียด
-                        </button>
-                      </td> */}
                       <td>
                         <IconButton
                           aria-label="expand row"
@@ -305,7 +297,7 @@ function Test() {
                                     {item.act_desc}
                                   </TableCell>
                                   <TableCell>
-                                    {item.act_numStdReserve}/{item.act_numStd}คน
+                                    {item.numStdReserve}/{item.act_numStd}คน
                                   </TableCell>
                                   <TableCell>
                                     {formatDateThai(item.act_dateStart)}

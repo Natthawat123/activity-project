@@ -9,7 +9,7 @@ import activity from './routes/activity.js'
 import participate from './routes/participate.js'
 import section from './routes/section.js'
 import forgotPassword from './routes/forgotPassword.js'
-import news from './routes/news.js'
+import notification from './routes/notification.js'
 import status from './routes/status.js'
 import notify from './routes/notify.js'
 
@@ -28,7 +28,7 @@ app.use('/', activity)
 app.use('/', participate)
 app.use('/', section)
 app.use('/', forgotPassword)
-app.use('/', news)
+app.use('/', notification)
 app.use('/status', status)
 app.use('/', notify)
 

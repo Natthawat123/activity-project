@@ -119,10 +119,10 @@ export const updateStudent = (req, res) => {
             std_email = ?, 
             std_mobile = ?, 
             std_address = ?, 
-            province = ?, 
-            district = ?, 
-            subdistrict = ?, 
-            zipcode = ? 
+            std_province = ?, 
+            std_district = ?, 
+            std_subdistrict = ?, 
+            std_zipcode = ? 
         WHERE std_ID = ?
     `
     const {

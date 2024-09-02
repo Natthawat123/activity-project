@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -7,15 +7,30 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
-import { formatDate } from "./Fx.jsx";
 import { formatISO, parseISO } from "date-fns";
+import { ContextActivity } from "./ActivityContext.jsx";
 
-function ActivityDetail({ activity, teacher, act_ID, id }) {
+function DetailActivity({ act_ID }) {
   const [isReadOnly, setIsReadOnly] = useState(true);
-  const [editData, setEditData] = useState(activity);
   const [showButtons, setShowButtons] = useState(false);
-  const [status, setStatus] = useState(activity.act_status);
+  const [editData, setEditData] = useState({});
+  const { getActivityByID, teacher } = useContext(ContextActivity);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchActivity = () => {
+      try {
+        const activity = getActivityByID(act_ID);
+        if (activity) {
+          setEditData(activity);
+        }
+      } catch (error) {
+        console.error("Error fetching activity:", error);
+      }
+    };
+
+    fetchActivity();
+  }, [act_ID, getActivityByID]);
 
   const editButton = () => {
     setIsReadOnly(!isReadOnly);
@@ -51,7 +66,6 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
   };
 
   const handleStatusChange = (event) => {
-    setStatus(event.target.value);
     setEditData((prev) => ({ ...prev, act_status: event.target.value }));
   };
 
@@ -73,7 +87,6 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
 
   const editActivity = async () => {
     try {
-      // จัดการวันที่ก่อนบันทึก
       const updatedData = {
         ...editData,
         act_dateStart: formatISO(parseISO(editData.act_dateStart), {
@@ -84,18 +97,7 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
         }),
       };
 
-      // อัปเดตข้อมูลกิจกรรม
       await axios.put(`/api/activity/${act_ID}`, updatedData);
-
-      // สร้างข่าวใหม่สำหรับการแก้ไขกิจกรรม
-      // const newsData = {
-      //   news_topic: `กิจกรรม ${activity.act_title}`,
-      //   news_desc: `แก้ไขรายละเอียดกิจกรรม ${activity.act_title}`,
-      //   news_date: new Date(),
-      // };
-
-      // // ส่งข่าวไปยัง API
-      // await axios.post("/api/news", newsData);
 
       Swal.fire("แก้ไขสำเร็จ", "แก้ไขข้อมูลกิจกรรมเรียบร้อย.", "success").then(
         () => {
@@ -104,7 +106,6 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
         }
       );
 
-      // รีโหลดหน้าเว็บ
       setTimeout(() => {
         window.location.reload();
       }, 1000);
@@ -122,7 +123,9 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
     ? new Date(editData.act_dateEnd).toISOString().split("T")[0] // YYYY-MM-DD
     : "";
 
-  const url = `https://sepolia.etherscan.io/tx/${activity.act_transaction}`;
+  const url = editData?.act_transaction
+    ? `https://sepolia.etherscan.io/tx/${activity.act_transaction}`
+    : "#";
 
   return (
     <div>
@@ -194,18 +197,7 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
                 <td className="px-6 py-4 font-medium text-gray-900">
                   จำนวนที่เปิดรับ
                 </td>
-                <td className="px-6 py-4 text-gray-500">
-                  {/* {activity.act_numStdReserve} {" / "}
-                  <input
-                    type="number"
-                    value={editData.act_numStd || ""}
-                    readOnly={isReadOnly}
-                    onChange={(e) =>
-                      handleInputChange("act_numStd", e.target.value)
-                    }
-                  /> */}
-                  000
-                </td>
+                <td className="px-6 py-4 text-gray-500">000</td>
               </tr>
               <tr>
                 <td className="px-6 py-4 font-medium text-gray-900">
@@ -268,7 +260,7 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
                 </td>
                 <td className="px-6 py-4 text-gray-500 ">
                   <a href={url} target="_blank" rel="noopener noreferrer">
-                    {activity.act_transaction ? "ขึ้นแล้ว" : "ยังไม่ขึ้น"}
+                    {editData?.act_transaction ? "ขึ้นแล้ว" : "ยังไม่ขึ้น"}
                   </a>
                 </td>
               </tr>
@@ -304,4 +296,4 @@ function ActivityDetail({ activity, teacher, act_ID, id }) {
   );
 }
 
-export default ActivityDetail;
+export default DetailActivity;

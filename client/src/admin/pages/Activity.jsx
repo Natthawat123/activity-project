@@ -1,5 +1,8 @@
-import Dash_activity from "../components/Dash_activity";
-import ListActivity from "../components/ListActivity";
+import { lazy } from "react";
+import { ActivityProvider } from "../components/Activity/ActivityContext";
+
+const ListActivity = lazy(() => import("../components/Activity/ListActivity"));
+const Dash_activity = lazy(() => import("../components/Dash_activity"));
 
 function Activity() {
   return (
@@ -9,7 +12,9 @@ function Activity() {
           <Dash_activity />
         </div>
         <div className="w-full">
-          <ListActivity />
+          <ActivityProvider>
+            <ListActivity />
+          </ActivityProvider>
         </div>
       </div>
     </div>

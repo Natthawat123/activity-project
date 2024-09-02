@@ -13,12 +13,11 @@ function Add_Activity({ closeModal }) {
   const [inputEndDate, setEndDate] = useState("");
   const [inputStaffID, setstaffID] = useState("");
   const [staffName, setStaffName] = useState([]);
-  const id = localStorage.getItem("id");
   useEffect(() => {
     axios
-      .get("/api/users")
+      .get("/api/teachers")
       .then((response) => {
-        setStaffName(response.data.filter((staff) => staff.role != "student"));
+        setStaffName(response.data);
       })
       .catch((error) => {
         console.error("Error fetching staff list:", error);
@@ -54,37 +53,27 @@ function Add_Activity({ closeModal }) {
       act_desc: inputDesc,
       act_dateStart: inputStartDate,
       act_dateEnd: inputEndDate,
-      act_numstd: inputNumStd,
+      act_numStd: inputNumStd,
       act_location: inputLocation,
-      staff_ID: inputStaffID,
+      t_ID: inputStaffID,
     };
     const news = {
-      news_topic: `กิจกรรมใหม่ ${inputTitle}`,
-      news_desc: `${inputDesc} ระยะเวลา ${inputStartDate} - ${inputEndDate} สถานที่ ณ ${inputLocation} จำนวนที่เปิดรับ ${inputNumStd} คน`,
-      news_date: new Date(),
+      topic: `กิจกรรมใหม่ ${inputTitle}`,
+      description: `${inputDesc} ระยะเวลา ${inputStartDate} - ${inputEndDate} สถานที่ ณ ${inputLocation} จำนวนที่เปิดรับ ${inputNumStd} คน`,
     };
+
     try {
-      await axios.post("/api/news", news);
-
-      // Then, post to /api/activitys
-      const response = await fetch("/api/activitys", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(activity),
+      await axios.post("/api/notification", news);
+      await axios.post("/api/activity", activity).then(() => {
+        Swal.fire({
+          title: "เพิ่มกิจกรรมใหม่สำเร็จ",
+          icon: "success",
+        });
+        closeModal();
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       });
-
-      const result = await response.json();
-
-      Swal.fire({
-        title: "เพิ่มกิจกรรมใหม่สำเร็จ",
-        icon: "success",
-      });
-      closeModal();
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
     } catch (error) {
       console.error("Error:", error);
       Swal.fire({
@@ -182,8 +171,8 @@ function Add_Activity({ closeModal }) {
           {staffName &&
             staffName.length > 0 &&
             staffName.map((item) => (
-              <option key={item.login_ID} value={item.login_ID}>
-                {item.fname} {item.lname}
+              <option key={item.t_ID} value={item.t_ID}>
+                {item.t_fname} {item.t_lname}
               </option>
             ))}
         </select>
@@ -197,9 +186,5 @@ function Add_Activity({ closeModal }) {
     </div>
   );
 }
-
-Add_Activity.propTypes = {
-  closeModal: PropTypes.func.isRequired,
-};
 
 export default Add_Activity;

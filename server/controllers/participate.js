@@ -1,33 +1,43 @@
 import db from '../db.js'
 
 // getAll
-export const getAll = (req, res) => {
+export const getByStd_ID = (req, res) => {
+    const {std_ID} = req.query
     const sql = `
-    SELECT 
-        a.*,
-        std.std_fname,std.std_lname,std.std_ID,
-        t.*,
-        s.*
-    FROM
-        participate p
-    JOIN 
-        activity a ON p.act_id = a.act_id
-    JOIN
-        student std ON p.std_ID = std.std_ID
-    JOIN
-        teacher t ON a.t_ID = t.t_ID
-    JOIN
-        section s ON std.sec_ID = s.sec_ID
-    WHERE
-        a.act_status = "เปิดลงทะเบียน"
-    `
-    // const sql = ` 
-    // SELECT 
-    //     activity.*, manage.std_ID, student.std_fname, student.std_lname,login.login_ID as ids
-    //     FROM activity 
-    //     JOIN manage ON activity.act_ID = manage.act_ID
-    //     JOIN student ON manage.std_ID = student.std_ID`
-    db.query(sql, (err, result) => {
+SELECT 
+    activity.act_ID,
+    activity.t_ID,
+    activity.act_title,
+    activity.act_desc,
+    activity.act_dateStart,
+    activity.act_dateEnd,
+    activity.act_numStd,
+    activity.act_location,
+    activity.act_status,
+    activity.act_createAt,
+    activity.act_transaction,
+    participate.std_ID,
+    participate.par_status,
+    teacher.t_fname,
+    teacher.t_lname,
+    teacher.t_mobile,
+    teacher.t_email,
+    COALESCE(participate_count.numStdReserve, 0) AS numStdReserve
+FROM
+    activity
+    LEFT JOIN participate ON activity.act_ID = participate.act_ID 
+                          AND participate.std_ID = ?
+    LEFT JOIN teacher ON activity.t_ID = teacher.t_ID
+    LEFT JOIN (
+        SELECT act_ID, COUNT(*) AS numStdReserve
+        FROM participate
+        GROUP BY act_ID
+    ) AS participate_count ON activity.act_ID = participate_count.act_ID
+ORDER BY activity.act_ID;
+
+`;
+
+    db.query(sql,[std_ID] ,(err, result) => {
         if (err) {
             return res.status(500).json({
                 error: err.message
@@ -165,25 +175,21 @@ export const updateStatusNotJoin = (req, res) => {
 // reserve
 export const reserveActivity = (req, res) => {
     const sql = `
-        INSERT INTO manage 
-            (man_status, std_ID, act_ID) 
+        INSERT INTO participate 
+            ( std_ID, act_ID) 
         VALUES 
-            (?, ?, ?)
+            ( ?, ?)
         `
     const {
-        man_status,
         std_ID,
         act_ID,
     } = req.body;
 
-    db.query(sql, [man_status, std_ID, act_ID], (err, result) => {
-        if (err) return res.status(500).json(err)
-
-        const sql2 = `UPDATE activity SET act_numStdReserve = act_numStdReserve + 1 WHERE act_ID = ?`;
-        db.query(sql2, [act_ID], (err2, result2) => {
-            if (err2) return res.status(500).json(err2)
-            return res.status(200).json('Reserved successfully');
-        })
+    db.query(sql, [ std_ID, act_ID], (err, result) => {
+        if (err) return res.status(500).json(err);
+        return res.status(200).json('Reserve successfully');
+        
+       
     })
 }
 

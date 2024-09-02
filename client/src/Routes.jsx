@@ -37,7 +37,7 @@ import AddUsers from "./admin/components/Add_users.jsx";
 import UpdateUser from "./admin/components/Update_user.jsx";
 import UpdateStudent from "./admin/components/UpdateStudent.jsx";
 import UpdateStaff from "./admin/components/UpdateStaff.jsx";
-import DetailActivityA from "./admin/components/Activity/Detail/Index.jsx";
+import DetailActivityA from "./admin/components/Activity/OneActivity.jsx";
 import DetailStudent from "./admin/components/DetailStudent.jsx";
 // import DetailStaff from "./admin/components/DetailStaff.jsx";
 import Table from "./admin/components/Upload/Table.jsx";

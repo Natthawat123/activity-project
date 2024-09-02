@@ -5,6 +5,6 @@ import {
 
 const router = express.Router()
 
-router.get('/admins/:id', readAdminOne)
+router.get('/admin/:id', readAdminOne)
 
 export default router

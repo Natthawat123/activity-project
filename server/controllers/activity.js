@@ -39,15 +39,15 @@ export const reserve = (req, res) => {
 //create
 export const createActivity = (req, res) => {
   const q =
-    "INSERT INTO activity(`act_title`, `act_desc`, `act_dateStart`, `act_dateEnd`, `act_numStd`, `act_location`, `staff_ID`, `act_status`, `act_createAt`) VALUES (?, ?, ?, ?, ?, ?, ?, 1 , ?)";
+    `INSERT INTO activity(act_title, act_desc, act_dateStart, act_dateEnd, act_numStd, act_location, t_ID,  act_createAt) VALUES (?, ?, ?, ?, ?, ?, ? , ?)`;
   const {
     act_title,
     act_desc,
     act_dateStart,
     act_dateEnd,
-    act_numstd,
+    act_numStd,
     act_location,
-    staff_ID,
+    t_ID,
   } = req.body;
 
   db.query(
@@ -57,10 +57,9 @@ export const createActivity = (req, res) => {
       act_desc,
       act_dateStart,
       act_dateEnd,
-      act_numstd,
+      act_numStd,
       act_location,
-      staff_ID,
-      1,
+      t_ID,
       new Date(),
     ],
     (err, result) => {
@@ -82,7 +81,7 @@ export const updateActivity = (req, res) => {
     act_dateEnd,
     act_numStd,
     act_location,
-    staff_ID,
+    t_ID,
     act_status,
     act_transaction,
   } = req.body;
@@ -95,7 +94,7 @@ export const updateActivity = (req, res) => {
             act_dateEnd = ?,
             act_numStd = ?,
             act_location = ?,
-            staff_ID = ?,
+            t_ID = ?,
             act_status = ?,
             act_transaction = ?
         WHERE act_ID = ?`;
@@ -109,7 +108,7 @@ export const updateActivity = (req, res) => {
       act_dateEnd,
       act_numStd,
       act_location,
-      staff_ID,
+      t_ID,
       act_status,
       act_transaction,
       id,
@@ -130,10 +129,11 @@ export const updateActivity = (req, res) => {
 };
 
 // getAll
+
 export const getAll = (req, res) => {
   const sql = `
   SELECT 
-    activity.*, teacher.t_fname, teacher.t_lname
+    activity.*, teacher.*
   FROM 
     activity
   JOIN 
@@ -160,33 +160,13 @@ export const readActivityOne = (req, res) => {
   const id = req.params.id;
   const sql = `
         SELECT 
-  a.act_ID,
-  a.act_title,
-  a.act_desc,
-  a.act_dateStart,
-  a.act_dateEnd,
-  a.act_numStd,
-  a.act_numStdReserve,
-  a.act_location,
-  a.staff_ID,
-  a.act_status,
-  a.act_createAt,
-  a.act_transaction,
-  t.staff_fname,
-  t.staff_lname,
-  st.std_ID,
-  st.std_fname,
-  st.std_lname,
-  st.sec_ID,
-  m.man_status
-
-
-FROM activity a 
-LEFT JOIN teacher t ON t.login_ID = a.staff_ID 
-LEFT JOIN manage m ON m.act_ID = a.act_ID 
-LEFT JOIN student st ON st.std_ID = m.std_ID
-WHERE 
-  a.act_ID = ?;
+          *
+        FROM
+          activity
+        JOIN
+          teacher on activity.t_ID = teacher.t_ID
+        WHERE activity.act_ID = ?
+  ;
 
 
 `;

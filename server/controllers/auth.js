@@ -72,10 +72,19 @@ export const login = (req, res) => {
 
 
 export const register2 = async (req, res) => {
-  const { username, password, role } = req.body;
+  const { 
+    username, 
+    password, 
+    role,
+    fname,
+    lname,
+    email,
+    mobile,
+    sec_ID,
+    sec_name,} = req.body;
 
   if (!username || !password || !role) {
-    return res.status(400).json({ message: "All fields are required." });
+    return res.status(400).json({ message: "Required fields: username, password, and role" });
   }
 
   try {
@@ -182,15 +191,15 @@ export const register = async (req, res) => {
 
         if (role === "teacher") {
           sql2 =
-            "INSERT INTO teacher (staff_fname, staff_lname, staff_mobile, staff_email, login_ID, sec_ID) VALUES (?, ?, ?, ?, ?, ?)";
-          values = [fname, lname, mobile, email, loginID, sec_ID];
+            "INSERT INTO teacher (t_fname, t_lname, t_mobile, t_email, login_ID) VALUES (?, ?, ?, ?, ?)";
+          values = [fname, lname, mobile, email, loginID];
         } else if (role === "student") {
           sql2 =
-            "INSERT INTO student (std_fname, std_lname, std_mobile, std_email, login_ID, std_ID, sec_ID) VALUES (?, ?, ?, ?, ?, ?, ?)";
-          values = [fname, lname, mobile, email, loginID, username, sec_ID];
+            "INSERT INTO student (std_ID,std_fname, std_lname, std_mobile, std_email, login_ID, sec_ID) VALUES (?, ?, ?, ?, ?, ?,?)";
+          values = [username,fname, lname, mobile, email, loginID, sec_ID];
         } else {
           sql2 =
-            "INSERT INTO admin (fname, lname, mobile, email, login_ID) VALUES (?, ?, ?, ?, ?)";
+            "INSERT INTO admin (a.fname, a.lname, a.mobile, a.email, login_ID) VALUES (?, ?, ?, ?, ?)";
           values = [fname, lname, mobile, email, loginID];
         }
 
