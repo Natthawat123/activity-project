@@ -54,7 +54,7 @@ const Header = () => {
         : "bg-gray-50 text-gray-600 border border-white"
     }`;
 
-  const getItemLogoutXs = (itemName) =>
+  const getItemClassXs = (itemName) =>
     `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 font-bold text-red-500 border border-white bg-grey-500 cursor-pointer px-3 py-2.5 text-xs leading-3 shadow-md rounded ${
       selectedItem === itemName
         ? "bg-red-600 text-white"
