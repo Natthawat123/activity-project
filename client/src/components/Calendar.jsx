@@ -97,7 +97,7 @@ function CalendarFull() {
   };
 
   return (
-    <div className="App w-full max-w-4xl mx-auto my-6 bg-slate-50 rounded-lg shadow-xl p-4 sm:p-6 md:p-8 lg:p-8">
+    <div className="App w-full max-w-4xl mx-auto my-6 bg-slate-50 rounded-lg shadow-xl p-4 sm:p-6 md:p-8 lg:p-8 ">
       <motion.h1
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}

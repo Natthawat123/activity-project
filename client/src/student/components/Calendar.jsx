@@ -8,6 +8,7 @@ import axios from "axios";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import Tooltip from "@mui/material/Tooltip";
 import { useNavigate } from "react-router";
+import { motion } from 'framer-motion';
 
 const localizer = momentLocalizer(moment);
 
@@ -198,8 +199,8 @@ function CalendarFull() {
   };
 
   return (
-    <div className="App w-full max-w-4xl mx-auto my-10 bg-slate-50 rounded-lg shadow-xl p-4 sm:p-6 md:p-8 lg:p-10">
-      <h1 className="text-center text-2xl sm:text-3xl font-bold mb-5">
+    <div className="App w-full max-w-4xl mx-auto my-6 bg-slate-50 rounded-lg shadow-xl p-4 sm:p-6 md:p-8 lg:p-8 ">
+    <h1 className="text-center text-2xl sm:text-3xl font-bold mb-5">
         ปฏิทินกิจกรรม
       </h1>
 

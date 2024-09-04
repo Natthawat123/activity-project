@@ -52,8 +52,6 @@ const NavBar = () => {
         : "bg-gray-50 text-gray-600 border border-white"
     }`;
 
-  const getItemClassXs = () =>
-    `px-4 py-3 text-gray-600 bg-gray-50 border border-gray-50 focus:outline-none focus:bg-gray-100 hover:bg-gray-100 duration-100 cursor-pointer text-xs leading-3 font-normal`;
   const getItemLogoutXs = (itemName) =>
     `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 font-bold text-red-500 border border-white bg-grey-500 cursor-pointer px-3 py-2.5 text-xs leading-3 shadow-md rounded ${
       selectedItem === itemName
@@ -110,7 +108,9 @@ const NavBar = () => {
 
             {/* Add similar li elements for other menu items */}
           </ul>
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-1">
+            <SlideBar />
+
             <Menu as="div" className="relative inline-block text-left">
               <div>
                 <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-xs md:text-sm font-semibold text-gray-900  ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
@@ -124,7 +124,7 @@ const NavBar = () => {
 
               <MenuItems
                 transition
-                className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                className="absolute right-0 z-10 mt-2 w-60 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
               >
                 <div className="py-1">
                   <MenuItem>
@@ -156,15 +156,11 @@ const NavBar = () => {
                   </MenuItem>
 
                   <MenuItem>
-                    <SlideBar />
+                    <Logout />
                   </MenuItem>
                 </div>
               </MenuItems>
             </Menu>
-
-            <div className="hidden md:flex">
-              <Logout />
-            </div>
           </div>
         </nav>
 
@@ -246,13 +242,6 @@ const NavBar = () => {
                   ประวัติส่วนตัว
                 </li>
               </Link>
-
-              <li
-                onClick={() => handleItemClick("Logout")}
-                className={getItemLogoutXs("Logout")}
-              >
-                <Logout />
-              </li>
             </ul>
           </div>
         </div>
