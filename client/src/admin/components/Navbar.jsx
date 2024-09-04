@@ -47,10 +47,10 @@ const NavBar = () => {
   };
 
   const getItemClass = (itemName) =>
-    `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 text-gray-600 border border-white bg-gray-50 cursor-pointer px-3 py-2.5 font-normal text-xs leading-3 shadow-md rounded ${
+    `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 text-gray-600 border border-white bg-gray-50 cursor-pointer px-3 py-2.5 font-normal text-xs leading-3 shadow-md rounded  items-center  h-10 ${
       selectedItem === itemName
         ? "bg-indigo-600 text-white"
-        : "bg-gray-50 text-gray-600 border border-white"
+        : "bg-gray-50 text-gray-600 border border-white "
     }`;
   // const getItemLogout = (itemName) => `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 text-red-600 border border-white bg-grey-500 cursor-pointer px-3 py-2.5 font-normal text-xs leading-3 shadow-md rounded ${selectedItem === itemName ? 'bg-red-600 text-white' : 'bg-gray-50 text-gray-600 border border-white'}`;
 
@@ -65,7 +65,7 @@ const NavBar = () => {
 
   return (
     <div className="3xl:container 3xl:mx-auto top-0 fixed w-full z-10">
-      <div className="bg-white rounded shadow-lg py-5 px-7 md:pl-28 md:pr-28">
+      <div className="bg-white rounded shadow-lg py-5 px-7 md:pl-28 md:pr-28 ">
         <nav className="flex justify-between">
           <div className="flex items-center space-x-3 lg:pr-16 pr-6">
             <img src={Logo} className="w-10" alt="IT Logo" />

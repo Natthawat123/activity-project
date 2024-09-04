@@ -12,6 +12,7 @@ import forgotPassword from './routes/forgotPassword.js'
 import notification from './routes/notification.js'
 import status from './routes/status.js'
 import notify from './routes/notify.js'
+import blockchain from './routes/blockchain.js'
 
 
 
@@ -31,6 +32,7 @@ app.use('/', forgotPassword)
 app.use('/', notification)
 app.use('/status', status)
 app.use('/', notify)
+app.use('/', blockchain)
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log('server on port 3000'))

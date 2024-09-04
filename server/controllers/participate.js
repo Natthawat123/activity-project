@@ -1,5 +1,35 @@
 import db from '../db.js'
 
+
+// get only participate by act_ID
+
+export const getByAct_ID = (req, res) => {
+    const { act_ID } = req.query;
+    const sql = `
+        SELECT 
+            p.*,s.*
+        FROM 
+            participate p 
+        LEFT JOIN
+            student s ON p.std_ID = s.std_ID
+        WHERE act_ID = ?
+    `;
+    
+    db.query(sql, [act_ID], (err, result) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({
+                error: 'An error occurred while fetching data'
+            });
+        }
+        if (result.length === 0) {
+            return res.status(404).json({
+                message: "Data not found"
+            });
+        }
+        return res.json(result);
+    });
+};
 // getAll
 export const getByStd_ID = (req, res) => {
     const {std_ID} = req.query

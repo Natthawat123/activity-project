@@ -216,7 +216,7 @@ function T({ activities = [], join = [] }) {
               <AccordionDetails>
                 <p>รายละเอียด: {activity.act_desc}</p>
 
-                <p>ระยะเวลา: {days.length} วัน</p>
+                <p>ระยะเวลlllา: {days.length} วัน</p>
                 <p>
                   เริ่ม: {formatDate(activity.act_dateStart).th} -{" "}
                   {formatDate(activity.act_dateEnd).th}

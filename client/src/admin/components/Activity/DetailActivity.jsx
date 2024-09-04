@@ -1,5 +1,5 @@
-import React, { useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useContext, useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router";
 import axios from "axios";
 import Swal from "sweetalert2";
 import Button from "@mui/material/Button";
@@ -10,13 +10,14 @@ import EditIcon from "@mui/icons-material/Edit";
 import { formatISO, parseISO } from "date-fns";
 import { ContextActivity } from "./ActivityContext.jsx";
 
-function DetailActivity({ act_ID }) {
+function DetailActivity() {
   const [isReadOnly, setIsReadOnly] = useState(true);
   const [showButtons, setShowButtons] = useState(false);
   const [editData, setEditData] = useState({});
   const { getActivityByID, teacher } = useContext(ContextActivity);
   const navigate = useNavigate();
 
+  const { act_ID } = useParams();
   useEffect(() => {
     const fetchActivity = () => {
       try {

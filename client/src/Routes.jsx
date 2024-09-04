@@ -32,7 +32,7 @@ import LayoutA from "./admin/components/Layout.jsx";
 import ListUsers from "./admin/components/ListUsers.jsx";
 import CalendarA from "./admin/pages/Calendar.jsx";
 import Activity from "./admin/pages/Activity.jsx";
-import Wallet from "./admin/pages/Wallet.jsx";
+import Wallet from "./admin/pages/Upload.jsx";
 import AddUsers from "./admin/components/Add_users.jsx";
 import UpdateUser from "./admin/components/Update_user.jsx";
 import UpdateStudent from "./admin/components/UpdateStudent.jsx";

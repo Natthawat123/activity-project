@@ -6,7 +6,8 @@ import {
     cancelReserve,
     decreaseNumStd,
     upload,
-    getByStd_ID
+    getByStd_ID,
+    getByAct_ID
 
 
 } from '../controllers/participate.js'
@@ -19,6 +20,7 @@ import {
 const router = express.Router()
 
 router.get('/participate', getByStd_ID)
+router.get('/reserve', getByAct_ID)
 
 
 
