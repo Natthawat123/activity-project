@@ -229,7 +229,7 @@ const currentUsers = test.slice(startIndex, endIndex);
                     onChange={handleFilterChange}
                     className="cursor-pointer text-xs block p-1 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value="all" className="text-center">
+                    <option value="all">
                       ทั้งหมด
                     </option>
                     <option value="admin">ผู้ดูแลระบบ</option>

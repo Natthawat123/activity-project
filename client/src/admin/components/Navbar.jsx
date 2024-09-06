@@ -48,7 +48,7 @@ const NavBar = () => {
   };
 
   const getItemClass = (itemName) =>
-    `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 text-gray-600 border border-white bg-gray-50 cursor-pointer px-3 py-2.5 font-normal text-xs leading-3 shadow-md rounded ${selectedItem === itemName
+    `focus:outline-none focus:ring-2 items-center flex h-10 focus:ring-offset-2 focus:ring-gray-800 text-gray-600 border border-white bg-gray-50 cursor-pointer px-3 py-2.5 font-normal text-xs leading-3 shadow-md rounded ${selectedItem === itemName
       ? "bg-indigo-600 text-white"
       : "bg-gray-50 text-gray-600 border border-white"
     }`;
@@ -56,11 +56,11 @@ const NavBar = () => {
 
   const getItemClassXs = () =>
     `px-4 py-3 text-gray-600 bg-gray-50 border border-gray-50 focus:outline-none focus:bg-gray-100 hover:bg-gray-100 duration-100 cursor-pointer text-xs leading-3 font-normal`;
-  const getItemLogoutXs = (itemName) =>
-    `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 font-bold text-red-500 border border-white bg-grey-500 cursor-pointer px-3 py-2.5 text-xs leading-3 shadow-md rounded ${selectedItem === itemName
-      ? "bg-red-600 text-white"
-      : "bg-gray-50 text-gray-600 border border-white"
-    }`;
+  // const getItemLogoutXs = (itemName) =>
+  //   `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 font-bold text-red-500 border border-white bg-grey-500 cursor-pointer px-3 py-2.5 text-xs leading-3 shadow-md rounded ${selectedItem === itemName
+  //     ? "bg-red-600 text-white"
+  //     : "bg-gray-50 text-gray-600 border border-white"
+  //   }`;
 
 
 
@@ -74,7 +74,7 @@ const NavBar = () => {
               ADMIN Dashboard
             </h2>
           </div>
-          <ul className="hidden md:flex flex-auto space-x-2 items-center justify-center">
+          <ul className="hidden  md:flex flex-auto space-x-2 items-center justify-center">
             <Link to="/admin/dashboard">
               <li
                 onClick={() => handleItemClick("Dashboard")}
