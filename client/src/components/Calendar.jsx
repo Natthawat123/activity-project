@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import Tooltip from "@mui/material/Tooltip";
 import { useNavigate } from "react-router";
-import axios from 'axios';
+import axios from "axios";
 
 const localizer = momentLocalizer(moment);
 
@@ -24,10 +24,9 @@ function CalendarFull() {
       .get("/api/activitys")
       .then((response) => {
         const data = response.data;
-  
+
         const seenTitles = new Set(); // Create a set to track seen titles
-        console.log("Received data:", data);
-  
+
         const eventList = data
           .filter((item) => {
             // Filter out items with duplicate titles
@@ -64,7 +63,7 @@ function CalendarFull() {
                   : "red"
                 : "gray",
           }));
-  
+
         setEvents(eventList);
       })
       .catch((error) => {
@@ -82,7 +81,6 @@ function CalendarFull() {
       border: "0",
       display: "block",
       margin: "2px",
-      
     };
     return {
       style,
@@ -100,7 +98,7 @@ function CalendarFull() {
 
   return (
     <div className="App w-full max-w-4xl mx-auto my-6 bg-slate-50 rounded-lg shadow-xl p-4 sm:p-6 md:p-8 lg:p-8 ">
-    <motion.h1
+      <motion.h1
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -272,16 +270,7 @@ function CalendarFull() {
                 }}
                 className="text-base sm:text-lg"
               >
-                {selectedEvent.status === 2
-                  ? "กิจกรรมสิ้นสุดแล้ว"
-                  : selectedEvent.numStd === selectedEvent.numStdReserve
-                  ? "ลงทะเบียนเต็มแล้ว"
-                  : now >= selectedEvent.reserveStart &&
-                    now <= selectedEvent.reserveEnd
-                  ? selectedEvent.status === 1
-                    ? "เปิดลงทะเบียน"
-                    : "ปิดลงทะเบียน"
-                  : "ไม่อยู่ช่วงเวลาที่เปิดลงทะเบียน"}
+                {selectedEvent.status}
               </p>
             </div>
           </div>

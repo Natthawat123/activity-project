@@ -129,7 +129,7 @@ const StudentForm = () => {
         console.error("Error fetching sections:", error);
       });
 
-    fetch("/api/teachers/" + staff_ID)
+    fetch("/api/teacher/" + staff_ID)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Error fetching data");
@@ -253,7 +253,7 @@ const StudentForm = () => {
         <hr className="mb-3" />
         <form className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:px-10">
           <div className="flex gap-2">
-            <div className="w-1/6">
+            <div className="w-3/12">
               <label
                 htmlFor="title"
                 className="block text-sm font-medium text-gray-600"
@@ -265,16 +265,16 @@ const StudentForm = () => {
                 onChange={handleTitleChange}
                 name="title"
                 id="title"
-                className="mt-1 p-2 border w-full rounded-md"
+                className="mt-1 p-2 mr-2 border w-full rounded-md"
               >
-                <option value="">เลือกคำนำหน้า</option>
+                <option value="" className="">เลือกคำนำหน้า</option>
                 <option value="อ.">อ.</option>
                 <option value="ดร.">ดร.</option>
                 <option value="รศ. ดร.">รศ. ดร.</option>
                 <option value="ผศ. ดร.">ผศ. ดร.</option>
               </select>
             </div>
-            <div className="w-5/6">
+            <div className="w-9/12">
               <label
                 htmlFor="firstName"
                 className="block text-sm font-medium text-gray-600"
@@ -286,7 +286,7 @@ const StudentForm = () => {
                 id="fname"
                 name="staff_fname"
                 onChange={handlechange}
-                value={value.staff_fname}
+                value={value.t_fname}
                 className="mt-1 p-2 border w-full rounded-md"
               />
             </div>
@@ -304,7 +304,7 @@ const StudentForm = () => {
               id="lname"
               name="staff_lname"
               onChange={handlechange}
-              value={value.staff_lname}
+              value={value.t_lname}
               className="mt-1 p-2 border w-full rounded-md"
             />
           </div>

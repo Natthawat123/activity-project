@@ -31,7 +31,7 @@ function Test() {
   const navigate = useNavigate();
 
   const contractAddress = "0xc9811A01727735E9c9aE046b7690b2AC9021E1B7";
-  const stdID = localStorage.getItem("id");
+  const std_ID = localStorage.getItem("id");
 
   useEffect(() => {
     const fetchSmartContract = async () => {
@@ -48,7 +48,7 @@ function Test() {
 
     const fetchActivity = async () => {
       try {
-        const res = await axios.get("/api/activitys");
+        const res = await axios.get(`/api/participate?std_ID=${std_ID}`);
         setActivity(res.data);
       } catch (err) {
         console.log(err);
@@ -56,8 +56,10 @@ function Test() {
     };
     fetchSmartContract();
     fetchActivity();
+    console.log(join);
     setIsLoaded(true);
-  }, []);
+  }, [std_ID]);
+
   const formatDateThai = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     const date = new Date(dateString);
@@ -72,18 +74,11 @@ function Test() {
     const joinEntry = join.find(
       (j) =>
         Number(j.activityId) === activityID &&
-        j.studentIds.some((id) => Number(id) === Number(stdID))
+        j.studentIds.some((id) => Number(id) === Number(std_ID))
     );
     if (joinEntry) {
-      return { message: "เข้าร่วมกิจกรรมแล้ว", color: "blue" };
+      return "เข้าร่วมกิจกรรมแล้ว";
     }
-    const reserveEntry = activity.find(
-      (r) => r.act_ID === activityID && r.login_ID === stdID
-    );
-    if (reserveEntry) {
-      return { message: "ลงทะเบียนสำเร็จ", color: "green" };
-    }
-    return { message: "ยังไม่ได้ลงทะเบียน", color: "gray" };
   };
 
   const handleSearch = (event) => {
@@ -124,12 +119,14 @@ function Test() {
   });
 
   const sortedItems = sortItems(filteredItems);
-  const lastPage = Math.max(0, Math.ceil(sortedItems.length / itemsPerPage) - 1);
+  const lastPage = Math.max(
+    0,
+    Math.ceil(sortedItems.length / itemsPerPage) - 1
+  );
   const visibleItems = sortedItems.slice(
     currentPage * itemsPerPage,
     Math.min((currentPage + 1) * itemsPerPage, sortedItems.length)
   );
-  
 
   const pageNumbers = [];
   for (let i = 0; i <= lastPage; i++) {
@@ -193,7 +190,7 @@ function Test() {
                     onChange={handleFilterChange}
                     className="text-xs block p-1.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value="default" className="text-center">
+                    <option value="default">
                       ทั้งหมด
                     </option>
                     <option value="joinEntry">เข้าร่วมกิจกรรมแล้ว</option>
@@ -207,7 +204,7 @@ function Test() {
                   onClick={handleSortChange}
                   className="block p-2 text-xs border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
-                  วันที่ ({sortOrder === "latest" ? "ใหม่สุด" : "เก่าสุด"})
+                  วันที่เริ่มกิจกรรม ({sortOrder === "latest" ? "ใหม่สุด" : "เก่าสุด"})
                 </button>
               </div>
             </div>
@@ -221,13 +218,13 @@ function Test() {
                 <th className="px-4 py-3">ชื่อกิจกรรม</th>
                 <th className="px-4 py-3">สถานที่</th>
                 <th className="px-4 py-3">อาจารย์ผู้จัด</th>
-                <th className="px-4 py-3">สถานะ</th>
+                <th className="px-4 py-3">สถานะการกิจกรรม</th>
+                <th className="px-4 py-3">สถานะการเข้าร่วม</th>
                 <th className="px-4 py-3 w-2/12">รายละเอียด</th>
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-gray-200 dark:divide-gray-700">
               {uniqueVisibleItems.map((item) => {
-                const status = getStatus(item.act_ID);
                 return (
                   <>
                     <tr
@@ -239,21 +236,16 @@ function Test() {
                       </td>
                       <td className="px-4 py-3">{item.act_location}</td>
                       <td className="px-4 py-3">
-                        {item.staff_fname} {item.staff_lname}
+                        {item.t_fname} {item.t_lname}
                       </td>
-                      <td className="px-4 py-3" style={{ color: status.color }}>
-                        {status.message}
+                      <td className="px-4 py-3">{item.act_status}</td>
+                      <td className="px-4 py-3">
+                        {getStatus(item.act_ID)
+                          ? getStatus(item.act_ID)
+                          : item.par_status
+                          ? item.par_status
+                          : "ยังไม่ได้ลงทะเบียน"}
                       </td>
-                      {/* <td className="px-6 py-3">
-                        <button
-                          className="text-blue-600 dark:text-blue-500 hover:underline"
-                          onClick={() =>
-                            navigate(`/activity/detail2/${item.act_ID}`)
-                          }
-                        >
-                          รายละเอียด
-                        </button>
-                      </td> */}
                       <td>
                         <IconButton
                           aria-label="expand row"
@@ -273,52 +265,49 @@ function Test() {
                       </td>
                     </tr>
                     <tr>
-                      <td
-                        style={{ paddingBottom: 0, paddingTop: 0 }}
-                        colSpan={6}
-                      >
-                        <Collapse
-                          in={openRows[item.act_ID]}
-                          timeout="auto"
-                          unmountOnExit
+                    <td colSpan={6} style={{ paddingBottom: 0, paddingTop: 0 }}>
+                    <Collapse in={openRows[item.act_ID]} timeout="auto" unmountOnExit>
+                      <Box sx={{ margin: 2, border: '1px solid #ddd', borderRadius: 2, padding: 2 ,fontFamily: 'Kanit, sans-serif'}}>
+                        <Typography
+                          variant="h6"
+                          component="div"
+                          gutterBottom
+                          sx={{ color: 'primary.main',fontFamily: 'Kanit, sans-serif', fontWeight: 'bold' }}
                         >
-                          <Box sx={{ margin: 1 }}>
-                            <Typography
-                              variant="h6"
-                              gutterBottom
-                              component="div"
-                            >
-                              รายละเอียดเพิ่มเติม
-                            </Typography>
-                            <Table size="small" aria-label="purchases">
-                              <TableHead>
-                                <TableRow>
-                                  <TableCell>รายละเอียด</TableCell>
-                                  <TableCell>จำนวนที่รับ</TableCell>
-                                  <TableCell>วันที่เริ่ม</TableCell>
-                                  <TableCell>วันที่สิ้นสุด</TableCell>
-                                </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                <TableRow>
-                                  <TableCell component="th" scope="row">
-                                    {item.act_desc}
-                                  </TableCell>
-                                  <TableCell>
-                                    {item.act_numStdReserve}/{item.act_numStd}คน
-                                  </TableCell>
-                                  <TableCell>
-                                    {formatDateThai(item.act_dateStart)}
-                                  </TableCell>
-                                  <TableCell>
-                                    {formatDateThai(item.act_dateEnd)}
-                                  </TableCell>
-                                </TableRow>
-                              </TableBody>
-                            </Table>
-                          </Box>
-                        </Collapse>
-                      </td>
+                          รายละเอียดเพิ่มเติม
+                        </Typography>
+                        <Table size="small" aria-label="purchases">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell sx={{ fontWeight: 'bold', color: 'secondary.main',fontFamily: 'Kanit, sans-serif' }}>
+                                รายละเอียดกิจกรรม
+                              </TableCell>
+                              <TableCell sx={{ fontWeight: 'bold', color: 'secondary.main',fontFamily: 'Kanit, sans-serif' }}>
+                                จำนวนที่รับ
+                              </TableCell>
+                              <TableCell sx={{ fontWeight: 'bold', color: 'secondary.main',fontFamily: 'Kanit, sans-serif' }}>
+                                วันที่เริ่ม
+                              </TableCell>
+                              <TableCell sx={{ fontWeight: 'bold', color: 'secondary.main',fontFamily: 'Kanit, sans-serif' }}>
+                                วันที่สิ้นสุด
+                              </TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            <TableRow>
+                              <TableCell sx={{ fontFamily: 'Kanit, sans-serif' }}>{item.act_desc}</TableCell>
+                              <TableCell sx={{ fontFamily: 'Kanit, sans-serif' }}>
+                                {item.numStdReserve}/{item.act_numStd} คน
+                              </TableCell>
+                              <TableCell sx={{ fontFamily: 'Kanit, sans-serif' }}>{formatDateThai(item.act_dateStart)}</TableCell>
+                              <TableCell sx={{ fontFamily: 'Kanit, sans-serif' }}>{formatDateThai(item.act_dateEnd)}</TableCell>
+                            </TableRow>
+                          </TableBody>
+                        </Table>
+                      </Box>
+                    </Collapse>
+                  </td>
+                  
                     </tr>
                   </>
                 );

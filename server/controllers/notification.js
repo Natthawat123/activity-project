@@ -1,30 +1,20 @@
 import db from '../db.js'
 
 
-export const get = (req, res) => {
+export const getMailbox = (req, res) => {
     const {
-        id,
-        role
-    } = req.query;
+        login_ID,
+    } = req.query; 
 
-    let sql;
+    const sql = `
+        SELECT * FROM 
+            notify n
+        JOIN
+            notification noti ON noti.noti_ID = n.noti_ID
+        WHERE login_ID = 10
+    `;
 
-    if (role == "student") {
-        sql = `SELECT
-                    *
-                FROM
-                    news
-                LEFT JOIN activity ON activity.act_title = news.act_title
-                WHERE
-                    news_type = 'all'
-                OR FIND_IN_SET(${id}, news_type) > 0;
-                `
-
-    } else {
-        sql = `SELECT * FROM news WHERE news_type = 'all'`;
-    }
-
-    db.query(sql, (err, result) => {
+    db.query(sql, [login_ID], (err, result) => {
         if (err) {
             return res.status(500).json({
                 error: err.message
@@ -33,6 +23,7 @@ export const get = (req, res) => {
         return res.json(result);
     });
 };
+
 
 export const getOne = (req, res) => {
     const {
@@ -123,38 +114,71 @@ export const deleteNews = (req, res) => {
         return res.json(result);
     })
 }
-export const addActivity = (req, res) => {
+export const post = (req, res) => {
     const {
-        news_topic,
-        news_desc,
-        news_date,
-        news_create,
-        act_title
+        topic,
+        description,
     } = req.body;
-    const news_type = "all"
 
-    const sql = `
-            INSERT INTO news(news_topic, news_desc, news_date, news_create,news_type,act_title)
-            VALUES( ? , ? , ? , ? ,?,?)
-            `;
-
-    db.query(sql, [
-        news_topic,
-        news_desc,
-        news_date,
-        news_create,
-        news_type,
-        act_title
-    ], (err, result) => {
-        if (err) {
-            return res.status(500).json({
-                error: err.message
+    const sqlNotification = `
+        INSERT INTO notification
+            (topic, description)
+        VALUES
+            ( ? , ?)
+        `;
+    const sqlNotify = `
+        INSERT INTO notify 
+            (noti_ID,login_ID)
+        SELECT 
+            ?,login_ID
+        FROM 
+            login;
+        `;
+    
+        db.beginTransaction((err) => {
+            if (err) throw err;
+    
+            // First, insert the news
+            db.query(sqlNotification, [topic,description], (error, results) => {
+                if (error) {
+                    return db.rollback(() => {
+                        res.status(500).send('Error inserting news: ' + error.message);
+                    });
+                }
+    
+                const noti_ID = results.insertId;
+    
+                db.query(sqlNotify, [noti_ID], (error) => {
+                    if (error) {
+                        return db.rollback(() => {
+                            res.status(500).send('Error inserting notifications: ' + error.message);
+                        });
+                    }
+    
+                    db.commit((err) => {
+                        if (err) {
+                            return db.rollback(() => {
+                                res.status(500).send('Error committing transaction: ' + err.message);
+                            });
+                        }
+                        res.status(200).send('News and notifications added successfully!');
+                    });
+                });
             });
-        }
-        return res.json(result);
-    });
+        });
+
+    // db.query(sql, [
+    //     topic,
+    //     description
+    // ], (err, result) => {
+    //     if (err) {
+    //         return res.status(500).json({
+    //             error: err.message
+    //         });
+    //     }
+    //     return res.json(result);
+    // });
 };
-// Example of backend error handling
 export const newsCancelReserve = (req, res) => {
     const {
         news_topic,

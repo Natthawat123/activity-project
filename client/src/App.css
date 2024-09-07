@@ -1,3 +1,7 @@
+*{
+    box-sizing: border-box;
+}
+
 @keyframes rgb {
     0% {
         color: red;

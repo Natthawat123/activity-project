@@ -1,7 +1,7 @@
 import db from '../db.js'
 
 export const readAdminOne = (req, res) => {
-    const sql = 'select * from admin where login_ID'
+    const sql = 'select * from admin where a_ID'
     const {
         id
     } = req.query

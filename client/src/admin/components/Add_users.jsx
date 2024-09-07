@@ -84,10 +84,8 @@ const Add_Users = ({ closeModal }) => {
       email: data.get("email") || `${username}@webmail.npru.ac.th`,
       mobile: data.get("phoneNumber"),
       sec_ID: data.get("newSection") ? null : selectedSection,
-      sec_name: data.get("newSection")
+      sec_name: data.get("newSection"),
     };
-
-    console.log("jsonData:", jsonData);
 
     try {
       const loginResponse = await axios.post("/api/auth/register", jsonData);

@@ -1,13 +1,75 @@
-import React, { useState } from "react";
-import Button from "@mui/material/Button";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import { useState, useEffect, useContext } from "react";
+import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import axios from "axios";
+import Web3 from "web3";
+import Abi from "../../../components/contract/abi2.json";
+import { ContextActivity } from "./ActivityContext";
+import { range } from "./Fx";
+
+// mui
+import Button from "@mui/material/Button";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 
-function Student({ act_ID, day = [], data = [], join = {}, id, activity }) {
+function ListReserveStudent() {
   const [showCheckBox, setShowCheckBox] = useState(false);
   const [selectCheckBox, setSelectCheckBox] = useState([]);
+  const [contract, setContract] = useState(null);
+  const [activity, setActivity] = useState({});
+  const [student, setStudent] = useState([]);
+  const [day, setDay] = useState([]);
+  const { getActivityByID } = useContext(ContextActivity);
+  const { act_ID } = useParams();
+  const contractAddress = "0xc9811A01727735E9c9aE046b7690b2AC9021E1B7";
+
+  useEffect(() => {
+    const fetchActivity = () => {
+      try {
+        const activity = getActivityByID(act_ID);
+        if (activity) {
+          setActivity(activity);
+          setDay(range(activity.act_dateStart, activity.act_dateEnd));
+        }
+      } catch (error) {
+        console.error("Error fetching activity:", error);
+      }
+    };
+
+    const fetchContract = async () => {
+      try {
+        const web3 = new Web3("https://rpc.sepolia.org");
+        const contract = new web3.eth.Contract(Abi, contractAddress);
+        const res = await contract.methods.get().call();
+
+        const format = res.map((item) => ({
+          actID: item.activityId,
+          students: item.studentIds.map((id, index) => ({
+            studentId: id,
+            dayJoin: item.dayJoin[index].map((date) => date.toString()),
+          })),
+        }));
+        const joinData = format.find((joinEntry) => joinEntry.actID == act_ID);
+        setContract(joinData);
+      } catch (err) {
+        console.error("Error fetching smart contract:", err);
+        setContract(null); // Set contract to null in case of error
+      }
+    };
+
+    const fetchReserveStudent = async () => {
+      try {
+        const res = await axios.get(`/api/reserve/?act_ID=${act_ID}`);
+        setStudent(res.data);
+      } catch (error) {
+        console.error("Failed to fetch reserve student", error);
+      }
+    };
+
+    fetchContract();
+    fetchReserveStudent();
+    fetchActivity();
+  }, [act_ID, getActivityByID]);
 
   const editCancelReserve = () => {
     setShowCheckBox(!showCheckBox);
@@ -32,7 +94,6 @@ function Student({ act_ID, day = [], data = [], join = {}, id, activity }) {
     const month = dateString.slice(4, 6);
     const day = dateString.slice(6, 8);
 
-    // สร้างวันที่ในรูปแบบไทย
     const thaiMonths = [
       "มกราคม",
       "กุมภาพันธ์",
@@ -83,10 +144,10 @@ function Student({ act_ID, day = [], data = [], join = {}, id, activity }) {
           cancelReserveNumStd: selectCheckBox.length,
         });
 
-        Swal.fire("สำเร็จ!", "ยกเลิกการลงทะเบียนสำเร็จ", "success"),
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
+        Swal.fire("สำเร็จ!", "ยกเลิกการลงทะเบียนสำเร็จ", "success");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } catch (error) {
         console.error("Error canceling reservations:", error);
         Swal.fire("Error!", "Failed to cancel reservations.", "error");
@@ -94,15 +155,15 @@ function Student({ act_ID, day = [], data = [], join = {}, id, activity }) {
     }
   };
 
-  const joinStudents = join.actID === BigInt(act_ID) ? join.students || [] : [];
-
-  if (!data[0]?.login_ID) {
+  if (contract === null) {
     return (
-      <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 mt-8">
-        <h1 className="text-lg font-bold">ยังไม่มีนักศึกษาลงทะเบียนเข้าร่วม</h1>
+      <div className="flex justify-center items-center h-screen">
+        Loading...
       </div>
     );
   }
+
+  const joinStudents = contract?.students || [];
 
   return (
     <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white p-4 mt-8">
@@ -134,17 +195,17 @@ function Student({ act_ID, day = [], data = [], join = {}, id, activity }) {
           </tr>
         </thead>
         <tbody className="text-slate-600">
-          {data.map((i, index) => {
+          {student.map((i, index) => {
             const daysJoined = joinStudents
-              .filter((student) => student.studentId === BigInt(i.login_ID))
+              .filter((student) => student.studentId === BigInt(i.std_ID))
               .reduce((count, student) => {
                 return count + student.dayJoin.filter((day) => day).length;
               }, 0);
 
             return (
-              <tr key={i.login_ID}>
+              <tr key={i.std_ID}>
                 <td className="px-6 py-3">{index + 1}</td>
-                <td className="px-6 py-3">{i.login_ID}</td>
+                <td className="px-6 py-3">{i.std_ID}</td>
                 <td className="px-6 py-3">
                   {i.std_fname} {i.std_lname}
                 </td>
@@ -152,7 +213,7 @@ function Student({ act_ID, day = [], data = [], join = {}, id, activity }) {
                   <td key={dayIndex} className="px-6 py-3">
                     {joinStudents.find(
                       (student) =>
-                        student.studentId === BigInt(i.login_ID) &&
+                        student.studentId == BigInt(i.std_ID) &&
                         student.dayJoin.includes(dateS(d))
                     )
                       ? "✔"
@@ -169,7 +230,7 @@ function Student({ act_ID, day = [], data = [], join = {}, id, activity }) {
                     <input
                       type="checkbox"
                       checked={selectCheckBox.some(
-                        (item) => item.std_ID === i.login_ID
+                        (item) => item.std_ID === i.std_ID
                       )}
                       onChange={(e) =>
                         selectCancelReserveStudent(
@@ -202,4 +263,4 @@ function Student({ act_ID, day = [], data = [], join = {}, id, activity }) {
   );
 }
 
-export default Student;
+export default ListReserveStudent;

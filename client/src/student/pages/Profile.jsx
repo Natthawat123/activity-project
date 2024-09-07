@@ -128,7 +128,7 @@ const StudentForm = () => {
         console.error("Error fetching sections:", error);
       });
 
-    fetch(`/api/students/${stdID}`)
+    fetch(`/api/student/${stdID}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Error fetching data");
@@ -197,7 +197,7 @@ const StudentForm = () => {
       std_fname: `${title}${value.std_fname}`.trim(),
     };
 
-    fetch(`/api/students/${stdID}`, {
+    fetch(`/api/student/${stdID}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -264,7 +264,7 @@ const StudentForm = () => {
                 type="text"
                 id="username"
                 name="login_ID"
-                value={value.username}
+                value={value.std_ID}
                 readOnly
                 className="mt-1 p-2 border w-full rounded-md"
               />

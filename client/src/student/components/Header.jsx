@@ -5,9 +5,9 @@ import Logout from "../../components/Logout";
 import axios from "axios";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
 import SlideBar from "../../components/news/SlideBar";
-import KeyIcon from '@mui/icons-material/Key';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import KeyIcon from "@mui/icons-material/Key";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 const Header = () => {
   const ID = localStorage.getItem("id");
@@ -17,7 +17,7 @@ const Header = () => {
   useEffect(() => {
     const fetchUsername = async () => {
       try {
-        const response = await axios.get(`/api/students/${ID}`);
+        const response = await axios.get(`/api/student/${ID}`);
         // setUsername(`${response.data.std_fname} ${response.data.std_lname}`);
         setUsername(response.data);
       } catch (error) {
@@ -48,19 +48,17 @@ const Header = () => {
   };
 
   const getItemClass = (itemName) =>
-    `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 text-gray-600 border border-white bg-gray-50 cursor-pointer px-3 py-2.5 font-normal text-xs leading-3 shadow-md rounded ${selectedItem === itemName
-      ? "bg-indigo-600 text-white"
-      : "bg-gray-50 text-gray-600 border border-white"
+    `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 text-gray-600 border border-white bg-gray-50 cursor-pointer px-3 py-2.5 font-normal text-xs leading-3 shadow-md rounded ${
+      selectedItem === itemName
+        ? "bg-indigo-600 text-white"
+        : "bg-gray-50 text-gray-600 border border-white"
     }`;
 
-  const getItemClassXs = () =>
-    `px-4 py-3 text-gray-600 bg-gray-50 border border-gray-50 focus:outline-none focus:bg-gray-100 hover:bg-gray-100 duration-100 cursor-pointer text-xs leading-3 font-normal`;
-
-
-  const getItemLogoutXs = (itemName) =>
-    `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 font-bold text-red-500 border border-white bg-grey-500 cursor-pointer px-3 py-2.5 text-xs leading-3 shadow-md rounded ${selectedItem === itemName
-      ? "bg-red-600 text-white"
-      : "bg-gray-50 text-gray-600 border border-white"
+  const getItemClassXs = (itemName) =>
+    `focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 font-bold text-red-500 border border-white bg-grey-500 cursor-pointer px-3 py-2.5 text-xs leading-3 shadow-md rounded ${
+      selectedItem === itemName
+        ? "bg-red-600 text-white"
+        : "bg-gray-50 text-gray-600 border border-white"
     }`;
   return (
     <div className="3xl:container 3xl:mx-auto top-0 fixed z-50 w-full">
@@ -104,8 +102,13 @@ const Header = () => {
             <Menu as="div" className="relative inline-block text-left">
               <div>
                 <MenuButton className=" inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-xs md:text-sm font-semibold text-gray-900  ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                  {username.std_fname}{"  "}{username.std_lname}
-                  <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
+                  {username.std_fname}
+                  {"  "}
+                  {username.std_lname}
+                  <ChevronDownIcon
+                    aria-hidden="true"
+                    className="-mr-1 h-5 w-5 text-gray-400"
+                  />
                 </MenuButton>
               </div>
 
@@ -121,12 +124,15 @@ const Header = () => {
                     >
                       <PersonPinIcon className="text-blue-500" />
                       <div className="">
-                        <div className="">{username.std_fname} {username.std_lname}</div>
-                        <div className="text-xs text-gray-400">{username.std_email}</div>
+                        <div className="">
+                          {username.std_fname} {username.std_lname}
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {username.std_email}
+                        </div>
                       </div>
                     </a>
                   </MenuItem>
-
                 </div>
                 <div className="py-1">
                   <MenuItem>
@@ -141,12 +147,9 @@ const Header = () => {
                   <MenuItem>
                     <Logout />
                   </MenuItem>
-
                 </div>
-
               </MenuItems>
             </Menu>
-
           </div>
         </nav>
         <div className="relative block md:hidden w-full mt-5">
@@ -157,8 +160,9 @@ const Header = () => {
             <div className="flex space-x-2">
               <span
                 id="s1"
-                className={`font-semibold text-sm leading-3 ${isListVisible ? "" : "hidden"
-                  }`}
+                className={`font-semibold text-sm leading-3 ${
+                  isListVisible ? "" : "hidden"
+                }`}
               >
                 {" "}
               </span>
@@ -184,13 +188,12 @@ const Header = () => {
           <div className="relative">
             <ul
               id="list"
-              className={`relative font-normal text-base leading-4 top-2 w-full rounded shadow-md transition-all duration-700 ${isListVisible
+              className={`relative font-normal text-base leading-4 top-2 w-full rounded shadow-md transition-all duration-700 ${
+                isListVisible
                   ? "opacity-100 max-h-40"
                   : "opacity-0 max-h-0 hidden"
-                }`}
+              }`}
             >
-
-
               <Link to="/activity/calendar">
                 <li
                   onClick={() => handleItemClick("ปฏิทินกิจกรรม")}
@@ -215,8 +218,6 @@ const Header = () => {
                   กิจกรรม
                 </li>
               </Link>
-
-
             </ul>
           </div>
         </div>

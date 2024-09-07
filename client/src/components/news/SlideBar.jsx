@@ -26,16 +26,19 @@ export default function SlideBar() {
   const [unreadCount, setUnreadCount] = React.useState(0);
   const [isHovered, setIsHovered] = React.useState(false);
   const drawerRef = React.useRef(null);
-  const id = localStorage.getItem("id");
+  const login_ID = localStorage.getItem("login_ID");
 
   React.useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await axios.get(`/api/notify?id=${id}`);
+        const response = await axios.get(
+          `/api/notification?login_ID=${login_ID}`
+        );
         setNews(response.data);
+        console.log(response);
         setUnreadCount(
           response.data.filter(
-            (notification) => notification.notify_status === "unread"
+            (notification) => notification.noti_status === "ยังไม่ได้อ่าน"
           ).length
         );
       } catch (error) {
@@ -44,7 +47,7 @@ export default function SlideBar() {
     };
 
     fetchNews();
-  }, [id]);
+  }, [login_ID]);
 
   const toggleDrawer = (open) => (event) => {
     if (
@@ -64,7 +67,7 @@ export default function SlideBar() {
   const read = async (news_ID) => {
     try {
       const res = await axios.put(`/api/notify`, {
-        login_ID: id,
+        login_ID: login_ID,
         news_ID: news_ID,
       });
       if (res.status === 200) {
@@ -79,12 +82,12 @@ export default function SlideBar() {
     }
   };
 
-  const color = (notify_status) => {
-    return notify_status === "read" ? "#fdd835" : "#e0e0e0";
+  const color = (noti_status) => {
+    return noti_status === "read" ? "#fdd835" : "#e0e0e0";
   };
 
-  const tooltip = (notify_status) => {
-    return notify_status === "read" ? "อ่านแล้ว" : "ทำเครื่องหมายว่าอ่านแล้ว";
+  const tooltip = (noti_status) => {
+    return noti_status === "read" ? "อ่านแล้ว" : "ทำเครื่องหมายว่าอ่านแล้ว";
   };
 
   const list = () => (
@@ -114,37 +117,37 @@ export default function SlideBar() {
         }
       >
         {news.map((item) => (
-          <React.Fragment key={item.news_ID}>
+          <React.Fragment key={item.noti_ID}>
             <ListItemButton
               onClick={() =>
                 setOpen((prev) => ({
                   ...prev,
-                  [item.news_ID]: !prev[item.news_ID],
+                  [item.noti_ID]: !prev[item.noti_ID],
                 }))
               }
             >
               <ListItemIcon>
-                <Tooltip title={tooltip(item.notify_status)}>
+                <Tooltip title={tooltip(item.noti_status)}>
                   <CheckCircleOutlineIcon
                     sx={{
-                      color: color(item.notify_status),
+                      color: color(item.noti_status),
                       "&:hover": {
                         color: "#fdd835",
                       },
                     }}
-                    onClick={() => read(item.news_ID)}
+                    onClick={() => read(item.noti_ID)}
                   />
                 </Tooltip>
               </ListItemIcon>
-              <ListItemText primary={item.news_topic} />
-              {open[item.news_ID] ? <ExpandLess /> : <ExpandMore />}
+              <ListItemText primary={item.topic} />
+              {open[item.noti_ID] ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
-            <Collapse in={open[item.news_ID]} timeout="auto" unmountOnExit>
+            <Collapse in={open[item.noti_ID]} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 <ListItemButton sx={{ pl: 4 }}>
                   <ListItemText
-                    primary={item.news_topic}
-                    secondary={item.news_desc}
+                    primary={item.topic}
+                    secondary={item.description}
                   />
                   <ListItemIcon>
                     <ArticleIcon color="primary" />
@@ -166,7 +169,7 @@ export default function SlideBar() {
           display: "flex",
           flexDirection: "column",
           "& > *": {
-            marginBottom: .5,
+            marginBottom: 0.5,
           },
         }}
       >
@@ -177,12 +180,15 @@ export default function SlideBar() {
           onMouseLeave={() => setIsHovered(false)}
         >
           <Badge
-            className={unreadCount > 0 ? "rgb" : "text-[#94a3b8] gap-3 flex  items-center px-4 py-2 text-xs  data-[focus]:bg-gray-100 data-[focus]:text-gray-900"}
+            className={
+              unreadCount > 0
+                ? "rgb"
+                : "text-[#94a3b8] gap-3 flex  items-center px-4 py-2 text-xs  data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
+            }
             badgeContent={unreadCount}
           >
             {isHovered ? <DraftsIcon /> : <MailIcon />}{" "}
             {/*<p className="text-gray-700 ">การแจ้งเตือน</p>*/}
-            
           </Badge>
         </div>
       </Box>

@@ -14,7 +14,7 @@ function Table() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("/api/upload");
+        const res = await axios.get("/api/participates");
         setActivity(res.data);
       } catch (error) {
         console.error("Error fetching data:", error);

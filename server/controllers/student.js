@@ -48,17 +48,14 @@ export const createStudent = (req, res) => {
 //read all
 export const getStudent = (req, res) => {
     const sql = `
-   SELECT 
-    section.*,
-    student.*,
-    t.staff_fname,
-    t.staff_lname,
-    t.staff_email,
-    t.staff_mobile,
-    t.staff_address
-FROM student
-left JOIN section ON section.sec_ID = student.sec_ID
-left JOIN teacher t ON t.sec_ID = student.sec_ID;
+ SELECT
+	*
+FROM
+	student std
+JOIN
+	section s ON std.sec_ID = s.sec_ID
+JOIN
+	teacher t ON s.t_ID = t.t_ID
 
     `
 
@@ -77,13 +74,17 @@ left JOIN teacher t ON t.sec_ID = student.sec_ID;
 
 export const getStudentOne = (req, res) => {
     const sql = `
-      SELECT student.*, teacher.staff_fname, teacher.staff_lname, section.*, login.*
-      FROM student
-      LEFT JOIN section ON section.sec_ID = student.sec_ID
-      LEFT JOIN teacher ON teacher.sec_ID = student.sec_ID
-      LEFT JOIN login ON login.username = student.std_ID
-      WHERE student.std_ID = ?
-    `;
+        SELECT
+	        *
+        FROM
+	        student std
+        JOIN
+	        section s ON std.sec_ID = s.sec_ID
+        JOIN
+	        teacher t ON s.t_ID = t.t_ID
+        WHERE
+            std.std_ID = ?
+        `;
 
     const {
         id
@@ -118,10 +119,10 @@ export const updateStudent = (req, res) => {
             std_email = ?, 
             std_mobile = ?, 
             std_address = ?, 
-            province = ?, 
-            district = ?, 
-            subdistrict = ?, 
-            zipcode = ? 
+            std_province = ?, 
+            std_district = ?, 
+            std_subdistrict = ?, 
+            std_zipcode = ? 
         WHERE std_ID = ?
     `
     const {

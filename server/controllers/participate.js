@@ -1,13 +1,73 @@
 import db from '../db.js'
 
-// read All
-export const readReserve = (req, res) => {
 
-    const sql = ` SELECT activity.*, manage.std_ID, student.std_fname, student.std_lname,login.login_ID as ids
-        FROM activity 
-        JOIN manage ON activity.act_ID = manage.act_ID
-        JOIN student ON manage.std_ID = student.std_ID`
-    db.query(sql, (err, result) => {
+// get only participate by act_ID
+
+export const getByAct_ID = (req, res) => {
+    const { act_ID } = req.query;
+    const sql = `
+        SELECT 
+            p.*,s.*
+        FROM 
+            participate p 
+        LEFT JOIN
+            student s ON p.std_ID = s.std_ID
+        WHERE act_ID = ?
+    `;
+    
+    db.query(sql, [act_ID], (err, result) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({
+                error: 'An error occurred while fetching data'
+            });
+        }
+        if (result.length === 0) {
+            return res.status(404).json({
+                message: "Data not found"
+            });
+        }
+        return res.json(result);
+    });
+};
+// getAll
+export const getByStd_ID = (req, res) => {
+    const {std_ID} = req.query
+    const sql = `
+SELECT 
+    activity.act_ID,
+    activity.t_ID,
+    activity.act_title,
+    activity.act_desc,
+    activity.act_dateStart,
+    activity.act_dateEnd,
+    activity.act_numStd,
+    activity.act_location,
+    activity.act_status,
+    activity.act_createAt,
+    activity.act_transaction,
+    participate.std_ID,
+    participate.par_status,
+    teacher.t_fname,
+    teacher.t_lname,
+    teacher.t_mobile,
+    teacher.t_email,
+    COALESCE(participate_count.numStdReserve, 0) AS numStdReserve
+FROM
+    activity
+    LEFT JOIN participate ON activity.act_ID = participate.act_ID 
+                          AND participate.std_ID = ?
+    LEFT JOIN teacher ON activity.t_ID = teacher.t_ID
+    LEFT JOIN (
+        SELECT act_ID, COUNT(*) AS numStdReserve
+        FROM participate
+        GROUP BY act_ID
+    ) AS participate_count ON activity.act_ID = participate_count.act_ID
+ORDER BY activity.act_ID;
+
+`;
+
+    db.query(sql,[std_ID] ,(err, result) => {
         if (err) {
             return res.status(500).json({
                 error: err.message
@@ -145,25 +205,21 @@ export const updateStatusNotJoin = (req, res) => {
 // reserve
 export const reserveActivity = (req, res) => {
     const sql = `
-        INSERT INTO manage 
-            (man_status, std_ID, act_ID) 
+        INSERT INTO participate 
+            ( std_ID, act_ID) 
         VALUES 
-            (?, ?, ?)
+            ( ?, ?)
         `
     const {
-        man_status,
         std_ID,
         act_ID,
     } = req.body;
 
-    db.query(sql, [man_status, std_ID, act_ID], (err, result) => {
-        if (err) return res.status(500).json(err)
-
-        const sql2 = `UPDATE activity SET act_numStdReserve = act_numStdReserve + 1 WHERE act_ID = ?`;
-        db.query(sql2, [act_ID], (err2, result2) => {
-            if (err2) return res.status(500).json(err2)
-            return res.status(200).json('Reserved successfully');
-        })
+    db.query(sql, [ std_ID, act_ID], (err, result) => {
+        if (err) return res.status(500).json(err);
+        return res.status(200).json('Reserve successfully');
+        
+       
     })
 }
 

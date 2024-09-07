@@ -70,7 +70,6 @@ function DetailStudent() {
     fetchSmartContract();
     fetchActivity();
   }, [id]);
-  console.log(student);
 
   const toggleRow = (actId) => {
     setOpenRows((prev) => ({ ...prev, [actId]: !prev[actId] }));
@@ -655,53 +654,48 @@ function DetailStudent() {
                           </td>
                         </tr>
                         <tr>
-                          <td
-                            style={{ paddingBottom: 0, paddingTop: 0 }}
-                            colSpan={6}
-                          >
-                            <Collapse
-                              in={openRows[item.act_ID]}
-                              timeout="auto"
-                              unmountOnExit
+                        <td colSpan={6} style={{ paddingBottom: 0, paddingTop: 0 }}>
+                        <Collapse in={openRows[item.act_ID]} timeout="auto" unmountOnExit>
+                          <Box sx={{ margin: 2, border: '1px solid #ddd', borderRadius: 2, padding: 2 ,fontFamily: 'Kanit, sans-serif'}}>
+                            <Typography
+                              variant="h6"
+                              component="div"
+                              gutterBottom
+                              sx={{ color: 'primary.main',fontFamily: 'Kanit, sans-serif', fontWeight: 'bold' }}
                             >
-                              <Box sx={{ margin: 1 }}>
-                                <Typography
-                                  variant="h6"
-                                  gutterBottom
-                                  component="div"
-                                >
-                                  รายละเอียดเพิ่มเติม
-                                </Typography>
-                                <Table size="small" aria-label="purchases">
-                                  <TableHead>
-                                    <TableRow>
-                                      <TableCell>รายละเอียด</TableCell>
-                                      <TableCell>จำนวน</TableCell>
-                                      <TableCell>วันที่เริ่ม</TableCell>
-                                      <TableCell>วันที่สิ้นสุด</TableCell>
-                                    </TableRow>
-                                  </TableHead>
-                                  <TableBody>
-                                    <TableRow>
-                                      <TableCell component="th" scope="row">
-                                        {item.act_desc}
-                                      </TableCell>
-                                      <TableCell>
-                                        {item.act_numStdReserve}/
-                                        {item.act_numStd} คน
-                                      </TableCell>
-                                      <TableCell>
-                                        {formatDateThai(item.act_dateStart)}
-                                      </TableCell>
-                                      <TableCell>
-                                        {formatDateThai(item.act_dateEnd)}
-                                      </TableCell>
-                                    </TableRow>
-                                  </TableBody>
-                                </Table>
-                              </Box>
-                            </Collapse>
-                          </td>
+                              รายละเอียดเพิ่มเติม
+                            </Typography>
+                            <Table size="small" aria-label="purchases">
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell sx={{ fontWeight: 'bold', color: 'secondary.main',fontFamily: 'Kanit, sans-serif' }}>
+                                    รายละเอียดกิจกรรม
+                                  </TableCell>
+                                  <TableCell sx={{ fontWeight: 'bold', color: 'secondary.main',fontFamily: 'Kanit, sans-serif' }}>
+                                    จำนวนที่รับ
+                                  </TableCell>
+                                  <TableCell sx={{ fontWeight: 'bold', color: 'secondary.main',fontFamily: 'Kanit, sans-serif' }}>
+                                    วันที่เริ่ม
+                                  </TableCell>
+                                  <TableCell sx={{ fontWeight: 'bold', color: 'secondary.main',fontFamily: 'Kanit, sans-serif' }}>
+                                    วันที่สิ้นสุด
+                                  </TableCell>
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                <TableRow>
+                                  <TableCell sx={{ fontFamily: 'Kanit, sans-serif' }}>{item.act_desc}</TableCell>
+                                  <TableCell sx={{ fontFamily: 'Kanit, sans-serif' }}>
+                                    {item.numStdReserve}/{item.act_numStd} คน
+                                  </TableCell>
+                                  <TableCell sx={{ fontFamily: 'Kanit, sans-serif' }}>{formatDateThai(item.act_dateStart)}</TableCell>
+                                  <TableCell sx={{ fontFamily: 'Kanit, sans-serif' }}>{formatDateThai(item.act_dateEnd)}</TableCell>
+                                </TableRow>
+                              </TableBody>
+                            </Table>
+                          </Box>
+                        </Collapse>
+                      </td>
                         </tr>
                       </>
                     );

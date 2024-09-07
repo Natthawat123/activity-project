@@ -6,25 +6,21 @@ export const user = (req, res) => {
         SELECT 
             l.*, 
             s.*,
-
-            COALESCE(t.login_ID, st.std_ID, a.login_ID) AS ID,
-            COALESCE(t.staff_fname, st.std_fname, a.fname) AS fname,
-            COALESCE(t.staff_lname, st.std_lname, a.lname) AS lname,
-            COALESCE(t.staff_email, st.std_email, a.email) AS email,
-            COALESCE(t.staff_mobile, st.std_mobile, a.mobile) AS mobile,
-            COALESCE(t.staff_address, st.std_address) AS address,
-            COALESCE(t.province, st.province) AS province,
-            COALESCE(t.district, st.district) AS district,
-            COALESCE(t.subdistrict, st.subdistrict) AS subdistrict,
-            COALESCE(t.zipcode, st.zipcode) AS zipcode
-
+            COALESCE(t.t_fname, st.std_fname, a.a_fname) AS fname,
+            COALESCE(t.t_lname, st.std_lname, a.a_lname) AS lname,
+            COALESCE(t.t_email, st.std_email, a.a_email) AS email,
+            COALESCE(t.t_mobile, st.std_mobile, a.a_mobile) AS mobile,
+            COALESCE(t.t_address, st.std_address) AS address,
+            COALESCE(t.t_province, st.std_province) AS province,
+            COALESCE(t.t_district, st.std_district) AS district,
+            COALESCE(t.t_subdistrict, st.std_subdistrict) AS subdistrict,
+            COALESCE(t.t_zipcode, st.std_zipcode) AS zipcode
         FROM 
             login l
-
         LEFT JOIN teacher t ON l.login_ID = t.login_ID
-        LEFT JOIN student st ON l.username = st.std_ID
+        LEFT JOIN student st ON l.login_ID = st.login_ID
         LEFT JOIN admin a ON l.login_ID = a.login_ID
-        LEFT JOIN section s ON COALESCE(t.sec_ID, st.sec_ID) = s.sec_ID 
+        LEFT JOIN section s ON  st.sec_ID  = s.sec_ID  OR t.t_ID = s.t_ID
     `
 
     db.query(sql, (err, result) => {
@@ -39,29 +35,25 @@ export const userOne = (req, res) => {
         id
     } = req.params
     const sql = `
-        SELECT 
+       SELECT 
             l.*, 
             s.*,
-
-            COALESCE(t.login_ID, st.std_ID, a.login_ID) AS ID,
-            COALESCE(t.staff_fname, st.std_fname, a.fname) AS fname,
-            COALESCE(t.staff_lname, st.std_lname, a.lname) AS lname,
-            COALESCE(t.staff_email, st.std_email, a.email) AS email,
-            COALESCE(t.staff_mobile, st.std_mobile, a.mobile) AS mobile,
-            COALESCE(t.staff_address, st.std_address) AS address,
-            COALESCE(t.province, st.province) AS province,
-            COALESCE(t.district, st.district) AS district,
-            COALESCE(t.subdistrict, st.subdistrict) AS subdistrict,
-            COALESCE(t.zipcode, st.zipcode) AS zipcode
-
+            COALESCE(t.t_fname, st.std_fname, a.a_fname) AS fname,
+            COALESCE(t.t_lname, st.std_lname, a.a_lname) AS lname,
+            COALESCE(t.t_email, st.std_email, a.a_email) AS email,
+            COALESCE(t.t_mobile, st.std_mobile, a.a_mobile) AS mobile,
+            COALESCE(t.t_address, st.std_address) AS address,
+            COALESCE(t.t_province, st.std_province) AS province,
+            COALESCE(t.t_district, st.std_district) AS district,
+            COALESCE(t.t_subdistrict, st.std_subdistrict) AS subdistrict,
+            COALESCE(t.t_zipcode, st.std_zipcode) AS zipcode
         FROM 
             login l
-
         LEFT JOIN teacher t ON l.login_ID = t.login_ID
-        LEFT JOIN student st ON l.username = st.std_ID
+        LEFT JOIN student st ON l.login_ID = st.login_ID
         LEFT JOIN admin a ON l.login_ID = a.login_ID
-        LEFT JOIN section s ON COALESCE(t.sec_ID, st.sec_ID) = s.sec_ID 
-        WHERE COALESCE(t.login_ID, st.login_ID, a.login_ID) = ?
+        LEFT JOIN section s ON  st.sec_ID  = s.sec_ID  OR t.t_ID = s.t_ID
+        WHERE l.login_ID = ?
     `
 
     db.query(sql, [id], (err, result) => {

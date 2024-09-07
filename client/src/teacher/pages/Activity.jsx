@@ -25,9 +25,11 @@ const ListActivity = () => {
 
         const teachersResponse = await fetch("/api/teachers");
         const teachersData = await teachersResponse.json();
-        setOrganizers(teachersData.map(
-          (teacher) => `${teacher.staff_fname || ""} ${teacher.staff_lname || ""}`.trim()
-        ));
+        setOrganizers(
+          teachersData.map((teacher) =>
+            `${teacher.t_fname || ""} ${teacher.t_lname || ""}`.trim()
+          )
+        );
         setIsLoaded(true);
       } catch (error) {
         setError(error);
@@ -37,6 +39,7 @@ const ListActivity = () => {
 
     fetchData();
   }, []);
+  console.log(activity);
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -48,15 +51,19 @@ const ListActivity = () => {
     setCurrentPage(0);
   };
 
-const filteredItems = activity.filter((item) => {
-  const organizerFullName = `${item.staff_fname || ""} ${item.staff_lname || ""}`.trim().toLowerCase();
-  const normalizedOrganizer = selectedOrganizer.trim().toLowerCase();
-  return (
-    (item.act_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     item.act_location.toLowerCase().includes(searchTerm.toLowerCase())) &&
-    (normalizedOrganizer === "" || organizerFullName === normalizedOrganizer)
-  );
-});
+  const filteredItems = activity.filter((item) => {
+    const organizerFullName = `${item.staff_fname || ""} ${
+      item.staff_lname || ""
+    }`
+      .trim()
+      .toLowerCase();
+    const normalizedOrganizer = selectedOrganizer.trim().toLowerCase();
+    return (
+      (item.act_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.act_location.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (normalizedOrganizer === "" || organizerFullName === normalizedOrganizer)
+    );
+  });
 
   const removeDuplicates = (items) => {
     const seenTitles = new Set();
@@ -98,7 +105,10 @@ const filteredItems = activity.filter((item) => {
       (currentPage + 1) * itemsPerPage
     );
 
-    const pageNumbers = Array.from({ length: lastPage + 1 }, (_, index) => index);
+    const pageNumbers = Array.from(
+      { length: lastPage + 1 },
+      (_, index) => index
+    );
 
     return (
       <div className="container mx-auto md:px-20 pt-36 md:pt-20 my-10 h-screen -mb-24">
@@ -108,11 +118,25 @@ const filteredItems = activity.filter((item) => {
           </div>
           <div className="flex justify-between">
             <div className="pb-4 items-center">
-              <label htmlFor="table-search" className="sr-only">Search</label>
+              <label htmlFor="table-search" className="sr-only">
+                Search
+              </label>
               <div className="relative mt-1">
                 <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                  <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                  <svg
+                    className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                    />
                   </svg>
                 </div>
                 <input
@@ -135,7 +159,9 @@ const filteredItems = activity.filter((item) => {
                 >
                   <option value="">ผู้จัดกิจกรรมทั้งหมด</option>
                   {organizers.map((organizerName, index) => (
-                    <option key={index} value={organizerName}>{organizerName}</option>
+                    <option key={index} value={organizerName}>
+                      {organizerName}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -144,7 +170,7 @@ const filteredItems = activity.filter((item) => {
                   onClick={handleSortChange}
                   className="block p-1.5 text-xs border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
-                  วันที่ ({sortOrder === "latest" ? "ใหม่สุด" : "เก่าสุด"})
+                วันที่เริ่มกิจกรรม ({sortOrder === "latest" ? "ใหม่สุด" : "เก่าสุด"})
                 </button>
               </div>
             </div>
@@ -160,7 +186,7 @@ const filteredItems = activity.filter((item) => {
                   ชื่อกิจกรรม
                 </th>
                 <th scope="col" className="px-6 py-3 w-3/12 text-center">
-                  วัน
+                  วันที่จัดกิจกรรม
                 </th>
                 <th scope="col" className="px-6 py-3 w-2/12 text-center">
                   สถานะ
@@ -172,17 +198,19 @@ const filteredItems = activity.filter((item) => {
             </thead>
             <tbody className="text-slate-600 flex flex-col w-full overflow-y-scroll items-center justify-between ">
               {visibleItems.map((item, index) => {
-                {item.organizerFullName}
+                {
+                  item.organizerFullName;
+                }
                 return (
                   <tr key={item.act_ID} className="border-b-2 flex w-full">
                     <td scope="col" className="px-6 py-3 w-1/12 text-center ">
                       {currentPage * itemsPerPage + index + 1}
                     </td>
-              
+
                     <td scope="col" className="px-6 py-3 w-4/12 text-center">
                       {item.act_title}
                     </td>
-                 
+
                     <td scope="col" className="px-6 py-3 w-3/12 text-center">
                       {formatDateThai(item.act_dateStart)} -{" "}
                       {formatDateThai(item.act_dateEnd)}
@@ -195,37 +223,37 @@ const filteredItems = activity.filter((item) => {
                           item.act_status === 2
                             ? "blue"
                             : item.act_numStd === item.act_numStdReserve
-                              ? "red"
-                              : now >=
+                            ? "red"
+                            : now >=
                                 moment(item.act_dateStart)
                                   .subtract(2, "weeks")
                                   .toDate() &&
-                                now <=
+                              now <=
                                 moment(item.act_dateStart)
                                   .subtract(1, "day")
                                   .toDate()
-                                ? item.act_status === 1
-                                  ? "green"
-                                  : "red"
-                                : "grey",
+                            ? item.act_status === 1
+                              ? "green"
+                              : "red"
+                            : "grey",
                       }}
                     >
                       {item.act_status === 2
                         ? "กิจกรรมสิ้นสุดแล้ว"
                         : item.act_numStd === item.act_numStdReserve
-                          ? "ลงทะเบียนเต็มแล้ว"
-                          : now >=
+                        ? "ลงทะเบียนเต็มแล้ว"
+                        : now >=
                             moment(item.act_dateStart)
                               .subtract(2, "weeks")
                               .toDate() &&
-                            now <=
+                          now <=
                             moment(item.act_dateStart)
                               .subtract(1, "day")
                               .toDate()
-                            ? item.act_status === 1
-                              ? "ลงทะเบียนได้"
-                              : "กิจกรรมจะเริ่มในอีก 1 วัน"
-                            : "กิจกรรมยังไม่เริ่ม"}
+                        ? item.act_status === 1
+                          ? "ลงทะเบียนได้"
+                          : "กิจกรรมจะเริ่มในอีก 1 วัน"
+                        : "กิจกรรมยังไม่เริ่ม"}
                     </td>
                     <td scope="col" className="px-6 py-3 w-2/12 text-center">
                       <Link to={`detail/${item.act_ID}`}>
@@ -248,8 +276,9 @@ const filteredItems = activity.filter((item) => {
                   setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))
                 }
                 disabled={currentPage === 0}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
-                  }`}
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                  currentPage === 0 ? "cursor-not-allowed" : "hover:bg-blue-200"
+                }`}
               >
                 ก่อนหน้า
               </button>
@@ -257,8 +286,9 @@ const filteredItems = activity.filter((item) => {
                 <button
                   key={pageNumber}
                   onClick={() => setCurrentPage(pageNumber)}
-                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${pageNumber === currentPage ? "bg-blue-200" : ""
-                    }`}
+                  className={` px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                    pageNumber === currentPage ? "bg-blue-200" : ""
+                  }`}
                 >
                   {pageNumber + 1}
                 </button>
@@ -268,10 +298,11 @@ const filteredItems = activity.filter((item) => {
                   setCurrentPage((prevPage) => Math.min(prevPage + 1, lastPage))
                 }
                 disabled={currentPage === lastPage}
-                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${currentPage === lastPage
+                className={`px-3 p-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-500  focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
+                  currentPage === lastPage
                     ? "cursor-not-allowed"
                     : "hover:bg-blue-200"
-                  }`}
+                }`}
               >
                 ถัดไป
               </button>
@@ -299,4 +330,3 @@ const filteredItems = activity.filter((item) => {
 };
 
 export default ListActivity;
-
